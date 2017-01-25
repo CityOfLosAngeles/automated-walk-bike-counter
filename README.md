@@ -9,12 +9,15 @@ However, thanks to advances in Machine Vision technology, we could now automate 
 This project is a proof of concept of how we could count the number folks moving through our streets. 
 ## Sponsors
 
-{{ Leadership }} 
+Jeanne Holm, ITA
+
+Great Streets - WHO? 
+
+DOT - WHO? 
 
 ## Partners
 
-{{ University }} 
-
+CSU LA, Dr. Mohammad Pourhomayoun
 ## City Team
 
 Carter Rubin 
@@ -31,5 +34,5 @@ Using the Google Machine Vision API, take data from video feeds and produce bicy
 
 ## Data Sources
 
-* Video Data
+* Video Data (
 * Count Ouput data (see `data` directory)
