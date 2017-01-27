@@ -31,5 +31,5 @@ Using the Google Machine Vision API, take data from video feeds and produce bicy
 
 ## Data Sources
 
-* Video Data
+* Video Data (see s3://traffic-video-lacity/)
 * Count Ouput data (see `data` directory)
