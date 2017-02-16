@@ -1,4 +1,4 @@
-# Great Streets + et al - Counterbot 
+# Great Streets + Department of Transportation + Information Technology Agency - Counter Machine
 
 ## About
 
