@@ -30,9 +30,9 @@ Long term, allow us to know annual active transportation counts for key corridor
 
 ## Deliverables
 
-Using the Google Machine Vision API, take data from video feeds and produce bicycle and pedestrian counts in the same format we got before. 
+Using the Google Machine Vision API or similar algorithm, take data from video feeds and produce bicycle and pedestrian counts in the same format we got before. 
 
 ## Data Sources
 
-* Video Data (see s3://traffic-video-lacity/)
+* Video Data (see s3://traffic-video-lacity/). To download the video data, install the [AWS Command Line Tools](https://aws.amazon.com/cli/) and run `aws s3 cp --recursive s3://traffic-video-lacity/ /local/path/for/data`.
 * Count Ouput data (see `data` directory)
