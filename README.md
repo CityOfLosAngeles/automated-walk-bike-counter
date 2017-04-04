@@ -1,4 +1,4 @@
-# Great Streets + Department of Transportation + Information Technology Agency - Counter Machine
+# Great Streets + Department of Transportation + Information Technology Agency - Count Machine
 
 ## About
 
