@@ -13,14 +13,12 @@ Jeanne Holm, ITA
 
 Great Streets - WHO? 
 
-DOT - WHO? 
+DOT - Seleta Reynolds, Marcel Porras 
 
 ## Partners
 
 CSU LA, Dr. Mohammad Pourhomayoun
 ## City Team
-
-Carter Rubin 
 
 Hunter Owens
 
