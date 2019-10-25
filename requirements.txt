@@ -1,0 +1,5 @@
+tensorflow
+opencv
+munkres
+pykalman
+pillow
