@@ -553,27 +553,28 @@ class ObjectTracker:
         boxes_drawing = []
         for i in range(0,len(boxes_)):
             mess = object_class[labels_[i]]
-            #cx = self.left + int((self.right-self.left)/2)
-            #cy = self.top + int((self.bot-self.top)/2)
-            cx = boxes_[i][0] + int((boxes_[i][2]-boxes_[i][0])/2)
-            cy = boxes_[i][1] + int((boxes_[i][3]-boxes_[i][1])/2)
+            if mess in self.object_classes:
+                #cx = self.left + int((self.right-self.left)/2)
+                #cy = self.top + int((self.bot-self.top)/2)
+                cx = boxes_[i][0] + int((boxes_[i][2]-boxes_[i][0])/2)
+                cy = boxes_[i][1] + int((boxes_[i][3]-boxes_[i][1])/2)
 
-            # Specifying the area of interest
-            #if ((cx>0 and cx<width_ori) and (cy>160 and cy<height_ori)):
-            if (0 < cx < width_ori) and (0 < cy < height_ori):
-                if labels_[i]<8:
-                    #if (labels_[i]==6):
-                    #	boxes_counting.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[5], 0, scores_[i]))
-                    #	boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[5], 0, scores_[i]))
-                    #else:
-                        boxes_counting.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[labels_[i]], 0, scores_[i]))
-                        boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[labels_[i]], 0, scores_[i]))
+                # Specifying the area of interest
+                #if ((cx>0 and cx<width_ori) and (cy>160 and cy<height_ori)):
+                if (0 < cx < width_ori) and (0 < cy < height_ori):
+                    if labels_[i]<8:
+                        #if (labels_[i]==6):
+                        #	boxes_counting.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[5], 0, scores_[i]))
+                        #	boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[5], 0, scores_[i]))
+                        #else:
+                            boxes_counting.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[labels_[i]], 0, scores_[i]))
+                            boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[labels_[i]], 0, scores_[i]))
 
-            # if (labels_[i]<8):
-            # 	if (labels_[i]==6):
-            # 		boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[5], 0, scores_[i]))
-            # 	else:
-            # 		boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[labels_[i]], 0, scores_[i]))
+                # if (labels_[i]<8):
+                # 	if (labels_[i]==6):
+                # 		boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[5], 0, scores_[i]))
+                # 	else:
+                # 		boxes_drawing.append((boxes_[i][0], boxes_[i][2], boxes_[i][1], boxes_[i][3], object_class[labels_[i]], 0, scores_[i]))
 
 
         return boxes_counting,boxes_drawing
