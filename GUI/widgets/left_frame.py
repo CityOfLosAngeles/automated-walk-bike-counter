@@ -46,7 +46,7 @@ class Left_Frame(Frame):
             self.color_objects[-1].grid(row=i, column=1, padx=(1,5), pady=3)
             self.color_objects[-1].bind("<Button-1>", lambda event, i=i: self.open_color_pallet_window(event,i))
 
-            self.controller.valid_selected_objects.append(( self.allowed_objects[i], "#FFFFFF", 0))
+            self.controller.valid_selected_objects.append(( self.allowed_objects[i], ((255, 255, 255), "#FFFFFF"), 0))
 
             pane.grid_rowconfigure(i, weight=1)
 
