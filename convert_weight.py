@@ -9,8 +9,8 @@ import sys
 import tensorflow as tf
 import numpy as np
 
-from model import yolov3
-from utils.misc_utils import parse_anchors, load_weights
+from automated_walk_bike_counter.core.model import yolov3
+from automated_walk_bike_counter.utils.misc_utils import parse_anchors, load_weights
 
 num_class = 80
 img_size = 416

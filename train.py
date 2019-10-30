@@ -9,12 +9,12 @@ from tqdm import trange
 
 import args
 
-from utils.data_utils import get_batch_data
-from utils.misc_utils import shuffle_and_overwrite, make_summary, config_learning_rate, config_optimizer, AverageMeter
-from utils.eval_utils import evaluate_on_cpu, evaluate_on_gpu, get_preds_gpu, voc_eval, parse_gt_rec
-from utils.nms_utils import gpu_nms
+from automated_walk_bike_counter.utils.data_utils import get_batch_data
+from automated_walk_bike_counter.utils.misc_utils import shuffle_and_overwrite, make_summary, config_learning_rate, config_optimizer, AverageMeter
+from automated_walk_bike_counter.utils.eval_utils import evaluate_on_cpu, evaluate_on_gpu, get_preds_gpu, voc_eval, parse_gt_rec
+from automated_walk_bike_counter.utils.nms_utils import gpu_nms
 
-from model import yolov3
+from automated_walk_bike_counter.core.model import yolov3
 
 # setting loggers
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s',

@@ -23,7 +23,7 @@ import argparse
 import sys
 from ..movingobject import MovingObject
 from ..frame import Frame
-from model import yolov3
+from ..model import yolov3
 from ...utils.plot_utils import get_color_table, plot_one_box
 from ...utils.misc_utils import parse_anchors, read_class_names
 from ...utils.nms_utils import gpu_nms
