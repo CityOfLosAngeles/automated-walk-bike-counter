@@ -62,4 +62,5 @@ class myConfiguration(object):
 
         myConfiguration.VALID_OBJECTS = self.parser.get(self.config_options['VALID_OBJECTS'][1] , self.config_options['VALID_OBJECTS'][0]).split(',')
 
-config = myConfiguration(r'config.ini')
+filename = os.path.join(os.path.dirname(__file__), "config.ini")
+config = myConfiguration(filename)
