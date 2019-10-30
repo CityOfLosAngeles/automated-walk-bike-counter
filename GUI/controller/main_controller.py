@@ -102,6 +102,10 @@ class MainController(BaseController):
                 color_rgb = (color_bgr[2], color_bgr[1], color_bgr[0])
                 colors[item[0].lower()]=color_rgb
 
+        if "cyclist" in objects:
+            objects.append("bicycle")
+            colors["bicycle"] = (255,255,255)
+
         print(str(objects))
         print(str(colors))
         return objects,colors

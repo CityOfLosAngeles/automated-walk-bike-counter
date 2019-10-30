@@ -50,6 +50,9 @@ class Left_Frame(Frame):
 
             pane.grid_rowconfigure(i, weight=1)
 
+        if "Cyclist" in self.allowed_objects:
+            self.controller.valid_selected_objects.append(("bicycle", ((255, 255, 255), "#FFFFFF"), 0))
+
         pane.grid_columnconfigure(0, weight=1)
         pane.grid_columnconfigure(1, weight=0)
 
