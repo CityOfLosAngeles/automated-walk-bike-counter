@@ -12,8 +12,9 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter.colorchooser import *
 from tkinter import messagebox
-from GUI.widgets.settings_pane import SettingsPane
-from development.configuration import config
+
+from ...core.configuration import config
+from .settings_pane import SettingsPane
 
 
 class Left_Frame(Frame):

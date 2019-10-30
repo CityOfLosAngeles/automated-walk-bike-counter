@@ -8,14 +8,16 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import os
 from tkinter import *
 from tkinter.ttk import *
 from tkinter.colorchooser import *
 from tkinter import messagebox
-import utils.file_utils as Util
 import threading
 from PIL import Image, ImageTk
 import cv2
+
+from ...utils import file_utils as Util
 
 
 class Video_Frame(Frame):
@@ -31,7 +33,7 @@ class Video_Frame(Frame):
         self.loading_thread_event = None
         self.loading_thread_started = False
         self.loading_frames = []
-        self.loading_image = Image.open(Util.get_project_root_dir() + "/data/images/loading.gif")
+        self.loading_image = Image.open(os.path.join(os.path.dirname(__file__), "../static/images/loading.gif"))
         self.video_frame_width = 800
         self.video_frame_height = 600
         self.cur_fr_number= IntVar()

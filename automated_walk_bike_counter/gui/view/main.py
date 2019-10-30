@@ -8,7 +8,6 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from .base import BaseView
 from tkinter import *
 import threading
 import os
@@ -16,9 +15,11 @@ import cv2
 from PIL import Image, ImageTk
 from tkinter.colorchooser import *
 from tkinter import messagebox
-from GUI.widgets.left_frame import Left_Frame
-from GUI.widgets.video_frame import Video_Frame
-from GUI.widgets.menu import App_Menu
+
+from .base import BaseView
+from ..widgets.left_frame import Left_Frame
+from ..widgets.video_frame import Video_Frame
+from ..widgets.menu import App_Menu
 
 
 class MainView(BaseView):

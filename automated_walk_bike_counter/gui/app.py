@@ -10,7 +10,7 @@
 
 import tkinter as tk
 from .controller.main_controller import MainController
-from GUI.view.main import MainView
+from .view.main import MainView
 
 
 class Application:

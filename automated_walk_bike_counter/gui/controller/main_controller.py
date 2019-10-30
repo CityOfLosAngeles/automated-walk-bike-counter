@@ -19,8 +19,8 @@ from .base import BaseController
 from ...utils import file_utils as utils
 from ...core.tracking.object_tracker import ObjectTracker
 from ...core.configuration import config
-from .widgets.aoi import AOIDialog
-from .video import Video,OutputVideo
+from ..widgets.aoi import AOIDialog
+from ..video import Video,OutputVideo
 
 class MainController(BaseController):
 
