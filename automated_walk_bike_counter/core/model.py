@@ -1,4 +1,13 @@
-# coding=utf-8
+# Copyright (c) Data Science Research Lab at California State University Los Angeles (CSULA), and City of Los Angeles ITA
+# Distributed under the terms of the Apache 2.0 License
+# www.calstatela.edu/research/data-science
+# Designed and developed by:
+# Data Science Research Lab
+# California State University Los Angeles
+# Dr. Mohammad Pourhomayoun
+# Mohammad Vahedi
+# Haiyan Wang
+
 # for better understanding about yolov3 architecture, refer to this website (in Chinese):
 # https://blog.csdn.net/leviopku/article/details/82660381
 
