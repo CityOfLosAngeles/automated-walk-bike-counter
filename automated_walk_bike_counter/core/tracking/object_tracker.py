@@ -9,7 +9,7 @@
 # Haiyan Wang
 
 import numpy as np
-from development.bounding_box import detected_object
+from ..bounding_box import detected_object
 import tensorflow as tf
 import math
 import cv2
@@ -17,17 +17,17 @@ import re
 import os
 from time import time as timer
 from munkres import Munkres,print_matrix
-from development.tracking.counter import Object_Counter
+from ..tracking.counter import Object_Counter
 import argparse
 
 import sys
 from ..movingobject import MovingObject
-from development.frame import Frame
+from ..frame import Frame
 from model import yolov3
-from utils.plot_utils import get_color_table, plot_one_box
-from utils.misc_utils import parse_anchors, read_class_names
-from utils.nms_utils import gpu_nms
-from GUI import video
+from ...utils.plot_utils import get_color_table, plot_one_box
+from ...utils.misc_utils import parse_anchors, read_class_names
+from ...utils.nms_utils import gpu_nms
+from ...gui import video
 import time
 
 from ..configuration import config

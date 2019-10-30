@@ -9,8 +9,9 @@
 # Haiyan Wang
 
 import configparser
-import utils.file_utils as fu
 import os
+
+from ..utils import file_utils as fu
 
 class myConfiguration(object):
 

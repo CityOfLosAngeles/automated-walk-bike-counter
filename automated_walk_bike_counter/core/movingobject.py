@@ -8,9 +8,9 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import inspect
 import numpy as np
 from pykalman import KalmanFilter
-import inspect
 
 class MovingObject(object):
 

@@ -6,8 +6,8 @@ import numpy as np
 import cv2
 from collections import Counter
 
-from utils.nms_utils import cpu_nms, gpu_nms
-from utils.data_utils import parse_line
+from .nms_utils import cpu_nms, gpu_nms
+from .data_utils import parse_line
 
 
 def calc_iou(pred_boxes, true_boxes):

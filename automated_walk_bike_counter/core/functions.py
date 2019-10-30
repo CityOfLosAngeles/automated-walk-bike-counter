@@ -10,7 +10,8 @@
 
 import logging
 import math
-from . import MovingObject
+
+from .movingobject import MovingObject
 
 #function overlap calculate how much 2 rectangles overlap
 def overlap_area(boxes):

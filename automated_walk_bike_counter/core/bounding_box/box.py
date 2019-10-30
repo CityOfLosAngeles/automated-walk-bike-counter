@@ -8,8 +8,6 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from . import detected_object
-
 class box:
 	def __init__(self,left, right, top, bot, mess, max_index, confidence):
 		self.left = left

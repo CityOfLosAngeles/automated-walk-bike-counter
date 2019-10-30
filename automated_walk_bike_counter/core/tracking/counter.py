@@ -8,8 +8,9 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from ..movingobject import MovingObject
 import cv2
+
+from ..movingobject import MovingObject
 
 class Object_Counter:
 

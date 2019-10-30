@@ -7,7 +7,7 @@ from __future__ import division, print_function
 import tensorflow as tf
 slim = tf.contrib.slim
 
-from utils.layer_utils import conv2d, darknet53_body, yolo_block, upsample_layer
+from automated_walk_bike_counter.utils.layer_utils import conv2d, darknet53_body, yolo_block, upsample_layer
 
 class yolov3(object):
 

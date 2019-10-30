@@ -8,14 +8,15 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from development.bounding_box.pedestrian import Pedestrian
-from development.bounding_box.biker import Biker
-from development.bounding_box.motorbiker import MotorBiker
-from development.bounding_box.car import Car
-from development.bounding_box.bus import Bus
-from development.bounding_box.truck import Truck
 import numpy as np
 import cv2
+
+from .bounding_box.pedestrian import Pedestrian
+from .bounding_box.biker import Biker
+from .bounding_box.motorbiker import MotorBiker
+from .bounding_box.car import Car
+from .bounding_box.bus import Bus
+from .bounding_box.truck import Truck
 
 class Frame:
 	##duplicated classification threshold > 0.30 then means 2 classification for same object

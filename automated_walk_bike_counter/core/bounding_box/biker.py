@@ -8,7 +8,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from development.bounding_box.detected_object import DetectedObject
+from .detected_object import DetectedObject
 
 class Biker(DetectedObject):
 	def __init__(self,box):

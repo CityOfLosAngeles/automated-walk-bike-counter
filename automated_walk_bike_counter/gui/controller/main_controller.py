@@ -9,17 +9,18 @@
 # Haiyan Wang
 
 from tkinter import *
-from .base import BaseController
 from tkinter import filedialog
 from tkinter import messagebox
-from development.tracking.object_tracker import ObjectTracker
 from PIL import ImageTk,Image
-import utils.file_utils as utils
 import argparse
 import cv2
-from GUI.widgets.aoi import AOIDialog
-from GUI.video import Video,OutputVideo
-from development.configuration import config
+
+from .base import BaseController
+from ...utils import file_utils as utils
+from ...core.tracking.object_tracker import ObjectTracker
+from ...core.configuration import config
+from .widgets.aoi import AOIDialog
+from .video import Video,OutputVideo
 
 class MainController(BaseController):
 

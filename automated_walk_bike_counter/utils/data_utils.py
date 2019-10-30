@@ -5,7 +5,7 @@ from __future__ import division, print_function
 import numpy as np
 import cv2
 import sys
-from utils.data_aug import *
+from .data_aug import *
 import random
 
 PY_VERSION = sys.version_info[0]
