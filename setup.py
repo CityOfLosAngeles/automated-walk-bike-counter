@@ -33,10 +33,17 @@ setup(
     maintainer_email="",
     url="https://github.com/CityOfLosAngeles/automated-walk-bike-counter",
     packages=find_packages(),
+    package_data={
+        "automated_walk_bike_counter": ["core/*.ini", "gui/static/images/*"],
+    },
     package_dir={"automated_walk_bike_counter": "automated_walk_bike_counter"},
     include_package_data=True,
     install_requires=requires,
-    entry_points={},
+    entry_points={
+        "console_scripts": [
+            "automated-walk-bike-counter = automated_walk_bike_counter.gui.app:main"
+        ]
+    },
     license="Apache-2.0 license",
     zip_safe=False,
     keywords="computer vision, city, streets, traffic, pedestrian, cyclist",

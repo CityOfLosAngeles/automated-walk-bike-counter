@@ -27,3 +27,7 @@ class Application:
         self.root.geometry("1280x720+100+100")
         self.root.mainloop()
 
+
+def main():
+    app = Application()
+    app.run()
