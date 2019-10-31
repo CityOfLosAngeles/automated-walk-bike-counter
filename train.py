@@ -1,4 +1,13 @@
-# coding: utf-8
+# Copyright (c) Data Science Research Lab at California State University Los
+# Angeles (CSULA), and City of Los Angeles ITA
+# Distributed under the terms of the Apache 2.0 License
+# www.calstatela.edu/research/data-science
+# Designed and developed by:
+# Data Science Research Lab
+# California State University Los Angeles
+# Dr. Mohammad Pourhomayoun
+# Mohammad Vahedi
+# Haiyan Wang
 
 from __future__ import division, print_function
 
@@ -9,12 +18,12 @@ from tqdm import trange
 
 import args
 
-from utils.data_utils import get_batch_data
-from utils.misc_utils import shuffle_and_overwrite, make_summary, config_learning_rate, config_optimizer, AverageMeter
-from utils.eval_utils import evaluate_on_cpu, evaluate_on_gpu, get_preds_gpu, voc_eval, parse_gt_rec
-from utils.nms_utils import gpu_nms
+from automated_walk_bike_counter.utils.data_utils import get_batch_data
+from automated_walk_bike_counter.utils.misc_utils import shuffle_and_overwrite, make_summary, config_learning_rate, config_optimizer, AverageMeter
+from automated_walk_bike_counter.utils.eval_utils import evaluate_on_cpu, evaluate_on_gpu, get_preds_gpu, voc_eval, parse_gt_rec
+from automated_walk_bike_counter.utils.nms_utils import gpu_nms
 
-from model import yolov3
+from automated_walk_bike_counter.core.model import yolov3
 
 # setting loggers
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s',

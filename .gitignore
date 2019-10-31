@@ -88,3 +88,11 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# There are a lot of possible videos in the project directory
+*.mp4
+*.avi
+*.ogg
+*.webm
+*.mpeg
+*.mkv

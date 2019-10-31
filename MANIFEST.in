@@ -1,0 +1,10 @@
+recursive_include automated_walk_bike_counter *.py
+recursive_include automated_walk_bike_counter *.ini
+recursive_include automated_walk_bike_counter *.gif
+
+
+include setup.py
+include README.md
+include LICENSE
+include MANIFEST.in
+include requirements.txt

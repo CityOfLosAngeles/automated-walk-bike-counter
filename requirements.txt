@@ -1,0 +1,6 @@
+tensorflow<2
+opencv-python
+munkres
+pykalman
+pillow
+tqdm

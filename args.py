@@ -3,7 +3,7 @@
 
 from __future__ import division, print_function
 
-from utils.misc_utils import parse_anchors, read_class_names
+from automated_walk_bike_counter.utils.misc_utils import parse_anchors, read_class_names
 import math
 
 ### Some paths
@@ -16,7 +16,7 @@ progress_log_path = './data/progress.log'  # The path to record the training pro
 anchor_path = './data/yolo_anchors.txt'  # The path of the anchor txt file.
 class_name_path = './data/coco.names'  # The path of the class names.
 
-### Training releated numbers
+### Training related numbers
 batch_size = 20
 img_size = [416, 416]  # Images will be resized to `img_size` and fed to the network, size format: [width, height]
 total_epoches = 200
