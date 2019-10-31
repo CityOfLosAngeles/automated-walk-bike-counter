@@ -40,7 +40,7 @@ setup(
     include_package_data=True,
     install_requires=requires,
     entry_points={
-        "console_scripts": [
+        "gui_scripts": [
             "automated-walk-bike-counter = automated_walk_bike_counter.gui.app:main"
         ]
     },
