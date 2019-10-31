@@ -1,4 +1,4 @@
-name: count-machine
+name: automated-walk-bike-counter
 channels:
   - conda-forge
 dependencies:

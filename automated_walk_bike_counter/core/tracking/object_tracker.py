@@ -21,7 +21,6 @@ import sys
 
 from PIL import Image, ImageTk
 from munkres import Munkres,print_matrix
-import fsspec
 
 from ..bounding_box import detected_object
 from ..configuration import config
