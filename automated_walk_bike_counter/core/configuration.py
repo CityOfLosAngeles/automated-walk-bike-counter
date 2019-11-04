@@ -8,59 +8,115 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-import configparser
 import os
+import configargparse
+import configparser
 
 from ..utils import file_utils as fu
 
-class myConfiguration(object):
+parser = configargparse.get_argument_parser()
 
-    def __init__(self, filename):
-        self.config_options = {}
-        self.parser = configparser.ConfigParser()
-        self.parser.optionxform = str
-        print("============> "+os.path.join(fu.get_project_root_dir(), filename))
-        file = self.parser.read(os.path.join(fu.get_project_root_dir(), filename))
+# Config file
+default_filename = os.path.join(os.path.dirname(__file__), "config.ini")
+parser.add_argument(
+    "--config",
+    is_config_file=True,
+    help="Configuration file location",
+    default=default_filename,
+    required=False,
+)
 
-        if not file:
-            raise ValueError('Config file not found in this address '+filename+'!')
+# Cost thresholds
+parser.add_argument(
+    "--PED_COST_THRESHOLD",
+    help="Pedestrian cost threshold",
+    required=True,
+    type=float,
+    env_var="PED_COST_THRESHOLD",
+)
+parser.add_argument(
+    "--BUS_COST_THRESHOLD",
+    help="Bus cost threshold",
+    required=True,
+    type=float,
+    env_var="BUS_COST_THRESHOLD",
+)
+parser.add_argument(
+    "--TRUCK_COST_THRESHOLD",
+    help="Truck cost threshold",
+    required=True,
+    type=float,
+    env_var="TRUCK_COST_THRESHOLD",
+)
 
-        #print("Sections = "+str(self.parser.sections()))
-        for name in self.parser.sections():
-            for config_key,config_value in self.parser.items(name):
-                print(config_key)
-                print(config_value)
-                self.config_options[config_key] = ( config_key , name )
-            #self.__dict__.update(self.parser.items(name))
-            
-        self.init_config()
+# Missing thresholds
+parser.add_argument(
+    "--MISSING_THRESHOLD",
+    help="Missing threshold",
+    required=True,
+    type=float,
+    env_var="MISSING_THRESHOLD",
+)
+parser.add_argument(
+    "--MISSING_THRESHOLD_MAX",
+    help="Missing threshold maximum",
+    required=True,
+    type=float,
+    env_var="MISSING_THRESHOLD_MAX",
+)
 
-    def init_config(self):
+# Duplicate thersholds
+parser.add_argument(
+    "--COUNT_THRESHOLD",
+    help="Count threshold",
+    required=True,
+    type=int,
+    env_var="COUNT_THRESHOLD",
+)
+parser.add_argument(
+    "--COUNT_THRESHOLD_BIKE",
+    help="Count threshold for bikes",
+    required=True,
+    type=int,
+    env_var="COUNT_THRESHOLD_BIKE",
+)
+parser.add_argument(
+    "--COUNT_THRESHOLD_MOTOR",
+    help="Count threshold for...",
+    required=True,
+    type=int,
+    env_var="COUNT_THRESHOLD_MOTOR",
+)
+parser.add_argument(
+    "--COUNT_THRESHOLD_CAR",
+    help="Count threshold for cars",
+    required=True,
+    type=int,
+    env_var="COUNT_THRESHOLD_CAR",
+)
+parser.add_argument(
+    "--COUNT_THRESHOLD_BUS",
+    help="Count threshold for buses",
+    required=True,
+    type=int,
+    env_var="COUNT_THRESHOLD_BUS",
+)
+parser.add_argument(
+    "--COUNT_THRESHOLD_TRUCK",
+    help="Count threshold for trucks",
+    required=True,
+    type=int,
+    env_var="COUNT_THRESHOLD_TRUCK",
+)
 
+# Tracking settings
+parser.add_argument(
+    "--VALID_OBJECTS",
+    help="Count threshold for...",
+    action="append",
+    required=True,
+    type=str,
+    env_var="VALID_OBJECTS",
+)
 
-        myConfiguration.PED_COST_THRESHOLD = self.parser.getint(self.config_options['PED_COST_THRESHOLD'][1] , self.config_options['PED_COST_THRESHOLD'][0])
-        myConfiguration.BUS_COST_THRESHOLD = self.parser.getint(self.config_options['BUS_COST_THRESHOLD'][1] , self.config_options['BUS_COST_THRESHOLD'][0])
-        myConfiguration.TRUCK_COST_THRESHOLD = self.parser.getint( self.config_options['TRUCK_COST_THRESHOLD'][1] , self.config_options['TRUCK_COST_THRESHOLD'][0] )
-
-        myConfiguration.MISSING_THRESHOLD = self.parser.getint( self.config_options['MISSING_THRESHOLD'][1] , self.config_options['MISSING_THRESHOLD'][0] )
-        myConfiguration.MISSING_THRESHOLD_MAX = self.parser.getint( self.config_options['MISSING_THRESHOLD_MAX'][1] , self.config_options['MISSING_THRESHOLD_MAX'][0] )
-
-        myConfiguration.DUPLICATE_THRESHOLD = self.parser.getfloat( self.config_options['DUPLICATE_THRESHOLD'][1] , self.config_options['DUPLICATE_THRESHOLD'][0] )
-        myConfiguration.BUS_TRUCK_DUPLICATE_THRESHOLD = self.parser.getfloat( self.config_options['BUS_TRUCK_DUPLICATE_THRESHOLD'][1] , self.config_options['BUS_TRUCK_DUPLICATE_THRESHOLD'][0] )
-        myConfiguration.DUPLICATE_CAR_THRESHOLD = self.parser.getfloat( self.config_options['DUPLICATE_CAR_THRESHOLD'][1] , self.config_options['DUPLICATE_CAR_THRESHOLD'][0] )
-        myConfiguration.DUPLICATE_TRUCK_THRESHOLD = self.parser.getfloat( self.config_options['DUPLICATE_TRUCK_THRESHOLD'][1] , self.config_options['DUPLICATE_TRUCK_THRESHOLD'][0] )
-        myConfiguration.CAR_TRUCK_DUPLICATE_THRESHOLD = self.parser.getfloat( self.config_options['CAR_TRUCK_DUPLICATE_THRESHOLD'][1] , self.config_options['CAR_TRUCK_DUPLICATE_THRESHOLD'][0] )
-
-        myConfiguration.COUNT_THRESHOLD = self.parser.getint(self.config_options['COUNT_THRESHOLD'][1] , self.config_options['COUNT_THRESHOLD'][0])
-        myConfiguration.COUNT_THRESHOLD_BIKE = self.parser.getint(self.config_options['COUNT_THRESHOLD_BIKE'][1] , self.config_options['COUNT_THRESHOLD_BIKE'][0])
-        myConfiguration.COUNT_THRESHOLD_MOTOR = self.parser.getint(self.config_options['COUNT_THRESHOLD_MOTOR'][1] , self.config_options['COUNT_THRESHOLD_MOTOR'][0])
-        #myConfiguration.COUNT_THRESHOLD_CAR = self.parser.getint(self.config_options['COUNT_THRESHOLD_CAR'][1] , self.config_options['COUNT_THRESHOLD_CAR'][0])
-        myConfiguration.COUNT_THRESHOLD_CAR = self.parser.getint(self.config_options['COUNT_THRESHOLD_CAR'][1] , self.config_options['COUNT_THRESHOLD_CAR'][0])
-        myConfiguration.COUNT_THRESHOLD_BUS = self.parser.getint(self.config_options['COUNT_THRESHOLD_BUS'][1] , self.config_options['COUNT_THRESHOLD_BUS'][0])
-        #myConfiguration.COUNT_THRESHOLD_TRUCK = self.parser.getint(self.config_options['COUNT_THRESHOLD_TRUCK'][1] , self.config_options['COUNT_THRESHOLD_TRUCK'][0])
-        myConfiguration.COUNT_THRESHOLD_TRUCK = self.parser.getint(self.config_options['COUNT_THRESHOLD_TRUCK'][1] , self.config_options['COUNT_THRESHOLD_TRUCK'][0])
-
-        myConfiguration.VALID_OBJECTS = self.parser.get(self.config_options['VALID_OBJECTS'][1] , self.config_options['VALID_OBJECTS'][0]).split(',')
-
-filename = os.path.join(os.path.dirname(__file__), "config.ini")
-config = myConfiguration(filename)
+config = parser.parse_known_args()[0]

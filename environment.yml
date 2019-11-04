@@ -2,6 +2,7 @@ name: automated-walk-bike-counter
 channels:
   - conda-forge
 dependencies:
+  - configargparse=0.14
   - fsspec=0.5.2
   - requests=2.22
   - munkres=1.0.12
