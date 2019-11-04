@@ -54,7 +54,8 @@ class Video_Frame(Frame):
         self.making_loading_frames()
 
         self.detection_thread_event = Event()
-        self.object_detection_thread = threading.Thread(target=self.controller.update_video_canvas, args=('data/my_data/sample.mp4',self), daemon=True)
+        sample_video_path = os.path.join(os.path.dirname(__file__), "../static/videos/sample.mp4")
+        self.object_detection_thread = threading.Thread(target=self.controller.update_video_canvas, args=(sample_video_path, self), daemon=True)
         self.object_detection_thread.start()
 
         self.loading_thread_event = Event()

@@ -4,3 +4,5 @@ munkres
 pykalman
 pillow
 tqdm
+fsspec
+requests

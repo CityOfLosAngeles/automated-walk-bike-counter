@@ -34,7 +34,11 @@ setup(
     url="https://github.com/CityOfLosAngeles/automated-walk-bike-counter",
     packages=find_packages(),
     package_data={
-        "automated_walk_bike_counter": ["core/*.ini", "gui/static/images/*"],
+        "automated_walk_bike_counter": [
+            "core/*.ini",
+            "gui/static/images/*",
+            "gui/static/videos/*",
+        ],
     },
     package_dir={"automated_walk_bike_counter": "automated_walk_bike_counter"},
     include_package_data=True,

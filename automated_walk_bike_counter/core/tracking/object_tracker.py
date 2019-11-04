@@ -286,6 +286,10 @@ class ObjectTracker:
             ##boxes, scores, labels = gpu_nms(pred_boxes, pred_scores, args.num_class, max_boxes=30, score_thresh=0.5, nms_thresh=0.5)
             bxs, scrs, lbls = gpu_nms(pred_boxes, pred_scores, args.num_class, max_boxes=30, score_thresh=0.5, nms_thresh=0.5)
 
+            # Set a default AWS region for the Tensorflow S3 adapter.
+            # TODO: figure out a more robust way of handling this, so
+            # that we can have multiple regions or different storage backends.
+            os.environ['AWS_REGION'] = os.environ.get('AWS_REGION', 'us-west-1')
             saver = tf.train.Saver()
             saver.restore(sess, args.restore_path)
 

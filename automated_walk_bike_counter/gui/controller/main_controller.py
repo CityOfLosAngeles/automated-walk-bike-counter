@@ -29,7 +29,6 @@ class MainController(BaseController):
         self.view_video_player_widget = None
         self.mask = []
         self.valid_selected_objects = []
-        # self.video = Video("data/my_data/sample2.mp4")
         self.video = None
         self.output_video = OutputVideo(self.video)
         self.listener_object = None
@@ -41,24 +40,17 @@ class MainController(BaseController):
         self.video = Video(filedialog.askopenfilename())
         self.video_settings_pane.initialize_resolution_combo()
         self.video_frame.set_progressbar_maximum()
-        # messagebox.showinfo("File info",self.filename[len(utils.get_project_root_dir())+1:])
 
     def update_video_canvas(self,filename,listener_object):
 
         parser = argparse.ArgumentParser(description="YOLO-V3 video test procedure.")
-        # parser.add_argument("input_video", type=str,default='data/my_data/truck_test.mp4',
-        #                     help="The path of the input video.")
-        parser.add_argument("--anchor_path", type=str, default="./data/yolo_anchors.txt",
+        parser.add_argument("--anchor_path", type=str, default="https://automated-walk-bike-counter.s3-us-west-1.amazonaws.com/yolo/yolo_anchors.txt",
                             help="The path of the anchor txt file.")
-        ##parser.add_argument("--new_size", nargs='*', type=int, default=[416, 416],
-        ##                    help="Resize the input image with `new_size`, size format: [width, height]")
         parser.add_argument("--new_size", nargs='*', type=int, default=[400, 400],
                             help="Resize the input image with `new_size`, size format: [width, height]")
-        parser.add_argument("--class_name_path", type=str, default="./data/coco.names",
+        parser.add_argument("--class_name_path", type=str, default="https://automated-walk-bike-counter.s3-us-west-1.amazonaws.com/yolo/coco.names",
                             help="The path of the class names.")
-        #parser.add_argument("--restore_path", type=str, default="./data/darknet_weights/yolov3.ckpt",
-        #                    help="The path of the weights to restore.")
-        parser.add_argument("--restore_path", type=str, default="./data/yolo_weights/yolov3.ckpt",
+        parser.add_argument("--restore_path", type=str, default="s3://automated-walk-bike-counter/yolo/yolov3.ckpt",
                            help="The path of the weights to restore.")
         parser.add_argument("--save_video", type=lambda x: (str(x).lower() == 'true'), default=True,
                             help="Whether to save the video detection results.")

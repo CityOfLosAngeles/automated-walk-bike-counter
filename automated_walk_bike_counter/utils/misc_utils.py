@@ -12,6 +12,7 @@
 import numpy as np
 import tensorflow as tf
 import random
+import fsspec
 
 from tensorflow.core.framework import summary_pb2
 
@@ -48,13 +49,14 @@ def parse_anchors(anchor_path):
     parse anchors.
     returned data: shape [N, 2], dtype float32
     '''
-    anchors = np.reshape(np.asarray(open(anchor_path, 'r').read().split(','), np.float32), [-1, 2])
-    return anchors
+    with fsspec.open(anchor_path, 'r') as anchor_file:
+        anchors = np.reshape(np.asarray(anchor_file.read().split(','), np.float32), [-1, 2])
+        return anchors
 
 
 def read_class_names(class_name_path):
     names = {}
-    with open(class_name_path, 'r') as data:
+    with fsspec.open(class_name_path, 'r') as data:
         for ID, name in enumerate(data):
             names[ID] = name.strip('\n')
     return names
@@ -89,7 +91,7 @@ def load_weights(var_list, weights_file):
         var_list: list of network variables.
         weights_file: name of the binary file.
     """
-    with open(weights_file, "rb") as fp:
+    with fsspec.open(weights_file, "rb") as fp:
         np.fromfile(fp, dtype=np.int32, count=5)
         weights = np.fromfile(fp, dtype=np.float32)
 
