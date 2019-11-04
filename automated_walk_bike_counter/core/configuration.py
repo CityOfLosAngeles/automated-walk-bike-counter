@@ -10,7 +10,6 @@
 
 import os
 import configargparse
-import configparser
 
 from ..utils import file_utils as fu
 
@@ -117,6 +116,52 @@ parser.add_argument(
     required=True,
     type=str,
     env_var="VALID_OBJECTS",
+)
+
+# Storage backend settings
+parser.add_argument(
+    "--AWS_REGION",
+    help="AWS region for when the weights are stored in S3",
+    required=False,
+    type=str,
+    default="us-west-1",
+    env_var="AWS_REGION",
+)
+
+parser.add_argument(
+    "--anchor_path",
+    type=str,
+    required=True,
+    help="The path of the anchor txt file.",
+)
+
+parser.add_argument(
+    "--new_size",
+    nargs='*',
+    type=int,
+    default=[400, 400],
+    help="Resize the input image with `new_size`, size format: [width, height]"
+)
+
+parser.add_argument(
+    "--class_name_path",
+    type=str,
+    help="The path of the class names.",
+    required=True,
+)
+
+parser.add_argument(
+    "--restore_path",
+    type=str,
+    help="The path of the weights to restore.",
+    required=True,
+)
+
+parser.add_argument(
+    "--save_video",
+    type=lambda x: (str(x).lower() == 'true'),
+    default=True,
+    help="Whether to save the video detection results."
 )
 
 config = parser.parse_known_args()[0]
