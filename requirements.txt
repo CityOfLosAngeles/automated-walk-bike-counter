@@ -6,3 +6,4 @@ pillow
 tqdm
 fsspec
 requests
+configargparse

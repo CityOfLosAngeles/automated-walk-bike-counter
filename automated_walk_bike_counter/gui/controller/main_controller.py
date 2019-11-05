@@ -12,7 +12,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
 from PIL import ImageTk,Image
-import argparse
+import configargparse
 import cv2
 
 from .base import BaseController
@@ -43,18 +43,6 @@ class MainController(BaseController):
 
     def update_video_canvas(self,filename,listener_object):
 
-        parser = argparse.ArgumentParser(description="YOLO-V3 video test procedure.")
-        parser.add_argument("--anchor_path", type=str, default="https://automated-walk-bike-counter.s3-us-west-1.amazonaws.com/yolo/yolo_anchors.txt",
-                            help="The path of the anchor txt file.")
-        parser.add_argument("--new_size", nargs='*', type=int, default=[400, 400],
-                            help="Resize the input image with `new_size`, size format: [width, height]")
-        parser.add_argument("--class_name_path", type=str, default="https://automated-walk-bike-counter.s3-us-west-1.amazonaws.com/yolo/coco.names",
-                            help="The path of the class names.")
-        parser.add_argument("--restore_path", type=str, default="s3://automated-walk-bike-counter/yolo/yolov3.ckpt",
-                           help="The path of the weights to restore.")
-        parser.add_argument("--save_video", type=lambda x: (str(x).lower() == 'true'), default=True,
-                            help="Whether to save the video detection results.")
-
         self.listener_object = listener_object
         object_classes,color_table = self.get_selected_objects_list()
         tracker = ObjectTracker(self.mask)
@@ -66,7 +54,7 @@ class MainController(BaseController):
         # tracker.frame_listener = self.handle_post_processed_frame
         print(listener_object.handle_post_processed_frame)
         tracker.frame_listener = listener_object.handle_post_processed_frame
-        tracker.trackObjects(parser)
+        tracker.trackObjects(config)
 
     # def handle_post_processed_frame(self,frame):
     #     self.view.handle_post_processed_frame(frame)

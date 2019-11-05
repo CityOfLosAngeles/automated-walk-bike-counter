@@ -202,14 +202,11 @@ class ObjectTracker:
         print("update skipped frame")
 
 
-    #def trackObjects(self, tfnetObject, file, SaveVideo ):
-    def trackObjects(self, parser ):
+    def trackObjects(self, args):
 
-        args = parser.parse_args()
-
-        args.anchors = parse_anchors(args.anchor_path)
-        args.classes = read_class_names(args.class_name_path)
-        args.num_class = len(args.classes)
+        anchors = parse_anchors(args.anchor_path)
+        classes = read_class_names(args.class_name_path)
+        num_class = len(classes)
 
         self.image_processing_size = args.new_size
 
@@ -276,20 +273,19 @@ class ObjectTracker:
         with tf.Session(config=cfg) as sess:
 
             input_data = tf.placeholder(tf.float32, [1, args.new_size[1], args.new_size[0], 3], name='input_data')
-            yolo_model = yolov3(args.num_class, args.anchors)
+            yolo_model = yolov3(num_class, anchors)
             with tf.variable_scope('yolov3'):
                 pred_feature_maps = yolo_model.forward(input_data, False)
             pred_boxes, pred_confs, pred_probs = yolo_model.predict(pred_feature_maps)
 
             pred_scores = pred_confs * pred_probs
 
-            ##boxes, scores, labels = gpu_nms(pred_boxes, pred_scores, args.num_class, max_boxes=30, score_thresh=0.5, nms_thresh=0.5)
-            bxs, scrs, lbls = gpu_nms(pred_boxes, pred_scores, args.num_class, max_boxes=30, score_thresh=0.5, nms_thresh=0.5)
+            bxs, scrs, lbls = gpu_nms(pred_boxes, pred_scores, num_class, max_boxes=30, score_thresh=0.5, nms_thresh=0.5)
 
-            # Set a default AWS region for the Tensorflow S3 adapter.
+            # Set the AWS region for the Tensorflow S3 adapter.
             # TODO: figure out a more robust way of handling this, so
             # that we can have multiple regions or different storage backends.
-            os.environ['AWS_REGION'] = os.environ.get('AWS_REGION', 'us-west-1')
+            os.environ['AWS_REGION'] = config.AWS_REGION
             saver = tf.train.Saver()
             saver.restore(sess, args.restore_path)
 
@@ -324,7 +320,7 @@ class ObjectTracker:
                 boxes_, scores_, labels_ = sess.run([bxs, scrs, lbls], feed_dict={input_data: img})
                 end_time = time.time()
 
-                boxes , boxes_drawing = self.convertY3BoxesToBoxes(boxes_, scores_, labels_, img_ori, args.new_size, args.classes)
+                boxes , boxes_drawing = self.convertY3BoxesToBoxes(boxes_, scores_, labels_, img_ori, args.new_size, classes)
 
                 postprocessed = img_ori
 
