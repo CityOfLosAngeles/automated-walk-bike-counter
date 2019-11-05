@@ -229,10 +229,8 @@ class ObjectTracker:
 
         camera = cv2.VideoCapture(file)
 
-        video_frame_cnt = int(camera.get(7))
         self.video_width = int(camera.get(3))
         self.video_height = int(camera.get(4))
-        video_fps = int(camera.get(5))
 
         # if file == 0:
         # 	tfnetObject.say('Press [ESC] to quit demo')
@@ -253,6 +251,7 @@ class ObjectTracker:
             print(outfile)
             if file == 0:#camera window
                 #fps = 1 / tfnetObject._get_fps(frame)
+                # TODO What is FPS here?
                 if fps < 1:
                     fps = 1
             else:
@@ -312,9 +311,7 @@ class ObjectTracker:
                 img = np.asarray(img, np.float32)
                 img = img[np.newaxis, :] / 255.
 
-                start_time = time.time()
                 boxes_, scores_, labels_ = sess.run([bxs, scrs, lbls], feed_dict={input_data: img})
-                end_time = time.time()
 
                 boxes , boxes_drawing = self.convertY3BoxesToBoxes(boxes_, scores_, labels_, img_ori, args.new_size, classes)
 

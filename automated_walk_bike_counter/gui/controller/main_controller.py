@@ -57,7 +57,7 @@ class MainController(BaseController):
 
     def add_new_aoi(self):
         if self.video:
-            aoi_dialog = AOIDialog(self.view.parent, self.video.filename, self)
+            AOIDialog(self.view.parent, self.video.filename, self)
         else:
             messagebox.showwarning("Warning", "Please select a file!")
 

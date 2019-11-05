@@ -36,7 +36,6 @@ class Left_Frame(Frame):
         #parent.grid_rowconfigure(0, weight=1)
 
         for i in range(len(self.allowed_objects)):
-            canvas = None
             self.checkbox_variables.append(IntVar())
             Checkbutton(pane, text = self.allowed_objects[i], variable= self.checkbox_variables[i],
                         command= lambda i=i : self.allowed_object_checkbox_changed(i) )\

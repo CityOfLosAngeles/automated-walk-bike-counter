@@ -81,7 +81,7 @@ class MainView(BaseView):
 
 
     def initialize_menu(self):
-        menubar = App_Menu(self.parent,self.controller)
+        App_Menu(self.parent,self.controller)
 
 
     def initialize_top_frame(self, parent):

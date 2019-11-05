@@ -14,10 +14,7 @@
 
 from __future__ import division, print_function
 
-import os
-import sys
 import tensorflow as tf
-import numpy as np
 
 from automated_walk_bike_counter.core.model import yolov3
 from automated_walk_bike_counter.utils.misc_utils import parse_anchors, load_weights
