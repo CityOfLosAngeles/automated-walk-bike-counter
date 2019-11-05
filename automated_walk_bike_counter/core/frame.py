@@ -9,7 +9,6 @@
 # Haiyan Wang
 
 import numpy as np
-import cv2
 
 from .bounding_box.pedestrian import Pedestrian
 from .bounding_box.biker import Biker

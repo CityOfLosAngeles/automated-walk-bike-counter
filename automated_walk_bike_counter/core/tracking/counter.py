@@ -8,10 +8,6 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-import cv2
-
-from ..movingobject import MovingObject
-
 class Object_Counter:
 
     #change to 10 from 20 on 2/26 because biker doesn't get counted correctly

@@ -11,7 +11,6 @@
 from tkinter import *
 from tkinter.ttk import *
 import tkinter as tk
-from tkinter import messagebox
 import math
 
 

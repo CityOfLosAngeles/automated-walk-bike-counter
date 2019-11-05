@@ -9,10 +9,7 @@
 # Haiyan Wang
 
 from tkinter import *
-import threading
 import os
-import cv2
-from PIL import Image, ImageTk
 from tkinter.colorchooser import *
 from tkinter import messagebox
 

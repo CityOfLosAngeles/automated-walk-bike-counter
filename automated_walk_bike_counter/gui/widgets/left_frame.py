@@ -11,7 +11,6 @@
 from tkinter import *
 from tkinter.ttk import *
 from tkinter.colorchooser import *
-from tkinter import messagebox
 
 from ...core.configuration import config
 from .settings_pane import SettingsPane

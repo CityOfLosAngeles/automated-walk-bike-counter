@@ -8,17 +8,13 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from tkinter import *
 from tkinter import filedialog
 from tkinter import messagebox
-from PIL import ImageTk,Image
 import configargparse
 import cv2
 
 from .base import BaseController
-from ...utils import file_utils as utils
 from ...core.tracking.object_tracker import ObjectTracker
-from ...core.configuration import config
 from ..widgets.aoi import AOIDialog
 from ..video import Video,OutputVideo
 

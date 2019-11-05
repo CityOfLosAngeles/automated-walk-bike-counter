@@ -10,12 +10,10 @@
 
 import tkinter as tk
 from tkinter import *
-from tkinter import messagebox
 import cv2
 from PIL import Image,ImageTk
 import numpy as np
 import threading
-import time
 
 
 class AOIDialog:

@@ -9,8 +9,6 @@
 # Haiyan Wang
 
 import cv2
-from tkinter import *
-
 
 class Video:
     def __init__(self, filename):

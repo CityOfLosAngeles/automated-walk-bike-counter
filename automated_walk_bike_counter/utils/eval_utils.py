@@ -15,7 +15,7 @@ import numpy as np
 import cv2
 from collections import Counter
 
-from .nms_utils import cpu_nms, gpu_nms
+from .nms_utils import cpu_nms
 from .data_utils import parse_line
 
 

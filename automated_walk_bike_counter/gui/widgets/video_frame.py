@@ -12,12 +12,10 @@ import os
 from tkinter import *
 from tkinter.ttk import *
 from tkinter.colorchooser import *
-from tkinter import messagebox
 import threading
 from PIL import Image, ImageTk
 import cv2
 
-from ...utils import file_utils as Util
 
 
 class Video_Frame(Frame):
