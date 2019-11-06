@@ -1,4 +1,5 @@
-# Copyright (c) Data Science Research Lab at California State University Los Angeles (CSULA), and City of Los Angeles ITA
+# Copyright (c) Data Science Research Lab at California State University Los
+# Angeles (CSULA), and City of Los Angeles ITA
 # Distributed under the terms of the Apache 2.0 License
 # www.calstatela.edu/research/data-science
 # Designed and developed by:
@@ -14,32 +15,40 @@
 from __future__ import division, print_function
 
 import random
-import numpy as np
+
 import cv2
+import numpy as np
 
 
 def mix_up(img1, img2, bbox1, bbox2):
-    '''
+    """
     return:
         mix_img: HWC format mix up image
-        mix_bbox: [N, 5] shape mix up bbox, i.e. `x_min, y_min, x_max, y_mix, mixup_weight`.
-    '''
+        mix_bbox: [N, 5] shape mix up bbox, i.e.
+          `x_min, y_min, x_max, y_mix, mixup_weight`.
+    """
     height = max(img1.shape[0], img2.shape[0])
     width = max(img1.shape[1], img2.shape[1])
 
-    mix_img = np.zeros(shape=(height, width, 3), dtype='float32')
+    mix_img = np.zeros(shape=(height, width, 3), dtype="float32")
 
     # rand_num = np.random.random()
     rand_num = np.random.beta(1.5, 1.5)
     rand_num = max(0, min(1, rand_num))
-    mix_img[:img1.shape[0], :img1.shape[1], :] = img1.astype('float32') * rand_num
-    mix_img[:img2.shape[0], :img2.shape[1], :] += img2.astype('float32') * (1. - rand_num)
+    mix_img[: img1.shape[0], : img1.shape[1], :] = img1.astype("float32") * rand_num
+    mix_img[: img2.shape[0], : img2.shape[1], :] += img2.astype("float32") * (
+        1.0 - rand_num
+    )
 
-    mix_img = mix_img.astype('uint8')
+    mix_img = mix_img.astype("uint8")
 
     # the last element of the 2nd dimention is the mix up weight
-    bbox1 = np.concatenate((bbox1, np.full(shape=(bbox1.shape[0], 1), fill_value=rand_num)), axis=-1)
-    bbox2 = np.concatenate((bbox2, np.full(shape=(bbox2.shape[0], 1), fill_value=1. - rand_num)), axis=-1)
+    bbox1 = np.concatenate(
+        (bbox1, np.full(shape=(bbox1.shape[0], 1), fill_value=rand_num)), axis=-1
+    )
+    bbox2 = np.concatenate(
+        (bbox2, np.full(shape=(bbox2.shape[0], 1), fill_value=1.0 - rand_num)), axis=-1
+    )
     mix_bbox = np.concatenate((bbox1, bbox2), axis=0)
 
     return mix_img, mix_bbox
@@ -71,7 +80,10 @@ def bbox_crop(bbox, crop_box=None, allow_outside_center=True):
         return bbox
     if not len(crop_box) == 4:
         raise ValueError(
-            "Invalid crop_box parameter, requires length 4, given {}".format(str(crop_box)))
+            "Invalid crop_box parameter, requires length 4, given {}".format(
+                str(crop_box)
+            )
+        )
     if sum([int(c is None) for c in crop_box]) == 4:
         return bbox
 
@@ -87,7 +99,9 @@ def bbox_crop(bbox, crop_box=None, allow_outside_center=True):
         mask = np.ones(bbox.shape[0], dtype=bool)
     else:
         centers = (bbox[:, :2] + bbox[:, 2:4]) / 2
-        mask = np.logical_and(crop_bbox[:2] <= centers, centers < crop_bbox[2:]).all(axis=1)
+        mask = np.logical_and(crop_bbox[:2] <= centers, centers < crop_bbox[2:]).all(
+            axis=1
+        )
 
     # transform borders
     bbox[:, :2] = np.maximum(bbox[:, :2], crop_bbox[:2])
@@ -99,6 +113,7 @@ def bbox_crop(bbox, crop_box=None, allow_outside_center=True):
     bbox = bbox[mask]
     return bbox
 
+
 def bbox_iou(bbox_a, bbox_b, offset=0):
     """Calculate Intersection-Over-Union(IOU) of two bounding boxes.
     Parameters
@@ -108,9 +123,10 @@ def bbox_iou(bbox_a, bbox_b, offset=0):
     bbox_b : numpy.ndarray
         An ndarray with shape :math:`(M, 4)`.
     offset : float or int, default is 0
-        The ``offset`` is used to control the whether the width(or height) is computed as
+        The `offset` is used to control the whether the width(or height) is computed as
         (right - left + ``offset``).
-        Note that the offset must be 0 for normalized bboxes, whose ranges are in ``[0, 1]``.
+        Note that the offset must be 0 for normalized bboxes,
+        whose ranges are in `[0, 1]`.
     Returns
     -------
     numpy.ndarray
@@ -129,9 +145,15 @@ def bbox_iou(bbox_a, bbox_b, offset=0):
     return area_i / (area_a[:, None] + area_b - area_i)
 
 
-def random_crop_with_constraints(bbox, size, min_scale=0.3, max_scale=1,
-                                 max_aspect_ratio=2, constraints=None,
-                                 max_trial=50):
+def random_crop_with_constraints(
+    bbox,
+    size,
+    min_scale=0.3,
+    max_scale=1,
+    max_aspect_ratio=2,
+    constraints=None,
+    max_trial=50,
+):
     """Crop an image randomly with bounding box constraints.
     This data augmentation is used in training of
     Single Shot Multibox Detector [#]_. More details can be found in
@@ -195,7 +217,8 @@ def random_crop_with_constraints(bbox, size, min_scale=0.3, max_scale=1,
             scale = random.uniform(min_scale, max_scale)
             aspect_ratio = random.uniform(
                 max(1 / max_aspect_ratio, scale * scale),
-                min(max_aspect_ratio, 1 / (scale * scale)))
+                min(max_aspect_ratio, 1 / (scale * scale)),
+            )
             crop_h = int(h * scale / np.sqrt(aspect_ratio))
             crop_w = int(w * scale * np.sqrt(aspect_ratio))
 
@@ -206,13 +229,13 @@ def random_crop_with_constraints(bbox, size, min_scale=0.3, max_scale=1,
             if len(bbox) == 0:
                 top, bottom = crop_t, crop_t + crop_h
                 left, right = crop_l, crop_l + crop_w
-                return bbox, (left, top, right-left, bottom-top)
+                return bbox, (left, top, right - left, bottom - top)
 
             iou = bbox_iou(bbox, crop_bb[np.newaxis])
             if min_iou <= iou.min() and iou.max() <= max_iou:
                 top, bottom = crop_t, crop_t + crop_h
                 left, right = crop_l, crop_l + crop_w
-                candidates.append((left, top, right-left, bottom-top))
+                candidates.append((left, top, right - left, bottom - top))
                 break
 
     # random select one
@@ -226,12 +249,14 @@ def random_crop_with_constraints(bbox, size, min_scale=0.3, max_scale=1,
     return bbox, (0, 0, w, h)
 
 
-def random_color_distort(img, brightness_delta=32, hue_vari=18, sat_vari=0.5, val_vari=0.5):
-    '''
+def random_color_distort(
+    img, brightness_delta=32, hue_vari=18, sat_vari=0.5, val_vari=0.5
+):
+    """
     randomly distort image color. Adjust brightness, hue, saturation, value.
     param:
         img: a BGR uint8 format OpenCV image. HWC format.
-    '''
+    """
 
     def random_hue(img_hsv, hue_vari, p=0.5):
         if np.random.uniform(0, 1) > p:
@@ -254,7 +279,9 @@ def random_color_distort(img, brightness_delta=32, hue_vari=18, sat_vari=0.5, va
     def random_brightness(img, brightness_delta, p=0.5):
         if np.random.uniform(0, 1) > p:
             img = img.astype(np.float32)
-            brightness_delta = int(np.random.uniform(-brightness_delta, brightness_delta))
+            brightness_delta = int(
+                np.random.uniform(-brightness_delta, brightness_delta)
+            )
             img = img + brightness_delta
         return np.clip(img, 0, 255)
 
@@ -281,9 +308,9 @@ def random_color_distort(img, brightness_delta=32, hue_vari=18, sat_vari=0.5, va
 
 
 def resize_with_bbox(img, bbox, new_width, new_height, interp=0):
-    '''
+    """
     Resize the image and correct the bbox accordingly.
-    '''
+    """
     ori_height, ori_width = img.shape[:2]
     img = cv2.resize(img, (new_width, new_height), interpolation=interp)
 
@@ -296,14 +323,14 @@ def resize_with_bbox(img, bbox, new_width, new_height, interp=0):
 
 
 def random_flip(img, bbox, px=0, py=0):
-    '''
+    """
     Randomly flip the image and correct the bbox.
     param:
     px:
         the probability of horizontal flip
     py:
         the probability of vertical flip
-    '''
+    """
     height, width = img.shape[:2]
     if np.random.uniform(0, 1) < px:
         img = cv2.flip(img, 1)
@@ -322,7 +349,7 @@ def random_flip(img, bbox, px=0, py=0):
 
 
 def random_expand(img, bbox, max_ratio=4, fill=0, keep_ratio=True):
-    '''
+    """
     Random expand original image with borders, this is identical to placing
     the original image on a larger canvas.
     param:
@@ -332,7 +359,7 @@ def random_expand(img, bbox, max_ratio=4, fill=0, keep_ratio=True):
         The value(s) for padded borders.
     keep_ratio : bool
         If `True`, will keep output image the same aspect ratio as input.
-    '''
+    """
     h, w, c = img.shape
     ratio_x = random.uniform(1, max_ratio)
     if keep_ratio:
@@ -346,17 +373,10 @@ def random_expand(img, bbox, max_ratio=4, fill=0, keep_ratio=True):
 
     dst = np.full(shape=(oh, ow, c), fill_value=fill, dtype=img.dtype)
 
-    dst[off_y:off_y + h, off_x:off_x + w, :] = img
+    dst[off_y : off_y + h, off_x : off_x + w, :] = img
 
     # correct bbox
     bbox[:, :2] += (off_x, off_y)
     bbox[:, 2:4] += (off_x, off_y)
 
     return dst, bbox
-
-
-
-
-
-
-

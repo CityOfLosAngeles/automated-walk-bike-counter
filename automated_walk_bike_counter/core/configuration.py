@@ -1,4 +1,5 @@
-# Copyright (c) Data Science Research Lab at California State University Los Angeles (CSULA), and City of Los Angeles ITA
+# Copyright (c) Data Science Research Lab at California State University Los
+# Angeles (CSULA), and City of Los Angeles ITA
 # Distributed under the terms of the Apache 2.0 License
 # www.calstatela.edu/research/data-science
 # Designed and developed by:
@@ -9,9 +10,8 @@
 # Haiyan Wang
 
 import os
-import configargparse
 
-from ..utils import file_utils as fu
+import configargparse
 
 parser = configargparse.get_argument_parser()
 
@@ -129,25 +129,19 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--anchor_path",
-    type=str,
-    required=True,
-    help="The path of the anchor txt file.",
+    "--anchor_path", type=str, required=True, help="The path of the anchor txt file.",
 )
 
 parser.add_argument(
     "--new_size",
-    nargs='*',
+    nargs="*",
     type=int,
     default=[400, 400],
-    help="Resize the input image with `new_size`, size format: [width, height]"
+    help="Resize the input image with `new_size`, size format: [width, height]",
 )
 
 parser.add_argument(
-    "--class_name_path",
-    type=str,
-    help="The path of the class names.",
-    required=True,
+    "--class_name_path", type=str, help="The path of the class names.", required=True,
 )
 
 parser.add_argument(
@@ -159,9 +153,9 @@ parser.add_argument(
 
 parser.add_argument(
     "--save_video",
-    type=lambda x: (str(x).lower() == 'true'),
+    type=lambda x: (str(x).lower() == "true"),
     default=True,
-    help="Whether to save the video detection results."
+    help="Whether to save the video detection results.",
 )
 
 config = parser.parse_known_args()[0]
