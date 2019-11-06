@@ -16,4 +16,4 @@ A computer vision application for automating the detection of pedestrians,
 cyclists, and cars from traffic cameras.
 """
 
-from ._version import __version__ # noqa: F401
+from ._version import __version__  # noqa: F401
