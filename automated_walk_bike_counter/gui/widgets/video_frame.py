@@ -1,4 +1,5 @@
-# Copyright (c) Data Science Research Lab at California State University Los Angeles (CSULA), and City of Los Angeles ITA
+# Copyright (c) Data Science Research Lab at California State University Los
+# Angeles (CSULA), and City of Los Angeles ITA
 # Distributed under the terms of the Apache 2.0 License
 # www.calstatela.edu/research/data-science
 # Designed and developed by:
@@ -10,9 +11,8 @@
 
 import os
 import threading
-from tkinter import *
-from tkinter.colorchooser import *
-from tkinter.ttk import *
+from tkinter import ALL, CENTER, HORIZONTAL, Canvas, E, Event, Frame, IntVar, N, S, W
+from tkinter.ttk import Progressbar
 
 import cv2
 from PIL import Image, ImageTk

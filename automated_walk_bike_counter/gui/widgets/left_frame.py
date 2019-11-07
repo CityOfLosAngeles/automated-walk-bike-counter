@@ -1,4 +1,5 @@
-# Copyright (c) Data Science Research Lab at California State University Los Angeles (CSULA), and City of Los Angeles ITA
+# Copyright (c) Data Science Research Lab at California State University Los
+# Angeles (CSULA), and City of Los Angeles ITA
 # Distributed under the terms of the Apache 2.0 License
 # www.calstatela.edu/research/data-science
 # Designed and developed by:
@@ -8,9 +9,9 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from tkinter import *
-from tkinter.colorchooser import *
-from tkinter.ttk import *
+from tkinter import Canvas, E, Frame, IntVar, LabelFrame, N, S, W
+from tkinter.colorchooser import askcolor
+from tkinter.ttk import Checkbutton, Style
 
 from ...core.configuration import config
 from .settings_pane import SettingsPane
@@ -35,7 +36,6 @@ class Left_Frame(Frame):
         pane.grid(row=0, column=0, padx=(5, 5), pady=5, sticky=(W, E, S, N))
 
         self.grid_columnconfigure(0, weight=1)
-        # parent.grid_rowconfigure(0, weight=1)
 
         for i in range(len(self.allowed_objects)):
             self.checkbox_variables.append(IntVar())
@@ -78,7 +78,6 @@ class Left_Frame(Frame):
         self.settings_pane.grid(row=1, column=0, padx=(5, 5), pady=5, sticky=(W, E))
 
     def allowed_object_checkbox_changed(self, index):
-        # messagebox.showinfo("title" , str(index)+" "+str(self.checkbox_variables[index].get())+" "+self.allowed_objects[index])
         tuple_data = self.controller.valid_selected_objects[index]
         list_data = list(tuple_data)
         list_data[-1] = self.checkbox_variables[index].get()
@@ -89,7 +88,6 @@ class Left_Frame(Frame):
         color = askcolor()
         print(color)
         self.color_objects[index].configure(background=str(color[1]))
-        # mb.showinfo("title"+str(color[1]))
         tuple_data = self.controller.valid_selected_objects[index]
         list_data = list(tuple_data)
         list_data[1] = color

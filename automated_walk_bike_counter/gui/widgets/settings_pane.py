@@ -1,4 +1,5 @@
-# Copyright (c) Data Science Research Lab at California State University Los Angeles (CSULA), and City of Los Angeles ITA
+# Copyright (c) Data Science Research Lab at California State University Los
+# Angeles (CSULA), and City of Los Angeles ITA
 # Distributed under the terms of the Apache 2.0 License
 # www.calstatela.edu/research/data-science
 # Designed and developed by:
@@ -9,9 +10,8 @@
 # Haiyan Wang
 
 import math
-import tkinter as tk
-from tkinter import *
-from tkinter.ttk import *
+from tkinter import DISABLED, HORIZONTAL, E, Label, LabelFrame, StringVar, W
+from tkinter.ttk import Combobox, Scale
 
 
 class SettingsPane(LabelFrame):
@@ -34,7 +34,6 @@ class SettingsPane(LabelFrame):
         self.controller.video_settings_pane = self
 
         self.initialize_resolution_combo()
-        # self.controller.output_video.has_AOI.trace('w', self.watch_for_aoi_changes(self.controller.output_video.has_AOI))
 
     def initialize_resolution_combo(self):
         predef_sizes = [320, 416, 608]
@@ -63,10 +62,10 @@ class SettingsPane(LabelFrame):
 
         label3 = Label(master=self, text="Show AOI in output :")
 
-        self.aoi_output_present_combo.config(state=tk.DISABLED)
+        self.aoi_output_present_combo.config(state=DISABLED)
 
         self.aoi_output_present_combo.current(0)
-        self.aoi_output_present_combo.config(state=tk.DISABLED)
+        self.aoi_output_present_combo.config(state=DISABLED)
         self.aoi_output_present_combo.bind(
             "<<ComboboxSelected>>", self.aoi_output_present_change
         )
