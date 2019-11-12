@@ -11,21 +11,25 @@
 
 from __future__ import division, print_function
 
-import numpy as np
-import cv2
 from collections import Counter
 
-from .nms_utils import cpu_nms, gpu_nms
+import numpy as np
+
+import cv2
+
 from .data_utils import parse_line
+from .nms_utils import cpu_nms
 
 
 def calc_iou(pred_boxes, true_boxes):
-    '''
-    Maintain an efficient way to calculate the ios matrix using the numpy broadcast tricks.
+    """
+    Maintain an efficient way to calculate the ios matrix using the numpy broadcast
+    tricks.
+
     shape_info: pred_boxes: [N, 4]
                 true_boxes: [V, 4]
     return: IoU matrix: shape: [N, V]
-    '''
+    """
 
     # [N, 1, 4]
     pred_boxes = np.expand_dims(pred_boxes, -2)
@@ -35,7 +39,7 @@ def calc_iou(pred_boxes, true_boxes):
     # [N, 1, 2] & [1, V, 2] ==> [N, V, 2]
     intersect_mins = np.maximum(pred_boxes[..., :2], true_boxes[..., :2])
     intersect_maxs = np.minimum(pred_boxes[..., 2:], true_boxes[..., 2:])
-    intersect_wh = np.maximum(intersect_maxs - intersect_mins, 0.)
+    intersect_wh = np.maximum(intersect_maxs - intersect_mins, 0.0)
 
     # shape: [N, V]
     intersect_area = intersect_wh[..., 0] * intersect_wh[..., 1]
@@ -54,10 +58,19 @@ def calc_iou(pred_boxes, true_boxes):
     return iou
 
 
-def evaluate_on_cpu(y_pred, y_true, num_classes, calc_now=True, max_boxes=50, score_thresh=0.5, iou_thresh=0.5):
-    '''
-    Given y_pred and y_true of a batch of data, get the recall and precision of the current batch.
-    '''
+def evaluate_on_cpu(
+    y_pred,
+    y_true,
+    num_classes,
+    calc_now=True,
+    max_boxes=50,
+    score_thresh=0.5,
+    iou_thresh=0.5,
+):
+    """
+    Given y_pred and y_true of a batch of data, get the recall and precision of the
+    current batch.
+    """
 
     num_images = y_true[0].shape[0]
     true_labels_dict = {i: 0 for i in range(num_classes)}  # {class: count}
@@ -92,20 +105,26 @@ def evaluate_on_cpu(y_pred, y_true, num_classes, calc_now=True, max_boxes=50, sc
         # [V, 4] (xmin, ymin, xmax, ymax)
         true_boxes = np.array(true_boxes_list)
         box_centers, box_sizes = true_boxes[:, 0:2], true_boxes[:, 2:4]
-        true_boxes[:, 0:2] = box_centers - box_sizes / 2.
+        true_boxes[:, 0:2] = box_centers - box_sizes / 2.0
         true_boxes[:, 2:4] = true_boxes[:, 0:2] + box_sizes
 
         # [1, xxx, 4]
-        pred_boxes = y_pred[0][i:i + 1]
-        pred_confs = y_pred[1][i:i + 1]
-        pred_probs = y_pred[2][i:i + 1]
+        pred_boxes = y_pred[0][i : i + 1]
+        pred_confs = y_pred[1][i : i + 1]
+        pred_probs = y_pred[2][i : i + 1]
 
         # pred_boxes: [N, 4]
         # pred_confs: [N]
         # pred_labels: [N]
         # N: Detected box number of the current image
-        pred_boxes, pred_confs, pred_labels = cpu_nms(pred_boxes, pred_confs * pred_probs, num_classes,
-                                                      max_boxes=max_boxes, score_thresh=score_thresh, iou_thresh=iou_thresh)
+        pred_boxes, pred_confs, pred_labels = cpu_nms(
+            pred_boxes,
+            pred_confs * pred_probs,
+            num_classes,
+            max_boxes=max_boxes,
+            score_thresh=score_thresh,
+            iou_thresh=iou_thresh,
+        )
 
         # len: N
         pred_labels_list = [] if pred_labels is None else pred_labels.tolist()
@@ -123,7 +142,10 @@ def evaluate_on_cpu(y_pred, y_true, num_classes, calc_now=True, max_boxes=50, sc
         for k in range(max_iou_idx.shape[0]):
             pred_labels_dict[pred_labels_list[k]] += 1
             match_idx = max_iou_idx[k]  # V level
-            if iou_matrix[k, match_idx] > iou_thresh and true_labels_list[match_idx] == pred_labels_list[k]:
+            if (
+                iou_matrix[k, match_idx] > iou_thresh
+                and true_labels_list[match_idx] == pred_labels_list[k]
+            ):
                 if match_idx not in correct_idx:
                     correct_idx.append(match_idx)
                     correct_conf.append(pred_confs[k])
@@ -140,19 +162,33 @@ def evaluate_on_cpu(y_pred, y_true, num_classes, calc_now=True, max_boxes=50, sc
 
     if calc_now:
         # avoid divided by 0
-        recall = sum(true_positive_dict.values()) / (sum(true_labels_dict.values()) + 1e-6)
-        precision = sum(true_positive_dict.values()) / (sum(pred_labels_dict.values()) + 1e-6)
+        recall = sum(true_positive_dict.values()) / (
+            sum(true_labels_dict.values()) + 1e-6
+        )
+        precision = sum(true_positive_dict.values()) / (
+            sum(pred_labels_dict.values()) + 1e-6
+        )
 
         return recall, precision
     else:
         return true_positive_dict, true_labels_dict, pred_labels_dict
 
 
-def evaluate_on_gpu(sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, y_pred, y_true, num_classes, iou_thresh=0.5, calc_now=True):
-    '''
-    Given y_pred and y_true of a batch of data, get the recall and precision of the current batch.
-    This function will perform gpu operation on the GPU.
-    '''
+def evaluate_on_gpu(
+    sess,
+    gpu_nms_op,
+    pred_boxes_flag,
+    pred_scores_flag,
+    y_pred,
+    y_true,
+    num_classes,
+    iou_thresh=0.5,
+    calc_now=True,
+):
+    """
+    Given y_pred and y_true of a batch of data, get the recall and precision of the
+    current batch. This function will perform gpu operation on the GPU.
+    """
 
     num_images = y_true[0].shape[0]
     true_labels_dict = {i: 0 for i in range(num_classes)}  # {class: count}
@@ -187,21 +223,25 @@ def evaluate_on_gpu(sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, y_pred,
         # [V, 4] (xmin, ymin, xmax, ymax)
         true_boxes = np.array(true_boxes_list)
         box_centers, box_sizes = true_boxes[:, 0:2], true_boxes[:, 2:4]
-        true_boxes[:, 0:2] = box_centers - box_sizes / 2.
+        true_boxes[:, 0:2] = box_centers - box_sizes / 2.0
         true_boxes[:, 2:4] = true_boxes[:, 0:2] + box_sizes
 
         # [1, xxx, 4]
-        pred_boxes = y_pred[0][i:i + 1]
-        pred_confs = y_pred[1][i:i + 1]
-        pred_probs = y_pred[2][i:i + 1]
+        pred_boxes = y_pred[0][i : i + 1]
+        pred_confs = y_pred[1][i : i + 1]
+        pred_probs = y_pred[2][i : i + 1]
 
         # pred_boxes: [N, 4]
         # pred_confs: [N]
         # pred_labels: [N]
         # N: Detected box number of the current image
-        pred_boxes, pred_confs, pred_labels = sess.run(gpu_nms_op,
-                                                       feed_dict={pred_boxes_flag: pred_boxes,
-                                                                  pred_scores_flag: pred_confs * pred_probs})
+        pred_boxes, pred_confs, pred_labels = sess.run(
+            gpu_nms_op,
+            feed_dict={
+                pred_boxes_flag: pred_boxes,
+                pred_scores_flag: pred_confs * pred_probs,
+            },
+        )
         # len: N
         pred_labels_list = [] if pred_labels is None else pred_labels.tolist()
         if pred_labels_list == []:
@@ -218,7 +258,10 @@ def evaluate_on_gpu(sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, y_pred,
         for k in range(max_iou_idx.shape[0]):
             pred_labels_dict[pred_labels_list[k]] += 1
             match_idx = max_iou_idx[k]  # V level
-            if iou_matrix[k, match_idx] > iou_thresh and true_labels_list[match_idx] == pred_labels_list[k]:
+            if (
+                iou_matrix[k, match_idx] > iou_thresh
+                and true_labels_list[match_idx] == pred_labels_list[k]
+            ):
                 if match_idx not in correct_idx:
                     correct_idx.append(match_idx)
                     correct_conf.append(pred_confs[k])
@@ -235,20 +278,26 @@ def evaluate_on_gpu(sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, y_pred,
 
     if calc_now:
         # avoid divided by 0
-        recall = sum(true_positive_dict.values()) / (sum(true_labels_dict.values()) + 1e-6)
-        precision = sum(true_positive_dict.values()) / (sum(pred_labels_dict.values()) + 1e-6)
+        recall = sum(true_positive_dict.values()) / (
+            sum(true_labels_dict.values()) + 1e-6
+        )
+        precision = sum(true_positive_dict.values()) / (
+            sum(pred_labels_dict.values()) + 1e-6
+        )
 
         return recall, precision
     else:
         return true_positive_dict, true_labels_dict, pred_labels_dict
 
 
-def get_preds_gpu(sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, image_ids, y_pred):
-    '''
+def get_preds_gpu(
+    sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, image_ids, y_pred
+):
+    """
     Given the y_pred of an input image, get the predicted bbox and label info.
     return:
         pred_content: 2d list.
-    '''
+    """
     image_id = image_ids[0]
 
     # keep the first dimension 1
@@ -256,9 +305,13 @@ def get_preds_gpu(sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, image_ids
     pred_confs = y_pred[1][0:1]
     pred_probs = y_pred[2][0:1]
 
-    boxes, scores, labels = sess.run(gpu_nms_op,
-                                     feed_dict={pred_boxes_flag: pred_boxes,
-                                                pred_scores_flag: pred_confs * pred_probs})
+    boxes, scores, labels = sess.run(
+        gpu_nms_op,
+        feed_dict={
+            pred_boxes_flag: pred_boxes,
+            pred_scores_flag: pred_confs * pred_probs,
+        },
+    )
 
     pred_content = []
     for i in range(len(labels)):
@@ -271,18 +324,21 @@ def get_preds_gpu(sess, gpu_nms_op, pred_boxes_flag, pred_scores_flag, image_ids
 
 
 gt_dict = {}  # key: img_id, value: gt object list
+
+
 def parse_gt_rec(gt_filename, resize_img_size):
-    '''
+    """
     parse and re-organize the gt info.
     return:
-        gt_dict: dict. Each key is a img_id, the value is the gt bboxes in the corresponding img.
-    '''
+        gt_dict: dict. Each key is a img_id, the value is the gt bboxes in the
+            corresponding img.
+    """
 
     global gt_dict
 
     if not gt_dict:
         resize_w, resize_h = resize_img_size
-        with open(gt_filename, 'r') as f:
+        with open(gt_filename, "r") as f:
             for line in f:
                 img_id, pic_path, boxes, labels = parse_line(line)
 
@@ -293,11 +349,15 @@ def parse_gt_rec(gt_filename, resize_img_size):
                 for i in range(len(labels)):
                     x_min, y_min, x_max, y_max = boxes[i]
                     label = labels[i]
-                    objects.append([x_min * resize_w / ori_w,
-                                    y_min * resize_h / ori_h,
-                                    x_max * resize_w / ori_w,
-                                    y_max * resize_h / ori_h,
-                                    label])
+                    objects.append(
+                        [
+                            x_min * resize_w / ori_w,
+                            y_min * resize_h / ori_h,
+                            x_max * resize_w / ori_w,
+                            y_max * resize_h / ori_h,
+                            label,
+                        ]
+                    )
                 gt_dict[img_id] = objects
     return gt_dict
 
@@ -310,18 +370,18 @@ def voc_ap(rec, prec, use_07_metric=False):
     """
     if use_07_metric:
         # 11 point metric
-        ap = 0.
-        for t in np.arange(0., 1.1, 0.1):
+        ap = 0.0
+        for t in np.arange(0.0, 1.1, 0.1):
             if np.sum(rec >= t) == 0:
                 p = 0
             else:
                 p = np.max(prec[rec >= t])
-            ap = ap + p / 11.
+            ap = ap + p / 11.0
     else:
         # correct AP calculation
         # first append sentinel values at the end
-        mrec = np.concatenate(([0.], rec, [1.]))
-        mpre = np.concatenate(([0.], prec, [0.]))
+        mrec = np.concatenate(([0.0], rec, [1.0]))
+        mpre = np.concatenate(([0.0], prec, [0.0]))
 
         # compute the precision envelope
         for i in range(mpre.size - 1, 0, -1):
@@ -337,9 +397,9 @@ def voc_ap(rec, prec, use_07_metric=False):
 
 
 def voc_eval(gt_dict, val_preds, classidx, iou_thres=0.5, use_07_metric=False):
-    '''
+    """
     Top level function that does the PASCAL VOC evaluation.
-    '''
+    """
     # 1.obtain gt: extract all gt objects for this class
     class_recs = {}
     npos = 0
@@ -348,7 +408,7 @@ def voc_eval(gt_dict, val_preds, classidx, iou_thres=0.5, use_07_metric=False):
         bbox = np.array([x[:4] for x in R])
         det = [False] * len(R)
         npos += len(R)
-        class_recs[img_id] = {'bbox': bbox, 'det': det}
+        class_recs[img_id] = {"bbox": bbox, "det": det}
 
     # 2. obtain pred results
     pred = [x for x in val_preds if x[-1] == classidx]
@@ -360,8 +420,8 @@ def voc_eval(gt_dict, val_preds, classidx, iou_thres=0.5, use_07_metric=False):
     sorted_ind = np.argsort(-confidence)
     try:
         BB = BB[sorted_ind, :]
-    except:
-        print('no box, ignore')
+    except KeyError:
+        print("no box, ignore")
         return 1e-6, 1e-6, 0, 0, 0
     img_ids = [img_ids[x] for x in sorted_ind]
 
@@ -375,7 +435,7 @@ def voc_eval(gt_dict, val_preds, classidx, iou_thres=0.5, use_07_metric=False):
         R = class_recs[img_ids[d]]
         bb = BB[d, :]
         ovmax = -np.Inf
-        BBGT = R['bbox']
+        BBGT = R["bbox"]
 
         if BBGT.size > 0:
             # calc iou
@@ -384,13 +444,16 @@ def voc_eval(gt_dict, val_preds, classidx, iou_thres=0.5, use_07_metric=False):
             iymin = np.maximum(BBGT[:, 1], bb[1])
             ixmax = np.minimum(BBGT[:, 2], bb[2])
             iymax = np.minimum(BBGT[:, 3], bb[3])
-            iw = np.maximum(ixmax - ixmin + 1., 0.)
-            ih = np.maximum(iymax - iymin + 1., 0.)
+            iw = np.maximum(ixmax - ixmin + 1.0, 0.0)
+            ih = np.maximum(iymax - iymin + 1.0, 0.0)
             inters = iw * ih
 
             # union
-            uni = ((bb[2] - bb[0] + 1.) * (bb[3] - bb[1] + 1.) + (BBGT[:, 2] - BBGT[:, 0] + 1.) * (
-                        BBGT[:, 3] - BBGT[:, 1] + 1.) - inters)
+            uni = (
+                (bb[2] - bb[0] + 1.0) * (bb[3] - bb[1] + 1.0)
+                + (BBGT[:, 2] - BBGT[:, 0] + 1.0) * (BBGT[:, 3] - BBGT[:, 1] + 1.0)
+                - inters
+            )
 
             overlaps = inters / uni
             ovmax = np.max(overlaps)
@@ -398,13 +461,13 @@ def voc_eval(gt_dict, val_preds, classidx, iou_thres=0.5, use_07_metric=False):
 
         if ovmax > iou_thres:
             # gt not matched yet
-            if not R['det'][jmax]:
-                tp[d] = 1.
-                R['det'][jmax] = 1
+            if not R["det"][jmax]:
+                tp[d] = 1.0
+                R["det"][jmax] = 1
             else:
-                fp[d] = 1.
+                fp[d] = 1.0
         else:
-            fp[d] = 1.
+            fp[d] = 1.0
 
     # compute precision recall
     fp = np.cumsum(fp)

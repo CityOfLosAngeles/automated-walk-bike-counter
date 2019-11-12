@@ -1,4 +1,5 @@
-# Copyright (c) Data Science Research Lab at California State University Los Angeles (CSULA), and City of Los Angeles ITA
+# Copyright (c) Data Science Research Lab at California State University Los
+# Angeles (CSULA), and City of Los Angeles ITA
 # Distributed under the terms of the Apache 2.0 License
 # www.calstatela.edu/research/data-science
 # Designed and developed by:
@@ -8,18 +9,30 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-import tkinter as tk
-from tkinter import *
-from tkinter import messagebox
-import cv2
-from PIL import Image,ImageTk
-import numpy as np
 import threading
-import time
+from tkinter import (
+    CENTER,
+    DISABLED,
+    NORMAL,
+    Button,
+    Canvas,
+    E,
+    Frame,
+    Label,
+    N,
+    S,
+    Toplevel,
+    W,
+)
+
+import numpy as np
+from PIL import Image, ImageTk
+
+import cv2
 
 
 class AOIDialog:
-    def __init__(self,parent,filename, controller):
+    def __init__(self, parent, filename, controller):
         top = self.top = Toplevel(parent)
         self.filename = filename
         self.controller = controller
@@ -33,37 +46,54 @@ class AOIDialog:
         camera = cv2.VideoCapture(self.filename)
         self.video_width = int(camera.get(3))
         self.video_height = int(camera.get(4))
-        self.empty_image = Image.new('RGB', (self.video_width, self.video_height), 0)
+        self.empty_image = Image.new("RGB", (self.video_width, self.video_height), 0)
         self.mask_image = self.get_empty_mask_image()
         self.btn_delete = None
         self.initialize_video_thread()
 
-        label1 = Label(top, text="Please select your area of interest (must be a polygon) on your video :")
-        label2 = Label(top, text="Hint : to add a new vertex left click and to close the polygon right click")
+        label1 = Label(
+            top,
+            text=(
+                "Please select your area of interest (must be a polygon) on your video:"
+            ),
+        )
+        label2 = Label(
+            top,
+            text=(
+                "Hint: to add a new vertex left click and to close the polygon right"
+                + "click"
+            ),
+        )
         video_new_height = self.get_video_resized_dimensions()[1]
-        self.video_frame = Frame(top, bg='green',width=800,height=600)
+        self.video_frame = Frame(top, bg="green", width=800, height=600)
         self.canvas = self.initialize_canvas(video_new_height)
-        self.canvas.grid(row=0,column=0,sticky=(W,E))
-        self.video_frame.rowconfigure(0,weight=1)
+        self.canvas.grid(row=0, column=0, sticky=(W, E))
+        self.video_frame.rowconfigure(0, weight=1)
 
         buttons_frame = Frame(top)
 
         label1.grid(row=0, column=1, columnspan=6, sticky=(W, N))
         label2.grid(row=1, column=1, columnspan=6, sticky=(W, N))
-        self.video_frame.grid(row=2,column=1, columnspan=4, sticky=(W, E))
-        buttons_frame.grid(row=3, column=1, columnspan=4, sticky=(W,E,N,S))
+        self.video_frame.grid(row=2, column=1, columnspan=4, sticky=(W, E))
+        buttons_frame.grid(row=3, column=1, columnspan=4, sticky=(W, E, N, S))
 
-        btn_save = Button(buttons_frame, text="Save AOI", width=20, command=self.save_mask)
+        btn_save = Button(
+            buttons_frame, text="Save AOI", width=20, command=self.save_mask
+        )
         btn_clear = Button(buttons_frame, text="Clear", width=20, command=self.clear)
-        btn_cancel = Button(buttons_frame, text="Cancel", width=20, command=self.close_window)
-        self.btn_delete = Button(buttons_frame, text="Delete AOI", width=20, command=self.delete_aoi)
+        btn_cancel = Button(
+            buttons_frame, text="Cancel", width=20, command=self.close_window
+        )
+        self.btn_delete = Button(
+            buttons_frame, text="Delete AOI", width=20, command=self.delete_aoi
+        )
         if self.controller.output_video.has_AOI:
-            self.btn_delete.config(state=tk.NORMAL)
+            self.btn_delete.config(state=NORMAL)
         else:
-            self.btn_delete.config(state=tk.DISABLED)
+            self.btn_delete.config(state=DISABLED)
 
-        btn_save.grid(row=0, column=1, padx=(0,10), pady=(5,20), sticky=(W,E))
-        btn_clear.grid(row=0, column=2, padx=(10,10), pady=(5,20), sticky=(W,E))
+        btn_save.grid(row=0, column=1, padx=(0, 10), pady=(5, 20), sticky=(W, E))
+        btn_clear.grid(row=0, column=2, padx=(10, 10), pady=(5, 20), sticky=(W, E))
         btn_cancel.grid(row=0, column=3, padx=(10, 10), pady=(5, 20), sticky=(W, E))
         self.btn_delete.grid(row=0, column=4, padx=(10, 0), pady=(5, 20), sticky=(W, E))
 
@@ -89,9 +119,9 @@ class AOIDialog:
         top.grab_set()
         top.wait_window()
 
-    def initialize_canvas(self,video_resized_height):
+    def initialize_canvas(self, video_resized_height):
 
-        canvas = Canvas(self.video_frame,width=800,height=video_resized_height)
+        canvas = Canvas(self.video_frame, width=800, height=video_resized_height)
         canvas.bind("<ButtonPress-1>", self.on_mouse_click)
         canvas.bind("<ButtonPress-3>", self.on_mouse_right_click)
         canvas.bind("<Motion>", self.on_mouse_move_callback)
@@ -101,18 +131,27 @@ class AOIDialog:
     def initialize_video_thread(self):
 
         self.thread_event = threading.Event()
-        self.video_loading_thread = threading.Thread(target=self.play_bg_video, args=(self.thread_event,), daemon=True)
+        self.video_loading_thread = threading.Thread(
+            target=self.play_bg_video, args=(self.thread_event,), daemon=True
+        )
         self.video_loading_thread.start()
 
     def save_mask(self):
 
-        if not (np.array_equal(np.asarray(self.mask_image), self.get_empty_mask_image())) and len(self.points) > 2:
+        if (
+            not (
+                np.array_equal(np.asarray(self.mask_image), self.get_empty_mask_image())
+            )
+            and len(self.points) > 2
+        ):
             self.save_result_to_parent(self.mask_image)
             self.controller.output_video.has_AOI = True
             self.controller.refresh_aoi_status()
             self.close_window()
         else:
-            self.top.messagebox.showwarning("Warning","You have not determined a valid AOI!")
+            self.top.messagebox.showwarning(
+                "Warning", "You have not determined a valid AOI!"
+            )
 
     def close_window(self):
 
@@ -123,88 +162,131 @@ class AOIDialog:
 
     def delete_aoi(self):
         self.controller.mask = None
-        self.controller.output_video.has_AOI=False
-        self.btn_delete.config(state=tk.DISABLED)
+        self.controller.output_video.has_AOI = False
+        self.btn_delete.config(state=DISABLED)
         self.controller.refresh_aoi_status()
         self.close_window()
 
-    def play_bg_video(self,e):
+    def play_bg_video(self, e):
 
         camera = cv2.VideoCapture(self.filename)
 
         while camera.isOpened() and not e.is_set():
-                ret, frame = camera.read()
+            ret, frame = camera.read()
 
-                if ret:
+            if ret:
 
-                    dims = self.get_video_resized_dimensions()
+                dims = self.get_video_resized_dimensions()
 
-                    frame = cv2.resize(frame, dims, interpolation=cv2.INTER_AREA)
+                frame = cv2.resize(frame, dims, interpolation=cv2.INTER_AREA)
 
-                    frame_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    frame_image = Image.fromarray(frame_image)
-                    frame_image = ImageTk.PhotoImage(frame_image)
+                frame_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame_image = Image.fromarray(frame_image)
+                frame_image = ImageTk.PhotoImage(frame_image)
 
-                    if not e.is_set():
-                        self.canvas.create_image(dims[0]/2+2, dims[1]/2+2, anchor=CENTER, image=frame_image, tag='canvas_image')
-                        self.canvas.tag_lower('canvas_image')
-                        self.canvas.image = frame_image
+                if not e.is_set():
+                    self.canvas.create_image(
+                        dims[0] / 2 + 2,
+                        dims[1] / 2 + 2,
+                        anchor=CENTER,
+                        image=frame_image,
+                        tag="canvas_image",
+                    )
+                    self.canvas.tag_lower("canvas_image")
+                    self.canvas.image = frame_image
 
-    def on_mouse_click(self,event):
+    def on_mouse_click(self, event):
         x = event.x
         y = event.y
-        ori_x = int(self.get_convert_to_original_coefficient()*x)
-        ori_y = int(self.get_convert_to_original_coefficient()*y)
+        ori_x = int(self.get_convert_to_original_coefficient() * x)
+        ori_y = int(self.get_convert_to_original_coefficient() * y)
 
         # if len(self.points) > 0:
         if self.drawing:
-            self.canvas.create_line(self.points[-1][0], self.points[-1][1], x, y, fill='#ffffff', width=2, tag="foreground")
-            cv2.line(self.mask_image, (self.ori_points[-1][0], self.ori_points[-1][1]), (ori_x, ori_y), (255, 255, 255), 2)
+            self.canvas.create_line(
+                self.points[-1][0],
+                self.points[-1][1],
+                x,
+                y,
+                fill="#ffffff",
+                width=2,
+                tag="foreground",
+            )
+            cv2.line(
+                self.mask_image,
+                (self.ori_points[-1][0], self.ori_points[-1][1]),
+                (ori_x, ori_y),
+                (255, 255, 255),
+                2,
+            )
         else:
             self.drawing = True
-            #self.clear()
+            # self.clear()
 
         self.points.append((x, y))
-        self.ori_points.append((ori_x,ori_y))
+        self.ori_points.append((ori_x, ori_y))
 
-    def on_mouse_right_click(self,event):
+    def on_mouse_right_click(self, event):
         if len(self.points) > 1:
-            self.canvas.create_line(self.points[-1][0], self.points[-1][1], self.points[0][0], self.points[0][1], fill='#ffffff', width=2, tag="foreground")
-            cv2.line(self.mask_image, (self.ori_points[-1][0], self.ori_points[-1][1]), (self.ori_points[0][0], self.ori_points[0][1]), (255, 255, 255), 2)
-            self.canvas.delete(self.canvas.find_withtag('line'))
+            self.canvas.create_line(
+                self.points[-1][0],
+                self.points[-1][1],
+                self.points[0][0],
+                self.points[0][1],
+                fill="#ffffff",
+                width=2,
+                tag="foreground",
+            )
+            cv2.line(
+                self.mask_image,
+                (self.ori_points[-1][0], self.ori_points[-1][1]),
+                (self.ori_points[0][0], self.ori_points[0][1]),
+                (255, 255, 255),
+                2,
+            )
+            self.canvas.delete(self.canvas.find_withtag("line"))
 
-        self.mask_image = cv2.fillConvexPoly(self.mask_image, np.array(self.ori_points, 'int32'), (255, 255, 255), 8, 0)
+        self.mask_image = cv2.fillConvexPoly(
+            self.mask_image, np.array(self.ori_points, "int32"), (255, 255, 255), 8, 0
+        )
         self.drawing = False
-        #cv2.imshow("image", self.mask_image)
+        # cv2.imshow("image", self.mask_image)
 
-    def on_mouse_move_callback(self,event):
+    def on_mouse_move_callback(self, event):
         x = event.x
         y = event.y
 
         if len(self.points) > 0 and self.drawing:
-            self.canvas.delete(self.canvas.find_withtag('line'))
-            self.canvas.create_line(self.points[-1][0], self.points[-1][1], x, y, fill='#ffffff', tag='line', width=2, dash=(4, 2))
+            self.canvas.delete(self.canvas.find_withtag("line"))
+            self.canvas.create_line(
+                self.points[-1][0],
+                self.points[-1][1],
+                x,
+                y,
+                fill="#ffffff",
+                tag="line",
+                width=2,
+                dash=(4, 2),
+            )
 
     def get_video_resized_dimensions(self):
 
-        r = 1/self.get_convert_to_original_coefficient()
+        r = 1 / self.get_convert_to_original_coefficient()
         return 800, int(self.video_height * r)
 
     def get_convert_to_original_coefficient(self):
-        return float(self.video_width)/800
+        return float(self.video_width) / 800
 
     def clear(self):
         self.drawing = False
         self.points = []
         self.ori_points = []
-        self.canvas.delete('foreground','line')
+        self.canvas.delete("foreground", "line")
         self.mask_image = self.get_empty_mask_image()
 
-    def save_result_to_parent(self,mask_image):
+    def save_result_to_parent(self, mask_image):
         self.controller.mask = mask_image
 
     def get_empty_mask_image(self):
-        img = Image.new('RGB', (self.video_width, self.video_height), 0)
+        img = Image.new("RGB", (self.video_width, self.video_height), 0)
         return np.asarray(img)
-
-

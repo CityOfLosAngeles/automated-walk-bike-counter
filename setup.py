@@ -11,8 +11,9 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
 from os.path import exists
+
+from setuptools import find_packages, setup
 
 from automated_walk_bike_counter._version import __version__ as version
 
@@ -23,10 +24,19 @@ requires = [
     if not line.startswith("#")
 ]
 
+develop_requires = [
+    "pre-commit",
+    "flake8",
+    "black",
+    "isort",
+]
 
 setup(
     name="automated-walk-bike-counter",
-    description="A computer vision application for automated counting of pedestrians and cyclists",
+    description=(
+        "A computer vision application for automated counting"
+        "of pedestrians and cyclists"
+    ),
     long_description=readme,
     long_description_content_type="text/markdown",
     maintainer="CSULA and Los Angeles ITA",
@@ -43,6 +53,7 @@ setup(
     package_dir={"automated_walk_bike_counter": "automated_walk_bike_counter"},
     include_package_data=True,
     install_requires=requires,
+    extras_require={"develop": develop_requires},
     entry_points={
         "gui_scripts": [
             "automated-walk-bike-counter = automated_walk_bike_counter.gui.app:main"
