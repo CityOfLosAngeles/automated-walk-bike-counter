@@ -16,8 +16,9 @@ from __future__ import division, print_function
 
 import random
 
-import cv2
 import numpy as np
+
+import cv2
 
 
 def mix_up(img1, img2, bbox1, bbox2):

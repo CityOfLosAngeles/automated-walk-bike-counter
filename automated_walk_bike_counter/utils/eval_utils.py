@@ -13,8 +13,9 @@ from __future__ import division, print_function
 
 from collections import Counter
 
-import cv2
 import numpy as np
+
+import cv2
 
 from .data_utils import parse_line
 from .nms_utils import cpu_nms

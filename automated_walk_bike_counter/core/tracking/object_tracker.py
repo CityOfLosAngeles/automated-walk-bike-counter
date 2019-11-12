@@ -15,8 +15,9 @@ import re
 import sys
 from time import time as timer
 
-import cv2
 import numpy as np
+
+import cv2
 import tensorflow as tf
 from munkres import Munkres
 

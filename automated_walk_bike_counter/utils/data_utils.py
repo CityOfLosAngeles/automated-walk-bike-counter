@@ -14,8 +14,9 @@ from __future__ import division, print_function
 import random
 import sys
 
-import cv2
 import numpy as np
+
+import cv2
 
 from .data_aug import (
     mix_up,
