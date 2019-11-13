@@ -4,13 +4,13 @@ channels:
 dependencies:
   - configargparse=0.14
   - fsspec=0.5
-  - requests=2
+  - libtiff=4.0
   - munkres=1
   - opencv=4
+  - pillow=6
   - pip=19
   - pykalman=0.9
   - python=3
+  - requests=2
   - tensorflow=1.13
   - tqdm=4
-  - pip:
-    - pillow=6
