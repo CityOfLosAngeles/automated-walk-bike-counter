@@ -7,9 +7,10 @@ dependencies:
   - requests=2
   - munkres=1
   - opencv=4
-  - pillow=6
   - pip=19
   - pykalman=0.9
   - python=3
   - tensorflow=1.13
   - tqdm=4
+  - pip:
+    - pillow=6
