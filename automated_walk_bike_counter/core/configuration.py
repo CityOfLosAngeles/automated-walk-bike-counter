@@ -16,34 +16,32 @@ import configargparse
 parser = configargparse.get_argument_parser()
 
 # Config file
-default_filename = os.path.join(os.path.dirname(__file__), "config.ini")
 parser.add_argument(
-    "--config",
-    is_config_file=True,
-    help="Configuration file location",
-    default=default_filename,
-    required=False,
+    "--config", is_config_file=True, help="Configuration file location", required=False,
 )
 
 # Cost thresholds
 parser.add_argument(
     "--PED_COST_THRESHOLD",
     help="Pedestrian cost threshold",
-    required=True,
+    required=False,
+    default=80,
     type=float,
     env_var="PED_COST_THRESHOLD",
 )
 parser.add_argument(
     "--BUS_COST_THRESHOLD",
     help="Bus cost threshold",
-    required=True,
+    default=110,
+    required=False,
     type=float,
     env_var="BUS_COST_THRESHOLD",
 )
 parser.add_argument(
     "--TRUCK_COST_THRESHOLD",
     help="Truck cost threshold",
-    required=True,
+    default=110,
+    required=False,
     type=float,
     env_var="TRUCK_COST_THRESHOLD",
 )
@@ -52,14 +50,16 @@ parser.add_argument(
 parser.add_argument(
     "--MISSING_THRESHOLD",
     help="Missing threshold",
-    required=True,
+    default=90,
+    required=False,
     type=float,
     env_var="MISSING_THRESHOLD",
 )
 parser.add_argument(
     "--MISSING_THRESHOLD_MAX",
     help="Missing threshold maximum",
-    required=True,
+    default=400,
+    required=False,
     type=float,
     env_var="MISSING_THRESHOLD_MAX",
 )
@@ -68,42 +68,48 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD",
     help="Count threshold",
-    required=True,
+    default=10,
+    required=False,
     type=int,
     env_var="COUNT_THRESHOLD",
 )
 parser.add_argument(
     "--COUNT_THRESHOLD_BIKE",
     help="Count threshold for bikes",
-    required=True,
+    default=5,
+    required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BIKE",
 )
 parser.add_argument(
     "--COUNT_THRESHOLD_MOTOR",
     help="Count threshold for...",
-    required=True,
+    default=3,
+    required=False,
     type=int,
     env_var="COUNT_THRESHOLD_MOTOR",
 )
 parser.add_argument(
     "--COUNT_THRESHOLD_CAR",
     help="Count threshold for cars",
-    required=True,
+    default=3,
+    required=False,
     type=int,
     env_var="COUNT_THRESHOLD_CAR",
 )
 parser.add_argument(
     "--COUNT_THRESHOLD_BUS",
     help="Count threshold for buses",
-    required=True,
+    default=3,
+    required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BUS",
 )
 parser.add_argument(
     "--COUNT_THRESHOLD_TRUCK",
     help="Count threshold for trucks",
-    required=True,
+    default=3,
+    required=False,
     type=int,
     env_var="COUNT_THRESHOLD_TRUCK",
 )
@@ -111,9 +117,10 @@ parser.add_argument(
 # Tracking settings
 parser.add_argument(
     "--VALID_OBJECTS",
+    nargs="+",
     help="Count threshold for...",
-    action="append",
-    required=True,
+    required=False,
+    default=["Person", "Cyclist", "Car", "Truck", "Bus"],
     type=str,
     env_var="VALID_OBJECTS",
 )
@@ -129,7 +136,10 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--anchor_path", type=str, required=True, help="The path of the anchor txt file.",
+    "--anchor_path",
+    type=str,
+    help="The path of the anchor txt file.",
+    default=os.path.join(os.path.dirname(__file__), "data", "yolo_anchors.txt"),
 )
 
 parser.add_argument(
@@ -141,14 +151,18 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--class_name_path", type=str, help="The path of the class names.", required=True,
+    "--class_name_path",
+    type=str,
+    help="The path of the class names.",
+    default=os.path.join(os.path.dirname(__file__), "data", "coco.names"),
 )
 
 parser.add_argument(
     "--restore_path",
     type=str,
     help="The path of the weights to restore.",
-    required=True,
+    default="s3://automated-walk-bike-counter/yolo/yolov3.ckpt",
+    required=False,
 )
 
 parser.add_argument(

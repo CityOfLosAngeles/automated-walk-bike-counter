@@ -45,7 +45,7 @@ setup(
     packages=find_packages(),
     package_data={
         "automated_walk_bike_counter": [
-            "core/*.ini",
+            "core/data/*",
             "gui/static/images/*",
             "gui/static/videos/*",
         ],
