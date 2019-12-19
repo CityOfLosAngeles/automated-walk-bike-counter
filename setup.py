@@ -55,7 +55,7 @@ setup(
     install_requires=requires,
     extras_require={"develop": develop_requires},
     entry_points={
-        "gui_scripts": [
+        "console_scripts": [
             "automated-walk-bike-counter = automated_walk_bike_counter.gui.app:main"
         ]
     },
