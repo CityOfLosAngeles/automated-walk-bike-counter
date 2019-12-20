@@ -12,5 +12,6 @@ dependencies:
   - pykalman=0.9
   - python=3
   - requests=2
+  - s3fs
   - tensorflow=1.13
   - tqdm=4
