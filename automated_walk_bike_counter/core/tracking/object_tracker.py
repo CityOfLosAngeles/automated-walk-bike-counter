@@ -14,10 +14,11 @@ import os
 import re
 import sys
 from time import time as timer
-
-import numpy as np
+from urllib.parse import urlparse
 
 import cv2
+import numpy as np
+import s3fs
 import tensorflow as tf
 from munkres import Munkres
 
@@ -411,9 +412,28 @@ class ObjectTracker:
             # Set the AWS region for the Tensorflow S3 adapter.
             # TODO: figure out a more robust way of handling this, so
             # that we can have multiple regions or different storage backends.
+            restore_path = args.restore_path
             os.environ["AWS_REGION"] = config.AWS_REGION
+            if urlparse(restore_path).scheme == "s3" and sys.platform == "win32":
+                print("Windows detected -- caching s3 artifacts")
+                fs = s3fs.S3FileSystem(anon=True)
+                dirname = os.path.dirname(restore_path)
+                objects = fs.ls(dirname)[1:]  # The first entry is the directory itself
+                cache = os.path.join(os.path.expanduser("~"), ".awbc")
+                if not os.path.exists(cache):
+                    os.mkdir(cache)
+                for obj in objects:
+                    print(f"Copying {obj}")
+                    out = os.path.join(cache, os.path.basename(obj))
+                    if not os.path.exists(out):
+                        with fs.open(obj, "rb") as ifile:
+                            with open(out, "wb") as ofile:
+                                ofile.write(ifile.read())
+                restore_path = os.path.join(cache, os.path.basename(restore_path))
+                print("Restoring from cache: ", restore_path)
+
             saver = tf.train.Saver()
-            saver.restore(sess, args.restore_path)
+            saver.restore(sess, restore_path)
 
             while camera.isOpened():
 
