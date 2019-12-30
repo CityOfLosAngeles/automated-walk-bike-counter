@@ -9,7 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, IntVar, BooleanVar
 
 import cv2
 
@@ -32,21 +32,38 @@ class MainController(BaseController):
         # Should be corrected....
         self.video_settings_pane = None
         self.video_frame = None
+        self.input_camera_type = "file"
+        self.camera_id = 0
+        self.internal_webcam = IntVar()
+        self.external_webcam = IntVar()
+        self.stop_thread = BooleanVar()
 
     def open_file(self):
-        self.video = Video(filedialog.askopenfilename())
-        self.video_settings_pane.initialize_resolution_combo()
-        self.video_frame.set_progressbar_maximum()
+        file_name = filedialog.askopenfilename()
+        if file_name:
+            self.video = Video(file_name)
+            self.input_camera_type = "file"
+            self.camera_id = 0
+            # Uncheck the selected cameras in source menu
+            self.internal_webcam.set(0)
+            self.external_webcam.set(0)
+            self.video_settings_pane.initialize_resolution_combo()
+            self.video_frame.set_progressbar_maximum()
 
     def update_video_canvas(self, filename, listener_object):
 
+        self.stop_thread.set(False)
         self.listener_object = listener_object
         object_classes, color_table = self.get_selected_objects_list()
         tracker = ObjectTracker(self.mask)
-        tracker.video_filename = self.video.filename
+        if self.video:
+            tracker.video_filename = self.video.filename
         tracker.object_classes = object_classes
         tracker.color_table = color_table
         tracker.video = self.video
+        tracker.input_camera_type = self.input_camera_type
+        tracker.camera_id = self.camera_id
+        tracker.stop_thread = self.stop_thread
         tracker.output_video = self.output_video
         # tracker.frame_listener = self.handle_post_processed_frame
         print(listener_object.handle_post_processed_frame)
@@ -83,10 +100,9 @@ class MainController(BaseController):
             objects.append("bicycle")
             colors["bicycle"] = (255, 255, 255)
 
-        print(str(objects))
-        print(str(colors))
         return objects, colors
 
     def cancel_tracking_process(self):
+        self.stop_thread.set(True)
         if self.listener_object:
             self.listener_object.stop_threads()

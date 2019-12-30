@@ -72,6 +72,10 @@ class ObjectTracker:
             "motorbike": 120,
             "bicycle": 100,
         }
+        self.input_camera_type = ""
+        self.camera_id = 0
+        self.stop_thread = False
+        self.background_frame = None
 
     def printDataReportOnFrame(self):
         if self.current_frame is not None:
@@ -170,20 +174,20 @@ class ObjectTracker:
         new_mObject.set_next_covariance(filtered_state_covariances[-1])
         new_mObject.counted += 1
 
-        print(
-            "New moving object added with the id of "
-            + str(self.moving_object_id_number)
-            + " detected as "
-            + current_detected_object.mess
-            + " in position : "
-            + str(current_detected_object.left)
-            + " "
-            + str(current_detected_object.right)
-            + " "
-            + str(current_detected_object.top)
-            + " "
-            + str(current_detected_object.bot)
-        )
+        # print(
+        #     "New moving object added with the id of "
+        #     + str(self.moving_object_id_number)
+        #     + " detected as "
+        #     + current_detected_object.mess
+        #     + " in position : "
+        #     + str(current_detected_object.left)
+        #     + " "
+        #     + str(current_detected_object.right)
+        #     + " "
+        #     + str(current_detected_object.top)
+        #     + " "
+        #     + str(current_detected_object.bot)
+        # )
         # add to current_tracks
         self.lastFrameMovingObjects.append(new_mObject)
 
@@ -225,24 +229,24 @@ class ObjectTracker:
                     - self.object_costs[obj.mess]
                 )
                 distances.append(dis)
-                print(
-                    "Distance between obj known "
-                    + str(obj.mess)
-                    + " at position "
-                    + str(obj.left)
-                    + " "
-                    + str(obj.right)
-                    + " "
-                    + str(obj.top)
-                    + " "
-                    + str(obj.bot)
-                    + " with object with id "
-                    + str(curObject.id)
-                    + " known as "
-                    + curObject.last_detected_object.mess
-                    + " is "
-                    + str(dis)
-                )
+                # print(
+                #     "Distance between obj known "
+                #     + str(obj.mess)
+                #     + " at position "
+                #     + str(obj.left)
+                #     + " "
+                #     + str(obj.right)
+                #     + " "
+                #     + str(obj.top)
+                #     + " "
+                #     + str(obj.bot)
+                #     + " with object with id "
+                #     + str(curObject.id)
+                #     + " known as "
+                #     + curObject.last_detected_object.mess
+                #     + " is "
+                #     + str(dis)
+                # )
             return distances
 
         def get_costs_extended(last_frame_detected, cur_detected_objects):
@@ -298,12 +302,12 @@ class ObjectTracker:
                 threshold = config.TRUCK_COST_THRESHOLD
 
             if all(c > threshold for c in costs):
-                print(
-                    "object id "
-                    + str(obj.id)
-                    + " cost with all other detected objects is more than threshold "
-                    + "and is counted as missing in kalman"
-                )
+                # print(
+                #     "object id "
+                #     + str(obj.id)
+                #     + " cost with all other detected objects is more than threshold "
+                #     + "and is counted as missing in kalman"
+                # )
                 # update it with KF predicted position
                 obj.kalman_update_missing(obj.predicted_position[-1])
                 # skip this moving object
@@ -339,17 +343,22 @@ class ObjectTracker:
         print("video : ", file)
 
         # check if the video is reading from a file or from the webcam
-        if file == "camera":
-            file = 0
+        if self.input_camera_type == "webcam":
+            file = self.camera_id
             vfname = "camera"
         else:
             # get the video name to process
             m = re.match(r"([^\.]*)(\..*)", file)
             vfname = m.group(1)
+            vfname = m.string[:m.string.rfind('.')]
 
             assert os.path.isfile(file), "file {} does not exist".format(file)
 
         camera = cv2.VideoCapture(file)
+
+        if self.input_camera_type == "webcam":
+            camera.set(3,1200)
+            camera.set(4,800)
 
         self.video_width = int(camera.get(3))
         self.video_height = int(camera.get(4))
@@ -359,20 +368,21 @@ class ObjectTracker:
 
         assert camera.isOpened(), "Cannot capture source"
 
-        if file == 0:  # camera window
-            cv2.namedWindow("", 0)
+        if self.input_camera_type == "webcam":
+            # cv2.namedWindow('', self.camera_id)
             # _, frame = camera.read()
             # height, width, _ = frame.shape
-            cv2.resizeWindow("", self.video_width, self.video_height)
+            # cv2.resizeWindow('', self.video_width, self.video_height)
+            pass
 
         if SaveVideo:
             fourcc = cv2.VideoWriter_fourcc(*"XVID")
             outfile = vfname + "_result.mp4"
             print(outfile)
-            if file == 0:  # camera window
-                # fps = 1 / tfnetObject._get_fps(frame)
-                # TODO What is FPS here?
-                if fps < 1:  # noqa: F821
+            if self.input_camera_type == "webcam":
+                #fps = 1 / tfnetObject._get_fps(frame)
+                fps=1
+                if fps < 1:
                     fps = 1
             else:
                 fps = round(camera.get(cv2.CAP_PROP_FPS))
@@ -435,7 +445,7 @@ class ObjectTracker:
             saver = tf.train.Saver()
             saver.restore(sess, restore_path)
 
-            while camera.isOpened():
+            while camera.isOpened() and not self.stop_thread.get():
 
                 self.currentFrameNumber += 1
 
@@ -500,8 +510,8 @@ class ObjectTracker:
                             self.current_frame.postprocessed_frame,
                             self.currentFrameNumber,
                         )
-                    if file == 0:  # camera window
-                        cv2.imshow("", self.current_frame.postprocessed_frame)
+                    if self.input_camera_type == "webcam":
+                        cv2.imshow('', self.current_frame.postprocessed_frame)
 
                 # from the 2nd frame, calculate cost using predicted position and new
                 # contour positions
@@ -521,8 +531,8 @@ class ObjectTracker:
                                 self.current_frame.postprocessed_frame,
                                 self.currentFrameNumber,
                             )
-                        if file == 0:  # camera window
-                            cv2.imshow("", self.current_frame.postprocessed_frame)
+                        if self.input_camera_type == "webcam":
+                            cv2.imshow('', self.current_frame.postprocessed_frame)
 
                         continue
 
@@ -546,8 +556,8 @@ class ObjectTracker:
                                 self.current_frame.postprocessed_frame,
                                 self.currentFrameNumber,
                             )
-                        if file == 0:  # camera window
-                            cv2.imshow("", self.current_frame.postprocessed_frame)
+                        if self.input_camera_type == "webcam":
+                            cv2.imshow('', self.current_frame.postprocessed_frame)
 
                         continue
 
@@ -564,14 +574,14 @@ class ObjectTracker:
                             self.currentFrameNumber,
                         )
 
-                    if file == 0:  # camera window
-                        cv2.imshow("", self.current_frame.postprocessed_frame)
+                    if self.input_camera_type == "webcam":
+                        cv2.imshow('', self.current_frame.postprocessed_frame)
 
                 if elapsed % 5 == 0:
                     sys.stdout.write("\r")
                     sys.stdout.write("{0:3.3f} FPS".format(elapsed / (timer() - start)))
                     sys.stdout.flush()
-                if file == 0:  # camera window
+                if self.input_camera_type == "webcam":
                     choice = cv2.waitKey(1)
                     if choice == 27:
                         break
@@ -579,7 +589,7 @@ class ObjectTracker:
         if SaveVideo:
             videoWriter.release()
         camera.release()
-        if file == 0:  # camera window
+        if self.input_camera_type == "webcam":
             cv2.destroyAllWindows()
 
         count = (
@@ -610,12 +620,6 @@ class ObjectTracker:
                 del self.lastFrameMovingObjects[index]
 
             elif self.masked_image != [] and not self.check_object_is_in_aoi(obj):
-                print(
-                    "Delete tracking object ",
-                    obj.position[-1][0],
-                    obj.position[-1][1],
-                    "out of the area of interest!}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}",
-                )
                 del self.lastFrameMovingObjects[index]
 
     def predictMovingObjectsNewPosition(
@@ -823,28 +827,18 @@ class ObjectTracker:
                 )
         elif mess == "bicycle":
             print("Bicycle detected....")
-        else:
-            plot_one_box(
-                img_ori, [x0, y0, x1, y1], label=mess, color=self.color_table[mess]
-            )
+        elif obj.id in self.object_counter.Cars:
+            plot_one_box(img_ori, [x0, y0, x1, y1], label="Car", color=self.color_table["car"])
+        elif obj.id in self.object_counter.Trucks:
+            plot_one_box(img_ori, [x0, y0, x1, y1], label="Truck", color=self.color_table["truck"])
+        # else:
+        #     plot_one_box(
+        #         img_ori, [x0, y0, x1, y1], label=mess, color=self.color_table[mess]
+        #     )
 
     def update_frame_listener(self, frame, frame_number):
         self.frame_listener(frame, frame_number)
 
     def check_object_is_in_aoi(self, obj):
 
-        r, g, b = self.masked_image[
-            int(
-                obj.position[-1][0] * (self.image_processing_size[0] / self.video_width)
-            ),
-            int(
-                obj.position[-1][1]
-                * (self.image_processing_size[1] / self.video_height)
-            ),
-        ]
-
-        if r == 0 and g == 0 and b == 0:
-            # The object is not in the area of interest
-            return False
-        else:
-            return True
+        return True

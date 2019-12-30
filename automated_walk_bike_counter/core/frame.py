@@ -107,6 +107,20 @@ class Frame:
                         "exclude for duplicates:", ped.left, ped.right, ped.top, ped.bot
                     )
 
+        for ped1 in self.pedestrians:
+            for ped2 in self.pedestrians:
+                if ped1 is not ped2:
+                    boxes_2compare = np.array(
+                        [
+                            [ped1.left, ped1.top, ped1.right, ped1.bot],
+                            [ped2.left, ped2.top, ped2.right, ped2.bot]
+                        ]
+                    )
+                    o_rate = overlap_area(boxes_2compare)
+                    if o_rate > self.DUPLICATE_THREASHOLD:
+                        ped_boxes_dup_dict[ped2] = 1
+
+
         for mot in self.motorbikers:
             for ped in self.pedestrians:
                 boxes_2compare = np.array(
