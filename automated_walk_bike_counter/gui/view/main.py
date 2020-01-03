@@ -66,20 +66,33 @@ class MainView(BaseView):
         App_Menu(self.parent, self.controller)
 
     def initialize_top_frame(self, parent):
-        frame = Frame(master=parent, width=1200)
-        frame.grid(row=0, column=0, sticky="ew")
-        button = Button(master=parent, text="Generate")
+        frame = Frame(master = parent, width=1220)
+        frame.grid(row=0,column=0,sticky=E+W)
+        place_holder = Frame(master=frame, width=1140)
+        place_holder.grid(row=0, column=0)
+        button = Button(master = frame, text= "Generate")
         button.bind("<ButtonPress-1>", self.generate_button_click)
-        button.grid(row=0, column=1, sticky="e")
+        button.grid(row=0, column=1)
+
+        stop_button = Button(master = frame, text= "Stop")
+        stop_button.bind("<ButtonPress-1>", self.cancel_button_click)
+        stop_button.grid(row=0, column=2)
+
+        self.parent.grid_columnconfigure(0,weight=1)
+        self.parent.grid_columnconfigure(1, weight=0)
+        self.parent.grid_columnconfigure(2, weight=0)
 
     def generate_button_click(self, event):
-        if not self.controller.video:
-            messagebox.showwarning("Warning", "Please select a file!")
+        if self.controller.input_camera_type == "file":
+            if not self.controller.video:
+                messagebox.showwarning("Warning", "Please select a file!")
+            else:
+                self.video_frame.initialize_canvas()
         else:
             self.video_frame.initialize_canvas()
 
     def update_setting_aoi_status(self):
         self.left_frame.settings_pane.update_aoi_changes()
 
-    def cancel_button_click(self):
+    def cancel_button_click(self, event):
         self.controller.cancel_tracking_process()

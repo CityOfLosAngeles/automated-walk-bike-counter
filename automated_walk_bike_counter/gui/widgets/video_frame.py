@@ -143,21 +143,8 @@ class Video_Frame(Frame):
         self.video_player_canvas.image = frame_image
 
     def stop_threads(self):
-
-        if self.loading_thread_event and self.object_detection_thread:
-            self.loading_thread_event.set()
-            self.object_detection_thread.set()
-            while (
-                not self.loading_thread_event.is_set()
-                or not self.object_detection_thread.is_set()
-            ):
-                self.loading_thread.wait()
-                self.object_detection_thread.wait()
-            self.video_player_canvas.delete(ALL)
+        self.video_player_canvas.delete(ALL)
+        self.cur_fr_number.set(0)
 
     def set_progressbar_maximum(self):
-        print(
-            "FFFFFFFFFFFFFFFFFFFF Frame_count: "
-            + str(self.controller.video.frame_count)
-        )
         self.progressbar["maximum"] = self.controller.video.frame_count
