@@ -14,9 +14,8 @@ import threading
 from tkinter import ALL, CENTER, HORIZONTAL, Canvas, E, Event, Frame, IntVar, N, S, W
 from tkinter.ttk import Progressbar
 
-from PIL import Image, ImageTk
-
 import cv2
+from PIL import Image, ImageTk
 
 
 class Video_Frame(Frame):

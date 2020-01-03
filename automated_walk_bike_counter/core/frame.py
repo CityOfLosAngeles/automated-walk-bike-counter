@@ -113,13 +113,12 @@ class Frame:
                     boxes_2compare = np.array(
                         [
                             [ped1.left, ped1.top, ped1.right, ped1.bot],
-                            [ped2.left, ped2.top, ped2.right, ped2.bot]
+                            [ped2.left, ped2.top, ped2.right, ped2.bot],
                         ]
                     )
                     o_rate = overlap_area(boxes_2compare)
                     if o_rate > self.DUPLICATE_THREASHOLD:
                         ped_boxes_dup_dict[ped2] = 1
-
 
         for mot in self.motorbikers:
             for ped in self.pedestrians:

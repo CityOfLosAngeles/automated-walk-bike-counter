@@ -25,10 +25,9 @@ from tkinter import (
     W,
 )
 
+import cv2
 import numpy as np
 from PIL import Image, ImageTk
-
-import cv2
 
 
 class AOIDialog:
