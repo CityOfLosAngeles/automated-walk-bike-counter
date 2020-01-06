@@ -9,7 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from tkinter import filedialog, messagebox, IntVar, BooleanVar
+from tkinter import BooleanVar, IntVar, filedialog, messagebox
 
 import cv2
 
