@@ -10,7 +10,7 @@ rather than sampling a (possibly not representative) time and location.
 
 This project is a python library that implements the [algorithm developed by CSULA](https://pdfs.semanticscholar.org/c1d9/8fca75c63fd5975fc2fcd3fe07ac02de4a5b.pdf) that allows you to train and run the pipeline on your own cameras.
 
-This approach allows cities and others 
+This approach allows cities and others to implement CV ped and bike counting techniques on existing camera infrastructure. 
 
 ## Sponsors
 
