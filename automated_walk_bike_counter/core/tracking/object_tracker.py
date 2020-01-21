@@ -445,7 +445,7 @@ class ObjectTracker:
             saver = tf.train.Saver()
             saver.restore(sess, restore_path)
 
-            while camera.isOpened() and not self.stop_thread.get():
+            while camera.isOpened() and not self.stop_thread or not self.stop_thread.get():
 
                 self.currentFrameNumber += 1
 
@@ -506,11 +506,13 @@ class ObjectTracker:
 
                     if SaveVideo:
                         videoWriter.write(self.current_frame.postprocessed_frame)
+                    if self.frame_listener:
                         self.update_frame_listener(
                             self.current_frame.postprocessed_frame,
                             self.currentFrameNumber,
                         )
-                    if self.input_camera_type == "webcam":
+
+                    if self.input_camera_type == "webcam" or not self.frame_listener:
                         cv2.imshow('', self.current_frame.postprocessed_frame)
 
                 # from the 2nd frame, calculate cost using predicted position and new
@@ -527,12 +529,15 @@ class ObjectTracker:
 
                         if SaveVideo:
                             videoWriter.write(self.current_frame.postprocessed_frame)
+                        if self.frame_listener:
                             self.update_frame_listener(
                                 self.current_frame.postprocessed_frame,
                                 self.currentFrameNumber,
                             )
-                        if self.input_camera_type == "webcam":
-                            cv2.imshow('', self.current_frame.postprocessed_frame)
+
+                        if self.input_camera_type == "webcam" or not self.frame_listener:
+                            temp_image = self.current_frame.postprocessed_frame
+                            cv2.imshow('', temp_image)
 
                         continue
 
@@ -552,11 +557,12 @@ class ObjectTracker:
 
                         if SaveVideo:
                             videoWriter.write(self.current_frame.postprocessed_frame)
+                        if self.frame_listener:
                             self.update_frame_listener(
                                 self.current_frame.postprocessed_frame,
                                 self.currentFrameNumber,
                             )
-                        if self.input_camera_type == "webcam":
+                        if self.input_camera_type == "webcam" or not self.frame_listener:
                             cv2.imshow('', self.current_frame.postprocessed_frame)
 
                         continue
@@ -569,19 +575,19 @@ class ObjectTracker:
 
                     if SaveVideo:
                         videoWriter.write(self.current_frame.postprocessed_frame)
+                    if self.frame_listener:
                         self.update_frame_listener(
                             self.current_frame.postprocessed_frame,
                             self.currentFrameNumber,
                         )
-
-                    if self.input_camera_type == "webcam":
+                    if self.input_camera_type == "webcam" or not self.frame_listener:
                         cv2.imshow('', self.current_frame.postprocessed_frame)
 
                 if elapsed % 5 == 0:
                     sys.stdout.write("\r")
                     sys.stdout.write("{0:3.3f} FPS".format(elapsed / (timer() - start)))
                     sys.stdout.flush()
-                if self.input_camera_type == "webcam":
+                if self.input_camera_type == "webcam" or not self.frame_listener:
                     choice = cv2.waitKey(1)
                     if choice == 27:
                         break
@@ -589,7 +595,7 @@ class ObjectTracker:
         if SaveVideo:
             videoWriter.release()
         camera.release()
-        if self.input_camera_type == "webcam":
+        if self.input_camera_type == "webcam" or not self.frame_listener:
             cv2.destroyAllWindows()
 
         count = (
