@@ -8,15 +8,13 @@ However, thanks to advances in computer vision we can now automate that,
 allowing us to constantly count the number of pedestrians and cyclists,
 rather than sampling a (possibly not representative) time and location.
 
-This project is a proof of concept of how we could count the number folks moving through our streets.
+This project is a python library that implements the [algorithm developed by CSULA](https://pdfs.semanticscholar.org/c1d9/8fca75c63fd5975fc2fcd3fe07ac02de4a5b.pdf) that allows you to train and run the pipeline on your own cameras.
+
+This approach allows cities and others to implement CV ped and bike counting techniques on existing camera infrastructure. 
 
 ## Sponsors
 
-Toyota Mobility Foundation - William Chernicoff
-
-ITA - Jeanne Holm
-
-DOT - Seleta Reynolds, Marcel Porras
+This work has been generously sponsored by the Toyota Mobility Foundation as part of [a grant](https://ladot.lacity.org/sites/g/files/wph266/f/Press%20Release%20LADOT%20Awarded%20Mobility%20Grant%2C%20Will%20Conduct%20Department%27s%20First%20Count%20of%20Walkers%20and%20Bicyclists.pdf). 
 
 ## Partners
 
@@ -24,30 +22,20 @@ CSU LA, Dr. Mohammad Pourhomayoun
 
 ## City Team
 
-Hunter Owens
-
-Ian Rose
-
-Janna Smith
+Hunter Owens, Ian Rose, Janna Smith, Anthony Lyons. 
 
 ## Goals
 
 Allow us to know real-time active transportation counts for key corridors.
 
-## Deliverables
-
-Using computer vision, take data from video feeds and produce bicycle and pedestrian counts,
-publishing them using open data standards so that they are ready-to-be used for policymaking.
-
 ## Data Sources
 
-Model weights for the computer vision algorithm may be found at `s3://automated-walk-bike-counter`.
+Model weights for the computer vision algorithm may be found at `s3://automated-walk-bike-counter`. You can also train your own model. 
 
 ## Requirements
 
 This application requires a working Python environment capable of running Tensorflow.
-Either Tensorflow GPU or Tensorflow CPU can be used,
-but the latter is likely too slow for real-time application.
+Either Tensorflow GPU or Tensorflow CPU can be used, but the latter is likely too slow for real-time application.
 
 ## Installation
 

@@ -66,19 +66,19 @@ class MainView(BaseView):
         App_Menu(self.parent, self.controller)
 
     def initialize_top_frame(self, parent):
-        frame = Frame(master = parent, width=1220)
-        frame.grid(row=0,column=0,sticky=E+W)
+        frame = Frame(master=parent, width=1220)
+        frame.grid(row=0, column=0, sticky=E + W)
         place_holder = Frame(master=frame, width=1140)
         place_holder.grid(row=0, column=0)
-        button = Button(master = frame, text= "Generate")
+        button = Button(master=frame, text="Generate")
         button.bind("<ButtonPress-1>", self.generate_button_click)
         button.grid(row=0, column=1)
 
-        stop_button = Button(master = frame, text= "Stop")
+        stop_button = Button(master=frame, text="Stop")
         stop_button.bind("<ButtonPress-1>", self.cancel_button_click)
         stop_button.grid(row=0, column=2)
 
-        self.parent.grid_columnconfigure(0,weight=1)
+        self.parent.grid_columnconfigure(0, weight=1)
         self.parent.grid_columnconfigure(1, weight=0)
         self.parent.grid_columnconfigure(2, weight=0)
 

@@ -27,7 +27,7 @@ class App_Menu(Menu):
         menu_source = Menu(menubar)
         menubar.add_cascade(menu=menu_file, label="File")
         menubar.add_cascade(menu=menu_tools, label="Tools")
-        menubar.add_cascade(menu=menu_source, label='Source')
+        menubar.add_cascade(menu=menu_source, label="Source")
 
         menu_file.add_command(label="Open...", command=controller.open_file)
         menu_file.add_separator()
@@ -35,10 +35,21 @@ class App_Menu(Menu):
 
         menu_tools.add_command(label="Add AOI", command=controller.add_new_aoi)
 
-        menu_source.add_checkbutton(label='Built-in Webcam', command=self.built_in_webcam_selected, onvalue=1, offvalue=0, variable=self.controller.internal_webcam)
+        menu_source.add_checkbutton(
+            label="Built-in Webcam",
+            command=self.built_in_webcam_selected,
+            onvalue=1,
+            offvalue=0,
+            variable=self.controller.internal_webcam,
+        )
 
-        menu_source.add_checkbutton(label='External Webcam', command=self.external_webcam_selected, onvalue=1, offvalue=0, variable=self.controller.external_webcam)
-
+        menu_source.add_checkbutton(
+            label="External Webcam",
+            command=self.external_webcam_selected,
+            onvalue=1,
+            offvalue=0,
+            variable=self.controller.external_webcam,
+        )
 
     def built_in_webcam_selected(self):
 
@@ -51,4 +62,3 @@ class App_Menu(Menu):
         self.controller.internal_webcam.set(0)
         self.controller.input_camera_type = "webcam"
         self.controller.camera_id = 1
-

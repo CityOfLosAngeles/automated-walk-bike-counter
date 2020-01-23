@@ -350,15 +350,15 @@ class ObjectTracker:
             # get the video name to process
             m = re.match(r"([^\.]*)(\..*)", file)
             vfname = m.group(1)
-            vfname = m.string[:m.string.rfind('.')]
+            vfname = m.string[: m.string.rfind(".")]
 
             assert os.path.isfile(file), "file {} does not exist".format(file)
 
         camera = cv2.VideoCapture(file)
 
         if self.input_camera_type == "webcam":
-            camera.set(3,1200)
-            camera.set(4,800)
+            camera.set(3, 1200)
+            camera.set(4, 800)
 
         self.video_width = int(camera.get(3))
         self.video_height = int(camera.get(4))
@@ -380,8 +380,8 @@ class ObjectTracker:
             outfile = vfname + "_result.mp4"
             print(outfile)
             if self.input_camera_type == "webcam":
-                #fps = 1 / tfnetObject._get_fps(frame)
-                fps=1
+                # fps = 1 / tfnetObject._get_fps(frame)
+                fps = 1
                 if fps < 1:
                     fps = 1
             else:
@@ -515,6 +515,7 @@ class ObjectTracker:
                     if self.input_camera_type == "webcam" or not self.frame_listener:
                         cv2.imshow('', self.current_frame.postprocessed_frame)
 
+
                 # from the 2nd frame, calculate cost using predicted position and new
                 # contour positions
                 else:
@@ -535,9 +536,11 @@ class ObjectTracker:
                                 self.currentFrameNumber,
                             )
 
+
                         if self.input_camera_type == "webcam" or not self.frame_listener:
                             temp_image = self.current_frame.postprocessed_frame
                             cv2.imshow('', temp_image)
+
 
                         continue
 
@@ -562,8 +565,10 @@ class ObjectTracker:
                                 self.current_frame.postprocessed_frame,
                                 self.currentFrameNumber,
                             )
+
                         if self.input_camera_type == "webcam" or not self.frame_listener:
                             cv2.imshow('', self.current_frame.postprocessed_frame)
+
 
                         continue
 
@@ -580,8 +585,10 @@ class ObjectTracker:
                             self.current_frame.postprocessed_frame,
                             self.currentFrameNumber,
                         )
+
                     if self.input_camera_type == "webcam" or not self.frame_listener:
                         cv2.imshow('', self.current_frame.postprocessed_frame)
+
 
                 if elapsed % 5 == 0:
                     sys.stdout.write("\r")
@@ -834,9 +841,16 @@ class ObjectTracker:
         elif mess == "bicycle":
             print("Bicycle detected....")
         elif obj.id in self.object_counter.Cars:
-            plot_one_box(img_ori, [x0, y0, x1, y1], label="Car", color=self.color_table["car"])
+            plot_one_box(
+                img_ori, [x0, y0, x1, y1], label="Car", color=self.color_table["car"]
+            )
         elif obj.id in self.object_counter.Trucks:
-            plot_one_box(img_ori, [x0, y0, x1, y1], label="Truck", color=self.color_table["truck"])
+            plot_one_box(
+                img_ori,
+                [x0, y0, x1, y1],
+                label="Truck",
+                color=self.color_table["truck"],
+            )
         # else:
         #     plot_one_box(
         #         img_ori, [x0, y0, x1, y1], label=mess, color=self.color_table[mess]

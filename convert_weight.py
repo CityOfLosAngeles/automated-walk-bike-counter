@@ -15,6 +15,7 @@
 from __future__ import division, print_function
 
 import tensorflow as tf
+
 from automated_walk_bike_counter.core.model import load_weights, parse_anchors, yolov3
 
 num_class = 80
