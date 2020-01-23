@@ -13,11 +13,6 @@ import os
 
 import configargparse
 
-
-def list_of_tuples(arg):
-    return [tuple(map(int, x.split(','))) for x in arg.split(';')]
-
-
 parser = configargparse.get_argument_parser()
 
 # Config file
@@ -176,50 +171,5 @@ parser.add_argument(
     default=True,
     help="Whether to save the video detection results.",
 )
-
-parser.add_argument(
-    "--input_type",
-    type=str,
-    default='',
-    choices=['file', 'camera'],
-    help="Whether the input is file or camera.",
-)
-
-parser.add_argument(
-    "--file_name",
-    type=str,
-    help="The path of the input file.",
-)
-
-parser.add_argument(
-    "--camera_id",
-    type=int,
-    default=0,
-    help="The id of the input camera.",
-)
-
-parser.add_argument(
-    "--search_objects",
-    type=list,
-    default=["Person", "Cyclist"],
-    help="The list of valid objects.",
-)
-
-parser.add_argument(
-    "--objects_colors",
-    type=list,
-    default=["#ff0000", "#00ff00"],
-    help="The list of objects' colors.",
-)
-
-
-parser.add_argument(
-    "--aoi",
-    type=list_of_tuples,
-    help="The list of aoi coordinates.",
-)
-
-
-
 
 config = parser.parse_known_args()[0]
