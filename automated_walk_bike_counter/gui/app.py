@@ -47,9 +47,6 @@ class Cli:
     def set_valid_selected_objects(self):
         allowed_objects = config.VALID_OBJECTS
         for i in range(len(allowed_objects)):
-            print(config.search_objects)
-            print(config.objects_colors)
-            print(allowed_objects[i])
 
             if allowed_objects[i] in config.search_objects:
                 object_color = config.objects_colors[config.search_objects.index(allowed_objects[i])]
@@ -124,15 +121,15 @@ class Cli:
 
 
 def main():
-    console = True
 
-    if not console:
-        app = Application()
-        app.run()
-    else:
+    if config.cli:
+
         if config.input_type == "file":
             print(config.file_name)
         else:
             print(config.camera_id)
         cli = Cli()
         cli.run()
+    else:
+        app = Application()
+        app.run()

@@ -219,6 +219,11 @@ parser.add_argument(
     help="The list of aoi coordinates.",
 )
 
+parser.add_argument(
+    "--cli",
+    type=lambda x: (str(x).lower() == "true"),
+    help="Whether to run the application on cli.",
+)
 
 
 
