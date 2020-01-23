@@ -1,0 +1,23 @@
+trigger:
+  - master
+jobs:
+  - job: 'test_automated_walk_bike_counter'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    timeoutInMinutes: 0
+    steps:
+      - bash: echo "##vso[task.prependpath]$CONDA/bin"
+        displayName: Add conda to PATH
+      - bash: conda env create --file environment.yml
+        displayName: Create conda env
+      - bash: |
+          source activate automated-walk-bike-counter
+          pip install .
+          automated-walk-bike-counter --help
+        displayName: Smoke test application
+      - bash: |
+          source activate automated-walk-bike-counter
+          pip install pre-commit
+          pre-commit install
+          pre-commit run --all-files
+        displayName: Run lint and formatting checks

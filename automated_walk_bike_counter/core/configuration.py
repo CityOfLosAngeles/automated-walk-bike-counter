@@ -15,7 +15,7 @@ import configargparse
 
 
 def list_of_tuples(arg):
-    return [tuple(map(int, x.split(','))) for x in arg.split(';')]
+    return [tuple(map(int, x.split(","))) for x in arg.split(";")]
 
 
 parser = configargparse.get_argument_parser()
@@ -180,22 +180,17 @@ parser.add_argument(
 parser.add_argument(
     "--input_type",
     type=str,
-    default='',
-    choices=['file', 'camera'],
+    default="",
+    choices=["file", "camera"],
     help="Whether the input is file or camera.",
 )
 
 parser.add_argument(
-    "--file_name",
-    type=str,
-    help="The path of the input file.",
+    "--file_name", type=str, help="The path of the input file.",
 )
 
 parser.add_argument(
-    "--camera_id",
-    type=int,
-    default=0,
-    help="The id of the input camera.",
+    "--camera_id", type=int, default=0, help="The id of the input camera.",
 )
 
 parser.add_argument(
@@ -214,12 +209,8 @@ parser.add_argument(
 
 
 parser.add_argument(
-    "--aoi",
-    type=list_of_tuples,
-    help="The list of aoi coordinates.",
+    "--aoi", type=list_of_tuples, help="The list of aoi coordinates.",
 )
-
-
 
 
 config = parser.parse_known_args()[0]
