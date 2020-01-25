@@ -445,7 +445,9 @@ class ObjectTracker:
             saver = tf.train.Saver()
             saver.restore(sess, restore_path)
 
-            while camera.isOpened() and not self.stop_thread or not self.stop_thread.get():
+            while (
+                camera.isOpened() and not self.stop_thread or not self.stop_thread.get()
+            ):
 
                 self.currentFrameNumber += 1
 
@@ -513,8 +515,7 @@ class ObjectTracker:
                         )
 
                     if self.input_camera_type == "webcam" and not config.cli:
-                        cv2.imshow('', self.current_frame.postprocessed_frame)
-
+                        cv2.imshow("", self.current_frame.postprocessed_frame)
 
                 # from the 2nd frame, calculate cost using predicted position and new
                 # contour positions
@@ -538,8 +539,7 @@ class ObjectTracker:
 
                         if self.input_camera_type == "webcam" and not config.cli:
                             temp_image = self.current_frame.postprocessed_frame
-                            cv2.imshow('', temp_image)
-
+                            cv2.imshow("", temp_image)
 
                         continue
 
@@ -566,8 +566,7 @@ class ObjectTracker:
                             )
 
                         if self.input_camera_type == "webcam" and not config.cli:
-                            cv2.imshow('', self.current_frame.postprocessed_frame)
-
+                            cv2.imshow("", self.current_frame.postprocessed_frame)
 
                         continue
 
@@ -586,8 +585,7 @@ class ObjectTracker:
                         )
 
                     if self.input_camera_type == "webcam" and not config.cli:
-                        cv2.imshow('', self.current_frame.postprocessed_frame)
-
+                        cv2.imshow("", self.current_frame.postprocessed_frame)
 
                 if elapsed % 5 == 0:
                     sys.stdout.write("\r")

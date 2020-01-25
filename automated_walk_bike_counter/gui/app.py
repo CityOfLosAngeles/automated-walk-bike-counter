@@ -10,16 +10,16 @@
 # Haiyan Wang
 
 import tkinter as tk
+
 import cv2
 import numpy as np
-
 from PIL import Image
-from .controller.main_controller import MainController
-from .view.main import MainView
+
 from ..core.configuration import config
 from ..core.tracking.object_tracker import ObjectTracker
+from .controller.main_controller import MainController
 from .video import OutputVideo, Video
-
+from .view.main import MainView
 
 
 class Application:
@@ -43,18 +43,26 @@ class Cli:
         self.aoi_points = config.aoi
         self.set_valid_selected_objects()
 
-
     def set_valid_selected_objects(self):
         allowed_objects = config.VALID_OBJECTS
         for i in range(len(allowed_objects)):
 
             if allowed_objects[i] in config.search_objects:
-                object_color = config.objects_colors[config.search_objects.index(allowed_objects[i])]
-                c = object_color.lstrip('#')
-                self.valid_selected_objects.append((allowed_objects[i], (tuple(int(c[i:i+2],16) for i in (0, 2, 4)), object_color), 1))
+                object_color = config.objects_colors[
+                    config.search_objects.index(allowed_objects[i])
+                ]
+                c = object_color.lstrip("#")
+                self.valid_selected_objects.append(
+                    (
+                        allowed_objects[i],
+                        (tuple(int(c[i : i + 2], 16) for i in (0, 2, 4)), object_color),
+                        1,
+                    )
+                )
             else:
-                self.valid_selected_objects.append((allowed_objects[i], ((255, 255, 255), "#FFFFFF"), 0))
-
+                self.valid_selected_objects.append(
+                    (allowed_objects[i], ((255, 255, 255), "#FFFFFF"), 0)
+                )
 
     def get_objects_colors_list(self):
 
@@ -77,11 +85,12 @@ class Cli:
 
     def get_mask_image(self):
         video_width, video_height = self.get_input_video_dimension()
-        mask_image = np.asarray(Image.new("RGB", (int(video_width), int(video_height)), 0))
+        mask_image = np.asarray(
+            Image.new("RGB", (int(video_width), int(video_height)), 0)
+        )
         return cv2.fillConvexPoly(
-                    mask_image, np.array(self.aoi_points, "int32"), (255, 255, 255), 8, 0
-               )
-
+            mask_image, np.array(self.aoi_points, "int32"), (255, 255, 255), 8, 0
+        )
 
     def get_input_video_dimension(self):
         width, height = 0, 0
@@ -98,9 +107,9 @@ class Cli:
         output_video = None
         object_classes, color_table = self.get_objects_colors_list()
         mask = []
-        if self.aoi_points and len(self.aoi_points)>2:
+        if self.aoi_points and len(self.aoi_points) > 2:
             mask = self.get_mask_image()
-        #cv2.imshow('aaa', mask)
+        # cv2.imshow('aaa', mask)
         tracker = ObjectTracker(mask)
 
         if config.file_name != "":
