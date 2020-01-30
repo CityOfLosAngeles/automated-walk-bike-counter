@@ -517,6 +517,7 @@ class ObjectTracker:
                     if self.input_camera_type == "webcam" and not config.cli:
                         cv2.imshow("", self.current_frame.postprocessed_frame)
 
+
                 # from the 2nd frame, calculate cost using predicted position and new
                 # contour positions
                 else:

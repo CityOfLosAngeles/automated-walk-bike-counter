@@ -103,7 +103,6 @@ class Cli:
         return width, height
 
     def run(self):
-        video_file = None
         output_video = None
         object_classes, color_table = self.get_objects_colors_list()
         mask = []
