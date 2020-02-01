@@ -396,7 +396,9 @@ class ObjectTracker:
             # Count the number of the frames that should pass in order to compute the time for exporting the counter
             # Since the periodic_counter_time is in minutes we use the following formula to compute the intervals
             # input counter time in minutes * video frame per second * number of seconds in each min
-            self.periodic_counter_interval = config.periodic_counter_time * self.video.fps * 60
+            self.periodic_counter_interval = (
+                config.periodic_counter_time * self.video.fps * 60
+            )
             # For testing purpose we can consider periodic_counter_time as seconds and use the following formula
             # self.periodic_counter_interval = config.periodic_counter_time * self.video.fps
 
@@ -465,7 +467,6 @@ class ObjectTracker:
                     if self.currentFrameNumber % self.periodic_counter_interval == 0:
                         self.object_counter.export_counter_threading()
 
-
                 elapsed = self.currentFrameNumber
 
                 ret, img_ori = camera.read()
@@ -531,7 +532,6 @@ class ObjectTracker:
 
                     if self.input_camera_type == "webcam" and not config.cli:
                         cv2.imshow("", self.current_frame.postprocessed_frame)
-
 
                 # from the 2nd frame, calculate cost using predicted position and new
                 # contour positions

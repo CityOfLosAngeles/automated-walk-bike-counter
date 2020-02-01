@@ -16,6 +16,7 @@ from ..configuration import config
 import os
 import csv
 
+
 class Object_Counter:
 
     # change to 10 from 20 on 2/26 because biker doesn't get counted correctly
@@ -53,11 +54,8 @@ class Object_Counter:
         self.export_counter = 0
         self.counter_thread = None
 
-
         if config.save_periodic_counter:
             self.export_counter_initialization()
-
-
 
     def addNewMovingObjectForCounting(self, obj, position_new, postprocessed):
         cur_detected_object = obj.last_detected_object
@@ -233,48 +231,50 @@ class Object_Counter:
 
     def export_counter_threading(self):
         self.counter_thread = threading.Thread(
-            target=self.counterExport,
-            args=(),
-            daemon=True
+            target=self.counterExport, args=(), daemon=True
         )
         self.counter_thread.start()
 
-
     def counterExport(self):
 
-        header = ['Time', 'Pedestrian', 'Cyclist']
+        header = ["Time", "Pedestrian", "Cyclist"]
 
         self.export_counter += 1
 
         cur_ped_counter = self.COUNTER_p
         cur_cyclist_counter = self.COUNTER_c
-        ped_output_counter =  cur_ped_counter - self.last_exported_ped_counter
-        cyclyst_output_counter =  cur_cyclist_counter - self.last_exported_cyclist_counter
+        ped_output_counter = cur_ped_counter - self.last_exported_ped_counter
+        cyclyst_output_counter = (
+            cur_cyclist_counter - self.last_exported_cyclist_counter
+        )
 
-        if ped_output_counter<0:
+        if ped_output_counter < 0:
             ped_output_counter = 0
-        if cyclyst_output_counter<0:
+        if cyclyst_output_counter < 0:
             cyclyst_output_counter = 0
 
         video_counted_minutes = config.periodic_counter_time * self.export_counter
 
-
-
         cur_timestamp_days = video_counted_minutes // (24 * 60 * 60)
-        print("--- cur_timestamp_days" + str(cur_timestamp_days))
         hours_minutes_total = video_counted_minutes % (24 * 60)
         remained_hours = hours_minutes_total // (60)
         cur_timestamp_hours = remained_hours
-        print("--- cur_timestamp_hours" + str(cur_timestamp_hours))
         remained_minutes = hours_minutes_total % (60)
         cur_timestamp_minutes = remained_minutes
-        print("---cur_timestamp_minutes " + str(self.export_counter))
 
-
-        with open(self.output_counter_file_name,  "a+", newline="") as csvfile:
+        with open(self.output_counter_file_name, "a+", newline="") as csvfile:
             counters = csv.DictWriter(csvfile, fieldnames=header)
-            data = [{'Time': str(cur_timestamp_days)+":"+str(cur_timestamp_hours)+":"+str(cur_timestamp_minutes), 'Pedestrian': str(ped_output_counter),
-                    'Cyclist': str(cyclyst_output_counter)}]
+            data = [
+                {
+                    "Time": str(cur_timestamp_days)
+                    + ":"
+                    + str(cur_timestamp_hours)
+                    + ":"
+                    + str(cur_timestamp_minutes),
+                    "Pedestrian": str(ped_output_counter),
+                    "Cyclist": str(cyclyst_output_counter),
+                }
+            ]
             counters.writerows(data)
 
         self.last_exported_ped_counter = cur_ped_counter

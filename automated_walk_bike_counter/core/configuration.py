@@ -200,15 +200,11 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--file_name",
-    type=str,
-    help="The path of the input file.",
+    "--file_name", type=str, help="The path of the input file.",
 )
 
 parser.add_argument(
-    "--camera_id",
-    type=int, default=0,
-    help="The id of the input camera.",
+    "--camera_id", type=int, default=0, help="The id of the input camera.",
 )
 
 parser.add_argument(
@@ -227,9 +223,7 @@ parser.add_argument(
 
 
 parser.add_argument(
-    "--aoi",
-    type=list_of_tuples,
-    help="The list of aoi coordinates.",
+    "--aoi", type=list_of_tuples, help="The list of aoi coordinates.",
 )
 
 parser.add_argument(
