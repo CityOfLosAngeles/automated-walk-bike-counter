@@ -76,6 +76,7 @@ class ObjectTracker:
         self.camera_id = 0
         self.stop_thread = False
         self.background_frame = None
+        self.periodic_counter_interval = 0
 
     def printDataReportOnFrame(self):
         if self.current_frame is not None:
@@ -391,6 +392,14 @@ class ObjectTracker:
                 outfile, fourcc, fps, (self.video_width, self.video_height)
             )
 
+        if config.save_periodic_counter and self.input_camera_type == "file":
+            # Count the number of the frames that should pass in order to compute the time for exporting the counter
+            # Since the periodic_counter_time is in minutes we use the following formula to compute the intervals
+            # input counter time in minutes * video frame per second * number of seconds in each min
+            self.periodic_counter_interval = config.periodic_counter_time * self.video.fps * 60
+            # For testing purpose we can consider periodic_counter_time as seconds and use the following formula
+            # self.periodic_counter_interval = config.periodic_counter_time * self.video.fps
+
         start = timer()
         n = 0
 
@@ -450,6 +459,12 @@ class ObjectTracker:
             ):
 
                 self.currentFrameNumber += 1
+
+                # Check for the need to generate the value of counters periodically
+                if self.periodic_counter_interval != 0:
+                    if self.currentFrameNumber % self.periodic_counter_interval == 0:
+                        self.object_counter.export_counter_threading()
+
 
                 elapsed = self.currentFrameNumber
 

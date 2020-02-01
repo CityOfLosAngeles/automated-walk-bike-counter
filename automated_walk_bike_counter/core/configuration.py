@@ -178,6 +178,20 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "--save_periodic_counter",
+    type=lambda x: (str(x).lower() == "true"),
+    default=False,
+    help="Whether to save the periodic counter.(Save counter in 15 minutes)",
+)
+
+parser.add_argument(
+    "--periodic_counter_time",
+    type=int,
+    default=15,
+    help="Time frame to generate the periodic counter.(in minutes)",
+)
+
+parser.add_argument(
     "--input_type",
     type=str,
     default="",
@@ -186,11 +200,15 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "--file_name", type=str, help="The path of the input file.",
+    "--file_name",
+    type=str,
+    help="The path of the input file.",
 )
 
 parser.add_argument(
-    "--camera_id", type=int, default=0, help="The id of the input camera.",
+    "--camera_id",
+    type=int, default=0,
+    help="The id of the input camera.",
 )
 
 parser.add_argument(
@@ -209,7 +227,9 @@ parser.add_argument(
 
 
 parser.add_argument(
-    "--aoi", type=list_of_tuples, help="The list of aoi coordinates.",
+    "--aoi",
+    type=list_of_tuples,
+    help="The list of aoi coordinates.",
 )
 
 parser.add_argument(

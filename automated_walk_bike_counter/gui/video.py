@@ -19,6 +19,7 @@ class Video:
         self.width = int(camera.get(3))
         self.height = int(camera.get(4))
         self.frame_count = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.fps = camera.get(cv2.CAP_PROP_FPS)
 
 
 class OutputVideo:
