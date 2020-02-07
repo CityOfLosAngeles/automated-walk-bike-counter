@@ -398,7 +398,7 @@ class ObjectTracker:
             # formula to compute the intervals
             # input counter time in minutes * video frame per second * number of
             # seconds in each min
-            self.periodic_counter_interval = (
+            self.periodic_counter_interval = int(
                 config.periodic_counter_time * self.video.fps * 60
             )
 
@@ -472,10 +472,7 @@ class ObjectTracker:
 
                 # Check for the need to generate the value of counters periodically
                 if self.periodic_counter_interval != 0:
-                    if (
-                        self.currentFrameNumber % int(self.periodic_counter_interval)
-                        == 0
-                    ):
+                    if self.currentFrameNumber % self.periodic_counter_interval == 0:
                         self.object_counter.export_counter_threading()
 
                 elapsed = self.currentFrameNumber
