@@ -110,7 +110,7 @@ class SettingsPane(LabelFrame):
         )
         self.aoi_combo.current(int(self.controller.output_video.has_AOI))
 
-    def aoi_output_present_change(self):
+    def aoi_output_present_change(self, event):
         self.controller.output_video.AOI_output_present = bool(
             self.aoi_output_present_combo.current()
         )

@@ -73,7 +73,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD",
     help="Count threshold",
-    default=10,
+    default=4,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD",
@@ -81,7 +81,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD_BIKE",
     help="Count threshold for bikes",
-    default=5,
+    default=2,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BIKE",
