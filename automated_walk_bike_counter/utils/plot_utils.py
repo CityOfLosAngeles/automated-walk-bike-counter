@@ -33,7 +33,7 @@ def plot_one_box(img, coord, label=None, color=None, line_thickness=None):
     line_thickness: int. rectangle line thickness.
     """
     print("<<<<<<<<" + label + " -- " + str(color) + ">>>>>>>>>>>>>>>>>>>>")
-    tl = line_thickness or int(round(0.002 * max(img.shape[0:2])))  # line thickness
+    tl = line_thickness or int(round(0.004 * max(img.shape[0:2])))  # line thickness
     color = color
     c1, c2 = (int(coord[0]), int(coord[1])), (int(coord[2]), int(coord[3]))
     cv2.rectangle(img, c1, c2, color, thickness=tl)
