@@ -21,3 +21,8 @@ jobs:
           pre-commit install
           pre-commit run --all-files
         displayName: Run lint and formatting checks
+      - bash: |
+          source activate automated-walk-bike-counter
+          pip install .
+          automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True
+        displayName: Test application
