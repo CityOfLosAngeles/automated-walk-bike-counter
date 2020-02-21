@@ -47,7 +47,6 @@ class Object_Counter:
         self.Cyclists = {}
         self.Trucks = {}
 
-
         self.output_counter_file_name = "counter.csv"
         self.last_exported_ped_counter = 0
         self.last_exported_cyclist_counter = 0

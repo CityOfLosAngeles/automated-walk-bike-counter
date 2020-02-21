@@ -1,4 +1,4 @@
-        # Copyright (c) Data Science Research Lab at California State University Los
+# Copyright (c) Data Science Research Lab at California State University Los
 # Angeles (CSULA), and City of Los Angeles ITA
 # Distributed under the terms of the Apache 2.0 License
 # www.calstatela.edu/research/data-science
