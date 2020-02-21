@@ -47,6 +47,16 @@ class Object_Counter:
         self.Cyclists = {}
         self.Trucks = {}
 
+
+        self.output_counter_file_name = "counter.csv"
+        self.last_exported_ped_counter = 0
+        self.last_exported_cyclist_counter = 0
+        self.export_counter = 0
+        self.counter_thread = None
+
+        if config.save_periodic_counter:
+            self.export_counter_initialization()
+
     def addNewMovingObjectForCounting(self, obj, position_new, postprocessed):
         cur_detected_object = obj.last_detected_object
         cont_m = cur_detected_object.mess
