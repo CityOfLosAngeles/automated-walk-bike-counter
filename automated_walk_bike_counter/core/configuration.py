@@ -218,5 +218,16 @@ parser.add_argument(
     help="Whether to run the application on cli.",
 )
 
+parser.add_argument(
+    "--save_periodic_counter",
+    type=lambda x: (str(x).lower() == "true"),
+    help="Whether to save a periodic count",
+)
+
+parser.add_argument(
+    "--periodic_counter_time",
+    type=int,
+    help="Interval (in minutes) to output the periodic counter",
+)
 
 config = parser.parse_known_args()[0]

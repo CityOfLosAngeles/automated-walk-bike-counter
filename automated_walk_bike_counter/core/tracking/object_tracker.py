@@ -76,6 +76,7 @@ class ObjectTracker:
         self.camera_id = 0
         self.stop_thread = False
         self.background_frame = None
+        self.periodic_counter_interval = 0
 
     def printDataReportOnFrame(self):
         if self.current_frame is not None:
