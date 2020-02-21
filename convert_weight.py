@@ -15,8 +15,8 @@
 from __future__ import division, print_function
 
 import tensorflow as tf
-
-from automated_walk_bike_counter.core.model import load_weights, parse_anchors, yolov3
+from automated_walk_bike_counter.core.model import yolov3
+from automated_walk_bike_counter.utils.misc_utils import load_weights, parse_anchors
 
 num_class = 80
 img_size = 416
