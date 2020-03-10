@@ -19,7 +19,7 @@ from ..configuration import config
 class Object_Counter:
 
     # change to 10 from 20 on 2/26 because biker doesn't get counted correctly
-    COUNT_THRESHOLD = 4
+    COUNT_THRESHOLD = 8
 
     COUNT_THRESHOLD_BIKE = 1
     COUNT_THRESHOLD_MOTOR = 3
@@ -47,7 +47,7 @@ class Object_Counter:
         self.Cyclists = {}
         self.Trucks = {}
 
-        self.output_counter_file_name = "counter.csv"
+        self.output_counter_file_name = "counter"
         self.last_exported_ped_counter = 0
         self.last_exported_cyclist_counter = 0
         self.export_counter = 0
@@ -220,6 +220,8 @@ class Object_Counter:
     def export_counter_initialization(self):
 
         header = ["Time", "Pedestrian", "Cyclist"]
+
+        self.output_counter_file_name = self.output_counter_file_name + ".csv"
 
         if os.path.isfile(self.output_counter_file_name):
             os.remove(self.output_counter_file_name)
