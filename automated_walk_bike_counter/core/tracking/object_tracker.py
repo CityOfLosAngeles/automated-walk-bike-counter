@@ -644,6 +644,8 @@ class ObjectTracker:
         )
         print(count)
 
+        self.object_counter.counter_thread.join()
+
     def removeTrackedObjects(self, thresh):
         # MISSING_THREASHOLD = 90
 
