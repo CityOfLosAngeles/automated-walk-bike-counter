@@ -227,6 +227,7 @@ parser.add_argument(
 parser.add_argument(
     "--periodic_counter_time",
     type=int,
+    default=15,
     help="Interval (in minutes) to output the periodic counter",
 )
 
