@@ -77,6 +77,7 @@ class ObjectTracker:
         self.stop_thread = False
         self.background_frame = None
         self.periodic_counter_interval = 0
+        self.valid_selected_objects = []
 
     def printDataReportOnFrame(self):
         if self.current_frame is not None:
@@ -333,6 +334,10 @@ class ObjectTracker:
 
         anchors = parse_anchors(args.anchor_path)
         classes = read_class_names(args.class_name_path)
+        self.object_counter.valid_selected_objects = self.valid_selected_objects
+        if config.save_periodic_counter:
+            self.object_counter.export_counter_initialization()
+
         num_class = len(classes)
 
         self.image_processing_size = args.new_size
@@ -403,7 +408,9 @@ class ObjectTracker:
             # input counter time in minutes * video frame per second * number of
             # seconds in each min
             self.periodic_counter_interval = int(
-                config.periodic_counter_time * self.video.fps * 60
+                # config.periodic_counter_time * self.video.fps * 60
+                config.periodic_counter_time
+                * self.video.fps
             )
 
             # For testing purpose we can consider periodic_counter_time as seconds
