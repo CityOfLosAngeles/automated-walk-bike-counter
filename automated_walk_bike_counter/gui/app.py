@@ -121,6 +121,12 @@ class Cli:
             tracker.output_video = output_video
             print(">> Video Filename : ", video.filename)
 
+        tracker.valid_selected_objects = [
+            "pedestrian" if item == "person" else item
+            for item in object_classes
+            if item != "bicycle"
+        ]
+
         tracker.object_classes = object_classes
         tracker.color_table = color_table
         tracker.input_camera_type = config.input_type
