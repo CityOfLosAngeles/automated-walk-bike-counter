@@ -30,7 +30,7 @@ parser.add_argument(
     "--PED_COST_THRESHOLD",
     help="Pedestrian cost threshold",
     required=False,
-    default=80,
+    default=90,
     type=float,
     env_var="PED_COST_THRESHOLD",
 )
@@ -63,7 +63,7 @@ parser.add_argument(
 parser.add_argument(
     "--MISSING_THRESHOLD_MAX",
     help="Missing threshold maximum",
-    default=400,
+    default=300,
     required=False,
     type=float,
     env_var="MISSING_THRESHOLD_MAX",
@@ -73,7 +73,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD",
     help="Count threshold",
-    default=4,
+    default=7,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD",
@@ -81,7 +81,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD_BIKE",
     help="Count threshold for bikes",
-    default=2,
+    default=3,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BIKE",
@@ -227,6 +227,7 @@ parser.add_argument(
 parser.add_argument(
     "--periodic_counter_time",
     type=int,
+    default=15,
     help="Interval (in minutes) to output the periodic counter",
 )
 

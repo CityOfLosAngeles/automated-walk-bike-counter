@@ -58,6 +58,11 @@ class MainController(BaseController):
         tracker = ObjectTracker(self.mask)
         if self.video:
             tracker.video_filename = self.video.filename
+        tracker.valid_selected_objects = [
+            "pedestrian" if item == "person" else item
+            for item in object_classes
+            if item != "bicycle"
+        ]
         tracker.object_classes = object_classes
         tracker.color_table = color_table
         tracker.video = self.video

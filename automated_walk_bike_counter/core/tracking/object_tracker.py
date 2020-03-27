@@ -43,8 +43,8 @@ class ObjectTracker:
 
     BOUNDRY = 30
 
-    COUNT_THRESHOLD = 10
-    COUNT_THRESHOLD_BIKE = 5
+    COUNT_THRESHOLD = 7
+    COUNT_THRESHOLD_BIKE = 3
     COUNT_THRESHOLD_MOTOR = 3
 
     def __init__(self, mask_image):
@@ -77,6 +77,7 @@ class ObjectTracker:
         self.stop_thread = False
         self.background_frame = None
         self.periodic_counter_interval = 0
+        self.valid_selected_objects = []
 
     def printDataReportOnFrame(self):
         if self.current_frame is not None:
@@ -333,6 +334,10 @@ class ObjectTracker:
 
         anchors = parse_anchors(args.anchor_path)
         classes = read_class_names(args.class_name_path)
+        self.object_counter.valid_selected_objects = self.valid_selected_objects
+        if config.save_periodic_counter:
+            self.object_counter.export_counter_initialization()
+
         num_class = len(classes)
 
         self.image_processing_size = args.new_size
@@ -352,6 +357,9 @@ class ObjectTracker:
             m = re.match(r"([^\.]*)(\..*)", file)
             vfname = m.group(1)
             vfname = m.string[: m.string.rfind(".")]
+            if config.save_periodic_counter:
+                self.object_counter.output_counter_file_name = vfname
+                self.object_counter.export_counter_initialization()
 
             assert os.path.isfile(file), "file {} does not exist".format(file)
 
@@ -400,12 +408,11 @@ class ObjectTracker:
             # input counter time in minutes * video frame per second * number of
             # seconds in each min
             self.periodic_counter_interval = int(
-                config.periodic_counter_time * self.video.fps * 60
+                # config.periodic_counter_time * self.video.fps * 60
+                config.periodic_counter_time
+                * self.video.fps
             )
 
-            print(
-                "==========> Counting Interval = " + str(self.periodic_counter_interval)
-            )
             # For testing purpose we can consider periodic_counter_time as seconds
             # and use the following formula
             # self.periodic_counter_interval =
@@ -601,6 +608,13 @@ class ObjectTracker:
 
                     self.printDataReportOnFrame()
 
+                    if self.periodic_counter_interval != 0:
+                        if (
+                            self.currentFrameNumber % self.periodic_counter_interval
+                            == 0
+                        ):
+                            self.object_counter.export_counter_threading()
+
                     if SaveVideo:
                         videoWriter.write(self.current_frame.postprocessed_frame)
                     if self.frame_listener:
@@ -627,6 +641,8 @@ class ObjectTracker:
         if self.input_camera_type == "webcam" and not config.cli:
             cv2.destroyAllWindows()
 
+        self.object_counter.export_counter_threading()
+
         count = (
             "Pedestrians: "
             + str(self.object_counter.COUNTER_p)
@@ -634,6 +650,8 @@ class ObjectTracker:
             + str(self.object_counter.COUNTER_c)
         )
         print(count)
+
+        self.object_counter.counter_thread.join()
 
     def removeTrackedObjects(self, thresh):
         # MISSING_THREASHOLD = 90

@@ -19,7 +19,7 @@ from ..configuration import config
 class Object_Counter:
 
     # change to 10 from 20 on 2/26 because biker doesn't get counted correctly
-    COUNT_THRESHOLD = 4
+    COUNT_THRESHOLD = 8
 
     COUNT_THRESHOLD_BIKE = 1
     COUNT_THRESHOLD_MOTOR = 3
@@ -47,14 +47,18 @@ class Object_Counter:
         self.Cyclists = {}
         self.Trucks = {}
 
-        self.output_counter_file_name = "counter.csv"
+        self.output_counter_file_name = "counter"
         self.last_exported_ped_counter = 0
         self.last_exported_cyclist_counter = 0
+        self.last_exported_car_counter = 0
+        self.last_exported_bus_counter = 0
+        self.last_exported_truck_counter = 0
         self.export_counter = 0
         self.counter_thread = None
+        self.valid_selected_objects = []
 
-        if config.save_periodic_counter:
-            self.export_counter_initialization()
+        # if config.save_periodic_counter:
+        #     self.export_counter_initialization()
 
     def addNewMovingObjectForCounting(self, obj, position_new, postprocessed):
         cur_detected_object = obj.last_detected_object
@@ -219,7 +223,10 @@ class Object_Counter:
 
     def export_counter_initialization(self):
 
-        header = ["Time", "Pedestrian", "Cyclist"]
+        # header = ["Time", "Pedestrian", "Cyclist"]
+        header = ["Time"] + self.valid_selected_objects
+
+        self.output_counter_file_name = self.output_counter_file_name + ".csv"
 
         if os.path.isfile(self.output_counter_file_name):
             os.remove(self.output_counter_file_name)
@@ -236,21 +243,52 @@ class Object_Counter:
 
     def counterExport(self):
 
-        header = ["Time", "Pedestrian", "Cyclist"]
+        # header = ["Time", "Pedestrian", "Cyclist"]
+        header = ["Time"] + self.valid_selected_objects
 
         self.export_counter += 1
 
-        cur_ped_counter = self.COUNTER_p
-        cur_cyclist_counter = self.COUNTER_c
-        ped_output_counter = cur_ped_counter - self.last_exported_ped_counter
-        cyclyst_output_counter = (
-            cur_cyclist_counter - self.last_exported_cyclist_counter
-        )
+        ped_output_counter = 0
+        cyclyst_output_counter = 0
+        car_output_counter = 0
+        truck_output_counter = 0
+        bus_output_counter = 0
+        cur_ped_counter = 0
+        cur_cyclist_counter = 0
+        cur_car_counter = 0
+        cur_truck_counter = 0
+        cur_bus_counter = 0
 
-        if ped_output_counter < 0:
-            ped_output_counter = 0
-        if cyclyst_output_counter < 0:
-            cyclyst_output_counter = 0
+        for item in header:
+            if item.lower() == "pedestrian":
+                cur_ped_counter = self.COUNTER_p
+                ped_output_counter = cur_ped_counter - self.last_exported_ped_counter
+                if ped_output_counter < 0:
+                    ped_output_counter = 0
+            elif item.lower() == "cyclist":
+                cur_cyclist_counter = self.COUNTER_c
+                cyclyst_output_counter = (
+                    cur_cyclist_counter - self.last_exported_cyclist_counter
+                )
+                if cyclyst_output_counter < 0:
+                    cyclyst_output_counter = 0
+            elif item.lower() == "car":
+                cur_car_counter = self.COUNTER_car
+                car_output_counter = cur_car_counter - self.last_exported_car_counter
+                if car_output_counter < 0:
+                    car_output_counter = 0
+            elif item.lower() == "truck":
+                cur_truck_counter = self.COUNTER_truck
+                truck_output_counter = (
+                    cur_truck_counter - self.last_exported_truck_counter
+                )
+                if truck_output_counter < 0:
+                    truck_output_counter = 0
+            elif item.lower() == "bus":
+                cur_bus_counter = self.COUNTER_bus
+                bus_output_counter = cur_bus_counter - self.last_exported_bus_counter
+                if bus_output_counter < 0:
+                    bus_output_counter = 0
 
         video_counted_minutes = config.periodic_counter_time * self.export_counter
 
@@ -263,20 +301,47 @@ class Object_Counter:
 
         with open(self.output_counter_file_name, "a+", newline="") as csvfile:
             counters = csv.DictWriter(csvfile, fieldnames=header)
-            data = [
-                {
-                    "Time": str(cur_timestamp_days)
-                    + ":"
-                    + str(cur_timestamp_hours)
-                    + ":"
-                    + str(cur_timestamp_minutes),
-                    "Pedestrian": str(ped_output_counter),
-                    "Cyclist": str(cyclyst_output_counter),
-                }
-            ]
+            data_object = {}
+
+            for item in ["Time"] + self.valid_selected_objects:
+                if item.lower() == "time":
+                    data_object[item] = (
+                        str(cur_timestamp_days)
+                        + ":"
+                        + str(cur_timestamp_hours)
+                        + ":"
+                        + str(cur_timestamp_minutes)
+                    )
+                elif item.lower() == "pedestrian":
+                    data_object[item] = str(ped_output_counter)
+                elif item.lower() == "cyclist":
+                    data_object[item] = str(cyclyst_output_counter)
+                elif item.lower() == "car":
+                    data_object[item] = str(car_output_counter)
+                elif item.lower() == "truck":
+                    data_object[item] = str(truck_output_counter)
+                elif item.lower() == "bus":
+                    data_object[item] = str(bus_output_counter)
+
+            data = [data_object]
+
+            # data = [
+            #     {
+            #         "Time": str(cur_timestamp_days)
+            #         + ":"
+            #         + str(cur_timestamp_hours)
+            #         + ":"
+            #         + str(cur_timestamp_minutes),
+            #         "Pedestrian": str(ped_output_counter),
+            #         "Cyclist": str(cyclyst_output_counter)
+            #     }
+            # ]
             counters.writerows(data)
 
         self.last_exported_ped_counter = cur_ped_counter
         self.last_exported_cyclist_counter = cur_cyclist_counter
+        self.last_exported_car_counter = cur_car_counter
+        self.last_exported_truck_counter = cur_truck_counter
+        self.last_exported_bus_counter = cur_bus_counter
 
         print("Counter exported to the csv file.........")
