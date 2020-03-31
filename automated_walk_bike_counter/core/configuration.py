@@ -123,7 +123,7 @@ parser.add_argument(
 parser.add_argument(
     "--VALID_OBJECTS",
     nargs="+",
-    help="Count threshold for...",
+    help="List of valid objects",
     required=False,
     default=["Person", "Cyclist", "Car", "Truck", "Bus"],
     type=str,
