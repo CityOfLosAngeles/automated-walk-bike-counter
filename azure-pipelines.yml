@@ -26,7 +26,7 @@ jobs:
           source activate automated-walk-bike-counter
           pip install .
           automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True --periodic_counter_interval=1 --input_type=file
-          diff ./ci/a-trip-down-market.csv ./ci/results-2.csv
-          automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True --periodic_counter_interval=1 --input_type=file --VALID_OBJECTS=Person
           diff ./ci/a-trip-down-market.csv ./ci/results-1.csv
+          automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True --periodic_counter_interval=1 --input_type=file --VALID_OBJECTS=Person
+          diff ./ci/a-trip-down-market.csv ./ci/results-2.csv
         displayName: Test application
