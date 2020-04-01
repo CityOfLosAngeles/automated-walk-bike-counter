@@ -18,6 +18,10 @@ def list_of_tuples(arg):
     return [tuple(map(int, x.split(","))) for x in arg.split(";")]
 
 
+def list_of_items(arg):
+    return [x for x in arg.split(",")]
+
+
 parser = configargparse.get_argument_parser()
 
 # Config file
@@ -195,9 +199,9 @@ parser.add_argument(
 
 parser.add_argument(
     "--search_objects",
-    type=list,
+    type=list_of_items,
     default=["Person", "Cyclist"],
-    help="The list of valid objects.",
+    help="The list of valid objects comma separated like Person,Cyclist.",
 )
 
 parser.add_argument(
