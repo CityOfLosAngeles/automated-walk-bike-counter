@@ -10,6 +10,7 @@
 # Haiyan Wang
 
 import csv
+import datetime
 import os
 import threading
 
@@ -243,7 +244,6 @@ class Object_Counter:
 
     def counterExport(self):
 
-        # header = ["Time", "Pedestrian", "Cyclist"]
         header = ["Time"] + self.valid_selected_objects
 
         self.export_counter += 1
@@ -291,13 +291,7 @@ class Object_Counter:
                     bus_output_counter = 0
 
         video_counted_minutes = config.periodic_counter_time * self.export_counter
-
-        cur_timestamp_days = video_counted_minutes // (24 * 60 * 60)
-        hours_minutes_total = video_counted_minutes % (24 * 60)
-        remained_hours = hours_minutes_total // (60)
-        cur_timestamp_hours = remained_hours
-        remained_minutes = hours_minutes_total % (60)
-        cur_timestamp_minutes = remained_minutes
+        timedelta = datetime.timedelta(minutes=video_counted_minutes)
 
         with open(self.output_counter_file_name, "a+", newline="") as csvfile:
             counters = csv.DictWriter(csvfile, fieldnames=header)
@@ -305,13 +299,7 @@ class Object_Counter:
 
             for item in ["Time"] + self.valid_selected_objects:
                 if item.lower() == "time":
-                    data_object[item] = (
-                        str(cur_timestamp_days)
-                        + ":"
-                        + str(cur_timestamp_hours)
-                        + ":"
-                        + str(cur_timestamp_minutes)
-                    )
+                    data_object[item] = str(timedelta)
                 elif item.lower() == "pedestrian":
                     data_object[item] = str(ped_output_counter)
                 elif item.lower() == "cyclist":
@@ -324,18 +312,6 @@ class Object_Counter:
                     data_object[item] = str(bus_output_counter)
 
             data = [data_object]
-
-            # data = [
-            #     {
-            #         "Time": str(cur_timestamp_days)
-            #         + ":"
-            #         + str(cur_timestamp_hours)
-            #         + ":"
-            #         + str(cur_timestamp_minutes),
-            #         "Pedestrian": str(ped_output_counter),
-            #         "Cyclist": str(cyclyst_output_counter)
-            #     }
-            # ]
             counters.writerows(data)
 
         self.last_exported_ped_counter = cur_ped_counter
