@@ -233,7 +233,7 @@ class Object_Counter:
             os.remove(self.output_counter_file_name)
 
         with open(self.output_counter_file_name, "w", newline="") as csvfile:
-            counters = csv.DictWriter(csvfile, fieldnames=header)
+            counters = csv.DictWriter(csvfile, fieldnames=header, lineterminator="\n")
             counters.writeheader()
 
     def export_counter_threading(self):
@@ -294,7 +294,7 @@ class Object_Counter:
         timedelta = datetime.timedelta(minutes=video_counted_minutes)
 
         with open(self.output_counter_file_name, "a+", newline="") as csvfile:
-            counters = csv.DictWriter(csvfile, fieldnames=header)
+            counters = csv.DictWriter(csvfile, fieldnames=header, lineterminator="\n")
             data_object = {}
 
             for item in ["Time"] + self.valid_selected_objects:
