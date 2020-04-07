@@ -408,9 +408,7 @@ class ObjectTracker:
             # input counter time in minutes * video frame per second * number of
             # seconds in each min
             self.periodic_counter_interval = int(
-                # config.periodic_counter_time * self.video.fps * 60
-                config.periodic_counter_time
-                * self.video.fps
+                config.periodic_counter_time * self.video.fps * 60
             )
 
             # For testing purpose we can consider periodic_counter_time as seconds
