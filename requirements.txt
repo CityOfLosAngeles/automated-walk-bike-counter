@@ -4,6 +4,6 @@ munkres
 pykalman
 pillow
 tqdm
-fsspec
+fsspec>=0.7.2
 requests
 configargparse
