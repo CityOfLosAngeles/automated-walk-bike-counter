@@ -4,6 +4,7 @@ munkres
 pykalman
 pillow
 tqdm
-fsspec>=0.7.2
+fsspec>=0.7.3
 requests
 configargparse
+s3fs==0.3.5
