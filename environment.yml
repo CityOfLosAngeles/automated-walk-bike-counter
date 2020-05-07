@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - configargparse=0.14
-  - fsspec=0.5
+  - fsspec=0.7.3
   - libtiff=4.0
   - munkres=1
   - opencv=4
@@ -12,6 +12,6 @@ dependencies:
   - pykalman=0.9
   - python=3
   - requests=2
-  - s3fs
+  - s3fs=0.3.5
   - tensorflow=1.13
   - tqdm=4
