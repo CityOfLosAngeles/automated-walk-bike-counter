@@ -24,9 +24,7 @@ class LeftFrame(Frame):
         self.controller = controller
         self.checkbox_variables = []
         self.color_objects = []
-        self.allowed_objects = (
-            config.VALID_OBJECTS
-        )  # ['Person', 'Cyclist', 'Car', 'Truck', 'Bus']
+        self.allowed_objects = config.VALID_OBJECTS
         self.settings_pane = None
         self.create_objects_list_frame()
 

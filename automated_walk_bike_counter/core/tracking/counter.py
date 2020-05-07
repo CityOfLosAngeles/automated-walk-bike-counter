@@ -24,10 +24,8 @@ class ObjectCounter:
 
     COUNT_THRESHOLD_BIKE = 1
     COUNT_THRESHOLD_MOTOR = 3
-    # COUNT_THRESHOLD_CAR = 6
     COUNT_THRESHOLD_CAR = 5
     COUNT_THRESHOLD_BUS = 5
-    # COUNT_THRESHOLD_TRUCK = 6
     COUNT_THRESHOLD_TRUCK = 5
 
     Motorbikes = {}
@@ -57,9 +55,6 @@ class ObjectCounter:
         self.export_counter = 0
         self.counter_thread = None
         self.valid_selected_objects = []
-
-        # if config.save_periodic_counter:
-        #     self.export_counter_initialization()
 
     def add_new_moving_object_for_counting(self, obj, position_new, postprocessed):
         cur_detected_object = obj.last_detected_object
@@ -224,7 +219,6 @@ class ObjectCounter:
 
     def export_counter_initialization(self):
 
-        # header = ["Time", "Pedestrian", "Cyclist"]
         header = ["Time"] + self.valid_selected_objects
 
         self.output_counter_file_name = self.output_counter_file_name + ".csv"
