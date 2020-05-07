@@ -108,7 +108,6 @@ class Cli:
         mask = []
         if self.aoi_points and len(self.aoi_points) > 2:
             mask = self.get_mask_image()
-        # cv2.imshow('aaa', mask)
         tracker = ObjectTracker(mask)
 
         if config.file_name != "":

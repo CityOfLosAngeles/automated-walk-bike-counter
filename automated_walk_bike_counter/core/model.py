@@ -32,9 +32,6 @@ class yolov3(object):
         weight_decay=5e-4,
     ):
 
-        # self.anchors = [[10, 13], [16, 30], [33, 23],
-        # [30, 61], [62, 45], [59,  119],
-        # [116, 90], [156, 198], [373,326]]
         self.class_num = class_num
         self.anchors = anchors
         self.batch_norm_decay = batch_norm_decay
@@ -164,7 +161,6 @@ class yolov3(object):
 
         # avoid getting possible nan value with tf.clip_by_value
         box_sizes = tf.exp(box_sizes) * rescaled_anchors
-        # box_sizes = tf.clip_by_value(tf.exp(box_sizes), 1e-9, 100) * rescaled_anchors
         # rescale to the original image scale
         box_sizes = box_sizes * ratio[::-1]
 
