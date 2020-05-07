@@ -50,19 +50,6 @@ def get_costs(pos, points):
     # for logging
 
 
-def mylogger(name, logfile):
-    logger = logging.getLogger(name)
-    if not len(logger.handlers):
-        logger = logging.getLogger(name)
-        hdlr = logging.FileHandler(logfile)
-        formatter = logging.Formatter("%(asctime)s %(levelname)s %(message)s")
-        hdlr.setFormatter(formatter)
-        logger.addHandler(hdlr)
-        logger.setLevel(logging.INFO)
-
-    return logger
-
-
 def update_skipped_frame(frame, fname, tracks, thresh):
 
     h, w = frame.shape[:2]
@@ -90,17 +77,3 @@ def removeTrackedObjects(tracking_arr, frame, thresh):
             del tracking_arr[index]
 
     return tracking_arr
-
-
-def track_new_object(position, tracks, counter):
-    new_mObject = MovingObject(counter, position)
-    new_mObject.add_position([position])
-    new_mObject.init_kalman_filter()
-    filtered_state_means, filtered_state_covariances = new_mObject.kf.filter(
-        new_mObject.position
-    )
-    new_mObject.set_next_mean(filtered_state_means[-1])
-    new_mObject.set_next_covariance(filtered_state_covariances[-1])
-
-    # add to current_tracks
-    tracks.append(new_mObject)

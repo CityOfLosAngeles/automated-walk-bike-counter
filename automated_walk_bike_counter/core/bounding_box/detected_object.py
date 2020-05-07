@@ -32,9 +32,3 @@ class DetectedObject:
         cy = self.top + int((self.bot - self.top) / 2)
         self.center_y = cy
         return [cx, cy]
-
-    def getWidth(self):
-        return self.right - self.left
-
-    def getHeigth(self):
-        return self.bot - self.top

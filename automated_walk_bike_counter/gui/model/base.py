@@ -8,11 +8,3 @@
 # Dr. Mohammad Pourhomayoun
 # Mohammad Vahedi
 # Haiyan Wang
-
-
-class BaseModel(object):
-    def __init__(self):
-        self.data = None
-
-    def update_data(self):
-        pass
