@@ -68,13 +68,9 @@ class MainController(BaseController):
         tracker.camera_id = self.camera_id
         tracker.stop_thread = self.stop_thread
         tracker.output_video = self.output_video
-        # tracker.frame_listener = self.handle_post_processed_frame
         print(listener_object.handle_post_processed_frame)
         tracker.frame_listener = listener_object.handle_post_processed_frame
         tracker.track_objects(config)
-
-    # def handle_post_processed_frame(self,frame):
-    #     self.view.handle_post_processed_frame(frame)
 
     def add_new_aoi(self):
         if self.video:

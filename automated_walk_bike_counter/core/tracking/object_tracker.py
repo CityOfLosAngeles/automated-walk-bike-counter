@@ -33,13 +33,6 @@ from ..tracking.counter import ObjectCounter
 
 class ObjectTracker:
 
-    # PED_AREA_THRESHOLD = 600
-    # PED_COST_THREASHOLD = 80
-    # BUS_COST_THREASHOLD = 110
-    # TRUCK_COST_THREASHOLD = 110
-    # MISSING_THREASHOLD = 90
-    # MISSING_THREASHOLD_MAX = 300
-
     BOUNDRY = 30
 
     COUNT_THRESHOLD = 7
@@ -175,20 +168,6 @@ class ObjectTracker:
         new_moving_object.set_next_covariance(filtered_state_covariances[-1])
         new_moving_object.counted += 1
 
-        # print(
-        #     "New moving object added with the id of "
-        #     + str(self.moving_object_id_number)
-        #     + " detected as "
-        #     + current_detected_object.mess
-        #     + " in position : "
-        #     + str(current_detected_object.left)
-        #     + " "
-        #     + str(current_detected_object.right)
-        #     + " "
-        #     + str(current_detected_object.top)
-        #     + " "
-        #     + str(current_detected_object.bot)
-        # )
         # add to current_tracks
         self.last_frame_moving_objects.append(new_moving_object)
 
@@ -198,18 +177,6 @@ class ObjectTracker:
 
         for obj in detected_objects:
             (left, right, top, bot, mess, max_indx, confidence) = obj.box
-            # 04/03/2018 exclude pedestrian inside of car by bbox size and shape
-
-            # commented since time of testing car countters whihch was caused problem
-            # for ped counter
-            # if (
-            #     mess=='person' and
-            #     (
-            #         ((right-left)*(bot-top) < self.PED_AREA_THRESHOLD) or
-            #         (bot-top) < (right-left) * 1.5)
-            # ):
-            # 	continue
-
             detected_objects_with_valid_contours.append(obj)
 
         return detected_objects_with_valid_contours
@@ -230,24 +197,6 @@ class ObjectTracker:
                     - self.object_costs[obj.mess]
                 )
                 distances.append(dis)
-                # print(
-                #     "Distance between obj known "
-                #     + str(obj.mess)
-                #     + " at position "
-                #     + str(obj.left)
-                #     + " "
-                #     + str(obj.right)
-                #     + " "
-                #     + str(obj.top)
-                #     + " "
-                #     + str(obj.bot)
-                #     + " with object with id "
-                #     + str(current_object.id)
-                #     + " known as "
-                #     + current_object.last_detected_object.mess
-                #     + " is "
-                #     + str(dis)
-                # )
             return distances
 
         last_frame_moving_objects_cost_matrix = []
@@ -266,12 +215,6 @@ class ObjectTracker:
                 threshold = config.TRUCK_COST_THRESHOLD
 
             if all(c > threshold for c in costs):
-                # print(
-                #     "object id "
-                #     + str(obj.id)
-                #     + " cost with all other detected objects is more than threshold "
-                #     + "and is counted as missing in kalman"
-                # )
                 # update it with KF predicted position
                 obj.kalman_update_missing(obj.predicted_position[-1])
                 # skip this moving object
@@ -334,16 +277,9 @@ class ObjectTracker:
         self.video_width = int(camera.get(3))
         self.video_height = int(camera.get(4))
 
-        # if file == 0:
-        # 	tfnetObject.say('Press [ESC] to quit demo')
-
         assert camera.isOpened(), "Cannot capture source"
 
         if self.input_camera_type == "webcam":
-            # cv2.namedWindow('', self.camera_id)
-            # _, frame = camera.read()
-            # height, width, _ = frame.shape
-            # cv2.resizeWindow('', self.video_width, self.video_height)
             pass
 
         if save_video:
@@ -351,7 +287,7 @@ class ObjectTracker:
             outfile = vfname + "_result.mp4"
             print(outfile)
             if self.input_camera_type == "webcam":
-                # fps = 1 / tfnetObject._get_fps(frame)
+                # TODO: what is going on here??
                 fps = 1
                 if fps < 1:
                     fps = 1
@@ -406,11 +342,10 @@ class ObjectTracker:
                 nms_thresh=0.5,
             )
 
-            # Set the AWS region for the Tensorflow S3 adapter.
-            # TODO: figure out a more robust way of handling this, so
-            # that we can have multiple regions or different storage backends.
             restore_path = args.restore_path
             scheme = urlparse(restore_path).scheme
+            # If there is a file scheme, it may be remote data hosted on s3/gcs.
+            # In that case, cache the weights locally.
             if scheme:
                 import fsspec
                 from fsspec.implementations.cached import WholeFileCacheFileSystem
@@ -620,7 +555,6 @@ class ObjectTracker:
         self.object_counter.counter_thread.join()
 
     def remove_tracked_objects(self, thresh):
-        # MISSING_THREASHOLD = 90
 
         for index, obj in enumerate(self.last_frame_moving_objects):
             obj.frames_since_seen += 1
@@ -789,13 +723,10 @@ class ObjectTracker:
         for i in range(0, len(boxes_)):
             mess = object_class[labels_[i]]
             if mess in self.object_classes:
-                # cx = self.left + int((self.right-self.left)/2)
-                # cy = self.top + int((self.bot-self.top)/2)
                 cx = boxes_[i][0] + int((boxes_[i][2] - boxes_[i][0]) / 2)
                 cy = boxes_[i][1] + int((boxes_[i][3] - boxes_[i][1]) / 2)
 
                 # Specifying the area of interest
-                # if ((cx>0 and cx<width_ori) and (cy>160 and cy<height_ori)):
                 if (0 < cx < width_ori) and (0 < cy < height_ori):
                     if labels_[i] < 8:
                         boxes_counting.append(
@@ -857,10 +788,6 @@ class ObjectTracker:
                 label="Truck",
                 color=self.color_table["truck"],
             )
-        # else:
-        #     plot_one_box(
-        #         img_ori, [x0, y0, x1, y1], label=mess, color=self.color_table[mess]
-        #     )
 
     def update_frame_listener(self, frame, frame_number):
         self.frame_listener(frame, frame_number)

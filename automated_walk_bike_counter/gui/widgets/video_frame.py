@@ -49,8 +49,6 @@ class VideoFrame(Frame):
             row=1, column=0, padx=(0, 0), pady=(0, 0), sticky=(E, W, S)
         )
         self.grid_columnconfigure(0, weight=1)
-        # self.grid_rowconfigure(0, weight=1)
-        # self.grid_rowconfigure(1, weight=1)
 
         self.controller.video_frame = self
 
