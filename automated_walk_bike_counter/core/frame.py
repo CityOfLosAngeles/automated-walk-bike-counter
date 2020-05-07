@@ -22,11 +22,10 @@ from .bounding_box.truck import Truck
 class Frame:
     # duplicated classification threshold > 0.30 then means 2 classification for same
     # object
-    DUPLICATE_THREASHOLD = 0.30
-    BUS_TRUCK_DUPLICATE_THREASHOLD = 0.60
-    DUPLICATE_CAR_THREASHOLD = 0.90
-    DUPLICATE_TRUCK_THREASHOLD = 0.90
-    CAR_TRUCK_DUPLICATE_THREASHOLD = 0.80
+    DUPLICATE_THRESHOLD = 0.30
+    DUPLICATE_CAR_THRESHOLD = 0.90
+    DUPLICATE_TRUCK_THRESHOLD = 0.90
+    CAR_TRUCK_DUPLICATE_THRESHOLD = 0.80
     BIK_AREA_THRESHOLD = 700
 
     def __init__(self, postprocessed, boxes):
@@ -92,7 +91,7 @@ class Frame:
                 )
                 o_rate = overlap_area(boxes_2compare)
                 print("overlap: ", o_rate)
-                if o_rate > self.DUPLICATE_THREASHOLD:
+                if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
                     print(
                         "exclude for duplicates:", ped.left, ped.right, ped.top, ped.bot
@@ -108,7 +107,7 @@ class Frame:
                         ]
                     )
                     o_rate = overlap_area(boxes_2compare)
-                    if o_rate > self.DUPLICATE_THREASHOLD:
+                    if o_rate > self.DUPLICATE_THRESHOLD:
                         ped_boxes_dup_dict[ped2] = 1
 
         for mot in self.motorbikers:
@@ -121,7 +120,7 @@ class Frame:
                 )
                 o_rate = overlap_area(boxes_2compare)
                 print("overlap: ", o_rate)
-                if o_rate > self.DUPLICATE_THREASHOLD:
+                if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
                     print(
                         "exclude for duplicates:", ped.left, ped.right, ped.top, ped.bot
@@ -138,7 +137,7 @@ class Frame:
                     )
                     o_rate = overlap_area(boxes_2compare)
                     print("overlap: ", o_rate)
-                    if o_rate > self.DUPLICATE_CAR_THREASHOLD:
+                    if o_rate > self.DUPLICATE_CAR_THRESHOLD:
                         ped_boxes_dup_dict[car2] = 1
                         print(
                             "car exclude for car duplicates:",
@@ -159,7 +158,7 @@ class Frame:
                     )
                     o_rate = overlap_area(boxes_2compare)
                     print("overlap: ", o_rate)
-                    if o_rate > self.DUPLICATE_TRUCK_THREASHOLD:
+                    if o_rate > self.DUPLICATE_TRUCK_THRESHOLD:
                         ped_boxes_dup_dict[truck2] = 1
                         print(
                             "truck exclude for truck duplicates:",
@@ -180,7 +179,7 @@ class Frame:
                 )
                 o_rate = overlap_area(boxes_2compare)
                 print("overlap: ", o_rate)
-                if o_rate > self.CAR_TRUCK_DUPLICATE_THREASHOLD:
+                if o_rate > self.CAR_TRUCK_DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[truck] = 1
                     print(
                         "truck exclude for duplicates with car:",
@@ -200,7 +199,7 @@ class Frame:
                 )
                 o_rate = overlap_area(boxes_2compare)
                 print("overlap: ", o_rate)
-                if o_rate > self.DUPLICATE_THREASHOLD:
+                if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
                     print(
                         "Car excluded for duplication with pedestrian :",
