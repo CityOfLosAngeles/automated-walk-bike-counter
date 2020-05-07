@@ -98,8 +98,6 @@ class MovingObject(object):
         self.set_next_mean(adjusted_next_mean)
         self.set_next_covariance(next_covariance)
         self.add_predicted_position([self.next_mean[:2]])
-
-        # self.update_last_detected_object_values(self.next_mean[:2])
         self.frames_since_seen += 1
 
     def set_next_mean(self, mean):

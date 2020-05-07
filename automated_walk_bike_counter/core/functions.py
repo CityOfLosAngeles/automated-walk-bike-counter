@@ -44,8 +44,6 @@ def get_costs(pos, points):
     ]
     return distances
 
-    # for logging
-
 
 def update_skipped_frame(frame, fname, tracks, thresh):
 
@@ -61,7 +59,6 @@ def update_skipped_frame(frame, fname, tracks, thresh):
 
 
 def removeTrackedObjects(tracking_arr, frame, thresh):
-    # MISSING_THREASHOLD = 90
     for index, obj in enumerate(tracking_arr):
         # if a moving object hasn't been updated for 10 frames then remove it
         if obj.frames_since_seen > thresh:
