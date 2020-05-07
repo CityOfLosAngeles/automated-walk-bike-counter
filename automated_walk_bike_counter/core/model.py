@@ -42,7 +42,7 @@ class YoloV3(object):
     def forward(self, inputs, is_training=False, reuse=False):
         # the input img_size, form: [height, weight]
         # it will be used later
-        self.img_size = tf.shape(inputs)[1:3]
+        self.img_size = tf.shape(input=inputs)[1:3]
         # set batch norm params
         batch_norm_params = {
             "decay": self.batch_norm_decay,
@@ -61,10 +61,10 @@ class YoloV3(object):
                 activation_fn=lambda x: tf.nn.leaky_relu(x, alpha=0.1),
                 weights_regularizer=slim.l2_regularizer(self.weight_decay),
             ):
-                with tf.variable_scope("darknet53_body"):
+                with tf.compat.v1.variable_scope("darknet53_body"):
                     route_1, route_2, route_3 = darknet53_body(inputs)
 
-                with tf.variable_scope("yolov3_head"):
+                with tf.compat.v1.variable_scope("yolov3_head"):
                     inter1, net = yolo_block(route_3, 512)
                     feature_map_1 = slim.conv2d(
                         net,
@@ -78,7 +78,7 @@ class YoloV3(object):
                     feature_map_1 = tf.identity(feature_map_1, name="feature_map_1")
 
                     inter1 = conv2d(inter1, 256, 1)
-                    inter1 = upsample_layer(inter1, tf.shape(route_2))
+                    inter1 = upsample_layer(inter1, tf.shape(input=route_2))
                     concat1 = tf.concat([inter1, route_2], axis=3)
 
                     inter2, net = yolo_block(concat1, 256)
@@ -94,7 +94,7 @@ class YoloV3(object):
                     feature_map_2 = tf.identity(feature_map_2, name="feature_map_2")
 
                     inter2 = conv2d(inter2, 128, 1)
-                    inter2 = upsample_layer(inter2, tf.shape(route_1))
+                    inter2 = upsample_layer(inter2, tf.shape(input=route_1))
                     concat2 = tf.concat([inter2, route_1], axis=3)
 
                     _, feature_map_3 = yolo_block(concat2, 128)
@@ -118,7 +118,7 @@ class YoloV3(object):
         anchors: shape: [3, 2]
         """
         # NOTE: size in [h, w] format! don't get messed up!
-        grid_size = tf.shape(feature_map)[1:3]  # [13, 13]
+        grid_size = tf.shape(input=feature_map)[1:3]  # [13, 13]
         # the downscale ratio in height and weight
         ratio = tf.cast(self.img_size / grid_size, tf.float32)
         # rescale the anchors to the feature_map
@@ -194,7 +194,7 @@ class YoloV3(object):
 
         def _reshape(result):
             x_y_offset, boxes, conf_logits, prob_logits = result
-            grid_size = tf.shape(x_y_offset)[:2]
+            grid_size = tf.shape(input=x_y_offset)[:2]
             boxes = tf.reshape(boxes, [-1, grid_size[0] * grid_size[1] * 3, 4])
             conf_logits = tf.reshape(
                 conf_logits, [-1, grid_size[0] * grid_size[1] * 3, 1]

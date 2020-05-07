@@ -63,7 +63,9 @@ def load_weights(var_list, weights_file):
                     num_params = np.prod(shape)
                     var_weights = weights[ptr : ptr + num_params].reshape(shape)
                     ptr += num_params
-                    assign_ops.append(tf.assign(var, var_weights, validate_shape=True))
+                    assign_ops.append(
+                        tf.compat.v1.assign(var, var_weights, validate_shape=True)
+                    )
                 # we move the pointer by 4, because we loaded 4 variables
                 i += 4
             elif "Conv" in var2.name.split("/")[-2]:
@@ -73,7 +75,9 @@ def load_weights(var_list, weights_file):
                 bias_params = np.prod(bias_shape)
                 bias_weights = weights[ptr : ptr + bias_params].reshape(bias_shape)
                 ptr += bias_params
-                assign_ops.append(tf.assign(bias, bias_weights, validate_shape=True))
+                assign_ops.append(
+                    tf.compat.v1.assign(bias, bias_weights, validate_shape=True)
+                )
                 # we loaded 1 variable
                 i += 1
             # we can load weights of conv layer
@@ -86,7 +90,9 @@ def load_weights(var_list, weights_file):
             # remember to transpose to column-major
             var_weights = np.transpose(var_weights, (2, 3, 1, 0))
             ptr += num_params
-            assign_ops.append(tf.assign(var1, var_weights, validate_shape=True))
+            assign_ops.append(
+                tf.compat.v1.assign(var1, var_weights, validate_shape=True)
+            )
             i += 1
 
     return assign_ops

@@ -317,17 +317,17 @@ class ObjectTracker:
         start = timer()
         n = 0
 
-        cfg = tf.ConfigProto()
+        cfg = tf.compat.v1.ConfigProto()
         cfg.gpu_options.allow_growth = True
-        with tf.Session(config=cfg) as sess:
+        with tf.compat.v1.Session(config=cfg) as sess:
 
-            input_data = tf.placeholder(
+            input_data = tf.compat.v1.placeholder(
                 tf.float32,
                 [1, args.new_size[1], args.new_size[0], 3],
                 name="input_data",
             )
             yolo_model = YoloV3(num_class, anchors)
-            with tf.variable_scope("yolov3"):
+            with tf.compat.v1.variable_scope("yolov3"):
                 pred_feature_maps = yolo_model.forward(input_data, False)
             pred_boxes, pred_confs, pred_probs = yolo_model.predict(pred_feature_maps)
 
@@ -368,7 +368,7 @@ class ObjectTracker:
                 # Set the restore path to be the cached index
                 restore_path = os.path.join(cache_dir, basename)
 
-            saver = tf.train.Saver()
+            saver = tf.compat.v1.train.Saver()
             saver.restore(sess, restore_path)
 
             while (

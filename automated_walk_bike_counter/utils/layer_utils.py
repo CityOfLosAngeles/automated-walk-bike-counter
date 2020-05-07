@@ -23,8 +23,8 @@ def conv2d(inputs, filters, kernel_size, strides=1):
         pad_end = pad_total - pad_beg
 
         padded_inputs = tf.pad(
-            inputs,
-            [[0, 0], [pad_beg, pad_end], [pad_beg, pad_end], [0, 0]],
+            tensor=inputs,
+            paddings=[[0, 0], [pad_beg, pad_end], [pad_beg, pad_end], [0, 0]],
             mode="CONSTANT",
         )
         return padded_inputs
@@ -103,7 +103,7 @@ def upsample_layer(inputs, out_shape):
     new_height, new_width = out_shape[1], out_shape[2]
     # NOTE: here height is the first
     # TODO: Do we need to set `align_corners` as True?
-    inputs = tf.image.resize_nearest_neighbor(
+    inputs = tf.compat.v1.image.resize_nearest_neighbor(
         inputs, (new_height, new_width), name="upsampled"
     )
     return inputs

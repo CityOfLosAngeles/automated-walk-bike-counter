@@ -1,4 +1,4 @@
-tensorflow<2
+tensorflow>2
 opencv-python
 munkres
 pykalman
