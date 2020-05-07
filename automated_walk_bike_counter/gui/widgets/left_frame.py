@@ -17,9 +17,9 @@ from ...core.configuration import config
 from .settings_pane import SettingsPane
 
 
-class Left_Frame(Frame):
+class LeftFrame(Frame):
     def __init__(self, parent, controller):
-        super(Left_Frame, self).__init__(parent, height=600)
+        super(LeftFrame, self).__init__(parent, height=600)
         self.style = Style().configure("TFrame.TFrame", background="yellow")
         self.controller = controller
         self.checkbox_variables = []

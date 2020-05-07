@@ -12,7 +12,7 @@
 from tkinter import FALSE, Menu
 
 
-class App_Menu(Menu):
+class AppMenu(Menu):
     def __init__(self, parent, controller):
         self.controller = controller
 

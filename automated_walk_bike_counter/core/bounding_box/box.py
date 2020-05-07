@@ -10,7 +10,7 @@
 # Haiyan Wang
 
 
-class box:
+class Box:
     def __init__(self, left, right, top, bot, mess, max_index, confidence):
         self.left = left
         self.right = right

@@ -15,4 +15,4 @@ from .tracking.object_tracker import ObjectTracker
 # No motion detection
 def count(self, bg):
     object_tracker = ObjectTracker()
-    object_tracker.trackObjects(self, self.FLAGS.demo, self.FLAGS.saveVideo)
+    object_tracker.track_objects(self, self.FLAGS.demo, self.FLAGS.saveVideo)

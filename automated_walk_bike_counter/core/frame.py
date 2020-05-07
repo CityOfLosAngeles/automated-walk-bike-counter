@@ -37,9 +37,9 @@ class Frame:
         self.trucks = []
         self.postprocessed_frame = postprocessed
         self.boxes = boxes
-        self.createDetectedObject()
+        self.create_detected_object()
 
-    def createDetectedObject(self):
+    def create_detected_object(self):
         for box in self.boxes:
             (left, right, top, bot, mess, max_indx, confidence) = box
 
@@ -56,7 +56,7 @@ class Frame:
             elif mess == "truck":
                 self.trucks.append(Truck(box))
 
-    def findDuplicateObjects(self):
+    def find_duplicated_objects(self):
         def overlap_area(boxes):
             if len(boxes) == 0:
                 return 0
@@ -211,20 +211,20 @@ class Frame:
 
         return ped_boxes_dup_dict
 
-    def getNoDuplicateObjects(self):
+    def get_no_duplicate_objects(self):
 
-        noDuplicateObjects = []
-        ped_boxes_dup_dict = self.findDuplicateObjects()
+        no_duplicate_objects = []
+        ped_boxes_dup_dict = self.find_duplicated_objects()
 
         for car in self.cars:
-            noDuplicateObjects.append(car)
+            no_duplicate_objects.append(car)
 
         # add pedestrian only into nodup_boxes
         for ped in self.pedestrians:
             if ped in ped_boxes_dup_dict:
                 continue
             else:
-                noDuplicateObjects.append(ped)
+                no_duplicate_objects.append(ped)
 
         # add bike into nodup_boxes
         for bik in self.bikers:
@@ -236,28 +236,28 @@ class Frame:
             ):
                 continue
             else:
-                noDuplicateObjects.append(bik)
+                no_duplicate_objects.append(bik)
 
         # add motorbikers 7/27, since we need to do better job for excluding motorbikers
         for mot in self.motorbikers:
-            noDuplicateObjects.append(mot)
+            no_duplicate_objects.append(mot)
 
         for truck in self.trucks:
             if truck in ped_boxes_dup_dict:
                 continue
             else:
-                noDuplicateObjects.append(truck)
+                no_duplicate_objects.append(truck)
 
-        return noDuplicateObjects
+        return no_duplicate_objects
 
-    def removeObjectsInsideOtherObjects(self, listOfObjects):
+    def remove_objects_inside_other_objects(self, list_of_objects):
         insider_dict = {}
-        noInside_Objects = []
+        no_inside_objects = []
 
         margin = 10
         # remove any box that inside of other boxes
-        for nbox in listOfObjects:
-            for mbox in listOfObjects:
+        for nbox in list_of_objects:
+            for mbox in list_of_objects:
                 if nbox.box == mbox.box:
                     continue
                 # check since inside conditions is valid for ped and bicycles and not
@@ -285,10 +285,10 @@ class Frame:
                             nbox.bot,
                         )
 
-        for obj in listOfObjects:
+        for obj in list_of_objects:
             if obj in insider_dict:
                 continue
             else:
-                noInside_Objects.append(obj)
+                no_inside_objects.append(obj)
 
-        return noInside_Objects
+        return no_inside_objects
