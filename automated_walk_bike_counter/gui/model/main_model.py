@@ -8,12 +8,3 @@
 # Dr. Mohammad Pourhomayoun
 # Mohammad Vahedi
 # Haiyan Wang
-
-from .base import BaseModel
-
-
-class MainModel(BaseModel):
-    def __init__(self):
-        super.__init__()
-
-        self.allowed_objects = ["Person", "Cyclist", "Car", "Bus", "Truck"]

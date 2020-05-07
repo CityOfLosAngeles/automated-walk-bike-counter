@@ -33,10 +33,6 @@ class MovingObject(object):
         self.pedestrian_id = -1
         self.last_detected_object = None
 
-    def count_frames(self):
-        self.frame_since_start = self.frame_since_start + 1
-        return self.frame_since_start
-
     def add_position(self, position_new):
         self.position = np.append(self.position, position_new, axis=0)
         self.frames_since_seen = 0
@@ -111,9 +107,3 @@ class MovingObject(object):
 
     def set_next_covariance(self, covariance):
         self.next_covariance = covariance
-
-    def set_frames_since_seen(self, num):
-        self.frames_since_seen = num
-
-    def detection_increase(self):
-        self.detection += 1

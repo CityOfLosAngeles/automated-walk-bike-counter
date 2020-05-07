@@ -40,15 +40,6 @@ class Frame:
         self.boxes = boxes
         self.createDetectedObject()
 
-    def addPedestrian(self, pedestrian):
-        self.pedestrians.append(pedestrian)
-
-    def addBiker(self, biker):
-        self.bikers.append(biker)
-
-    def addMotorbiker(self, motorbiker):
-        self.motorbikers.append(motorbiker)
-
     def createDetectedObject(self):
         for box in self.boxes:
             (left, right, top, bot, mess, max_indx, confidence) = box
