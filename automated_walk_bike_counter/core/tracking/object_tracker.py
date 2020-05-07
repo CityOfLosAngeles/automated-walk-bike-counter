@@ -250,43 +250,6 @@ class ObjectTracker:
                 # )
             return distances
 
-        def get_costs_extended(last_frame_detected, cur_detected_objects):
-            distances = []
-            coefficient = 1
-            for obj in cur_detected_objects:
-                distances.append(
-                    math.floor(
-                        math.sqrt(
-                            (
-                                obj.center_x
-                                - last_frame_detected.predicted_position[-1][0]
-                            )
-                            ** 2
-                            + (
-                                obj.center_y
-                                - last_frame_detected.predicted_position[-1][1]
-                            )
-                            ** 2
-                        )
-                    )
-                    + coefficient
-                    * math.floor(
-                        math.sqrt(
-                            (
-                                obj.getWidth()
-                                - last_frame_detected.last_detected_object.getWidth()
-                            )
-                            ** 2
-                            + (
-                                obj.getHeigth()
-                                - last_frame_detected.last_detected_object.getHeigth()
-                            )
-                            ** 2
-                        )
-                    )
-                )
-            return distances
-
         lastFrameMovingObjectsCostMatrix = []
         validMovingObjects = []
         for index, obj in enumerate(self.lastFrameMovingObjects):
