@@ -9,10 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-import logging
 import math
-
-from .movingobject import MovingObject
 
 
 # function overlap calculate how much 2 rectangles overlap

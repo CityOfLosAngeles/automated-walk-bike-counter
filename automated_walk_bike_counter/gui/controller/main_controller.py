@@ -11,8 +11,6 @@
 
 from tkinter import BooleanVar, IntVar, filedialog, messagebox
 
-import cv2
-
 from ...core.configuration import config
 from ...core.tracking.object_tracker import ObjectTracker
 from ..video import OutputVideo, Video
