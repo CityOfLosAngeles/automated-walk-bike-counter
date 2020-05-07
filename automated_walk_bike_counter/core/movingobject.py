@@ -117,18 +117,3 @@ class MovingObject(object):
 
     def detection_increase(self):
         self.detection += 1
-
-    def update_last_detected_object_values(self, newCenterPosition):
-        center_x, center_y = newCenterPosition
-        w = self.last_detected_object.left - self.last_detected_object.right
-        h = self.last_detected_object.top - self.last_detected_object.bot
-
-        new_left = int(center_x - w / 2)
-        new_top = int(center_y - h / 2)
-        new_right = int(center_x + w / 2)
-        new_bot = int(center_y + h / 2)
-
-        self.last_detected_object.left = new_left
-        self.last_detected_object.right = new_right
-        self.last_detected_object.top = new_top
-        self.last_detected_object.bot = new_bot
