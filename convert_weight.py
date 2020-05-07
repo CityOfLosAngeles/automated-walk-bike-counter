@@ -16,7 +16,7 @@ from __future__ import division, print_function
 
 import tensorflow as tf
 
-from automated_walk_bike_counter.core.model import yolov3
+from automated_walk_bike_counter.core.model import YoloV3
 from automated_walk_bike_counter.utils.misc_utils import load_weights, parse_anchors
 
 num_class = 80
@@ -25,7 +25,7 @@ weight_path = "./data/yolo_weights/yolov3.weights"
 save_path = "./data/yolo_weights/yolov3.ckpt"
 anchors = parse_anchors("./data/yolo_anchors.txt")
 
-model = yolov3(80, anchors)
+model = YoloV3(80, anchors)
 with tf.Session() as sess:
     inputs = tf.placeholder(tf.float32, [1, img_size, img_size, 3])
 

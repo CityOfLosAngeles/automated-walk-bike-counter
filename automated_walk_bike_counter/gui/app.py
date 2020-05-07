@@ -130,7 +130,7 @@ class Cli:
         tracker.color_table = color_table
         tracker.input_camera_type = config.input_type
         tracker.camera_id = config.camera_id
-        tracker.trackObjects(config)
+        tracker.track_objects(config)
 
 
 def main():

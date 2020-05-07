@@ -24,9 +24,9 @@ class DetectedObject:
         self.confidence = confidence
         self.center_x = 0
         self.center_y = 0
-        self.center = self.getObjectCenteralPointArray()
+        self.center = self.get_object_central_point_array()
 
-    def getObjectCenteralPointArray(self):
+    def get_object_central_point_array(self):
         cx = self.left + int((self.right - self.left) / 2)
         self.center_x = cx
         cy = self.top + int((self.bot - self.top) / 2)

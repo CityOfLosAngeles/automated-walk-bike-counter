@@ -21,7 +21,7 @@ from ..utils.layer_utils import conv2d, darknet53_body, upsample_layer, yolo_blo
 slim = tf.contrib.slim
 
 
-class yolov3(object):
+class YoloV3(object):
     def __init__(
         self,
         class_num,

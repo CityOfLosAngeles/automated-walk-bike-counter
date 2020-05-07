@@ -29,8 +29,8 @@ def parse_anchors(anchor_path):
 def read_class_names(class_name_path):
     names = {}
     with fsspec.open(class_name_path, "r") as data:
-        for ID, name in enumerate(data):
-            names[ID] = name.strip("\n")
+        for i, name in enumerate(data):
+            names[i] = name.strip("\n")
     return names
 
 

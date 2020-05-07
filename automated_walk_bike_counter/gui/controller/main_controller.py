@@ -71,7 +71,7 @@ class MainController(BaseController):
         # tracker.frame_listener = self.handle_post_processed_frame
         print(listener_object.handle_post_processed_frame)
         tracker.frame_listener = listener_object.handle_post_processed_frame
-        tracker.trackObjects(config)
+        tracker.track_objects(config)
 
     # def handle_post_processed_frame(self,frame):
     #     self.view.handle_post_processed_frame(frame)
