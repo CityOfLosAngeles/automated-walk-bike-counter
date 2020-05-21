@@ -609,12 +609,12 @@ class ObjectTracker:
 
                     self.printDataReportOnFrame()
 
-                    if self.periodic_counter_interval != 0:
-                        if (
-                            self.currentFrameNumber % self.periodic_counter_interval
-                            == 0
-                        ):
-                            self.object_counter.export_counter_threading()
+                    # if self.periodic_counter_interval != 0:
+                    #     if (
+                    #         self.currentFrameNumber % self.periodic_counter_interval
+                    #         == 0
+                    #     ):
+                    #         self.object_counter.export_counter_threading()
 
                     if SaveVideo:
                         videoWriter.write(self.current_frame.postprocessed_frame)
