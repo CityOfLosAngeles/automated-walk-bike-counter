@@ -11,8 +11,6 @@
 
 from tkinter import BooleanVar, IntVar, filedialog, messagebox
 
-import cv2
-
 from ...core.configuration import config
 from ...core.tracking.object_tracker import ObjectTracker
 from ..video import OutputVideo, Video
@@ -70,22 +68,15 @@ class MainController(BaseController):
         tracker.camera_id = self.camera_id
         tracker.stop_thread = self.stop_thread
         tracker.output_video = self.output_video
-        # tracker.frame_listener = self.handle_post_processed_frame
         print(listener_object.handle_post_processed_frame)
         tracker.frame_listener = listener_object.handle_post_processed_frame
-        tracker.trackObjects(config)
-
-    # def handle_post_processed_frame(self,frame):
-    #     self.view.handle_post_processed_frame(frame)
+        tracker.track_objects(config)
 
     def add_new_aoi(self):
         if self.video:
             AOIDialog(self.view.parent, self.video.filename, self)
         else:
             messagebox.showwarning("Warning", "Please select a file!")
-
-    def show_mask(self):
-        cv2.imshow("image", self.mask)
 
     def refresh_aoi_status(self):
         self.view.update_setting_aoi_status()

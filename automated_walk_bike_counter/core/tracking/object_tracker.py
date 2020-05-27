@@ -26,19 +26,12 @@ from ...utils.nms_utils import gpu_nms
 from ...utils.plot_utils import plot_one_box
 from ..configuration import config
 from ..frame import Frame
-from ..model import yolov3
+from ..model import YoloV3
 from ..movingobject import MovingObject
-from ..tracking.counter import Object_Counter
+from ..tracking.counter import ObjectCounter
 
 
 class ObjectTracker:
-
-    # PED_AREA_THRESHOLD = 600
-    # PED_COST_THREASHOLD = 80
-    # BUS_COST_THREASHOLD = 110
-    # TRUCK_COST_THREASHOLD = 110
-    # MISSING_THREASHOLD = 90
-    # MISSING_THREASHOLD_MAX = 300
 
     BOUNDRY = 30
 
@@ -47,12 +40,12 @@ class ObjectTracker:
     COUNT_THRESHOLD_MOTOR = 3
 
     def __init__(self, mask_image):
-        self.lastFrameMovingObjects = []
+        self.last_frame_moving_objects = []
         self.masked_image = mask_image
         self.moving_object_id_number = 0
-        self.object_counter = Object_Counter()
+        self.object_counter = ObjectCounter()
         self.current_frame = None
-        self.currentFrameNumber = 0  # elapsed frames
+        self.current_frame_number = 0  # elapsed frames
         self.video_width = 0
         self.video_height = 0
         self.roiBasePoint = []
@@ -78,7 +71,7 @@ class ObjectTracker:
         self.periodic_counter_interval = 0
         self.valid_selected_objects = []
 
-    def printDataReportOnFrame(self):
+    def print_data_report_on_frame(self):
         if self.current_frame is not None:
             h, w = self.current_frame.postprocessed_frame.shape[:2]
             x = 5
@@ -144,7 +137,7 @@ class ObjectTracker:
                     2,
                 )
                 x = x + gap
-            counter = "  Fr:" + str(self.currentFrameNumber)
+            counter = "  Fr:" + str(self.current_frame_number)
             cv2.putText(
                 self.current_frame.postprocessed_frame,
                 counter,
@@ -155,144 +148,63 @@ class ObjectTracker:
                 2,
             )
 
-    def addNewMovingObjectToCounter(self, obj, position_new, postprocessed):
-        self.object_counter.addNewMovingObjectForCounting(
+    def add_new_moving_object_to_counter(self, obj, position_new, postprocessed):
+        self.object_counter.add_new_moving_object_for_counting(
             obj, position_new, postprocessed
         )
 
-    def addNewMovingObject(self, current_detected_object):
+    def add_new_moving_object(self, current_detected_object):
         self.moving_object_id_number += 1
-        new_mObject = MovingObject(
+        new_moving_object = MovingObject(
             self.moving_object_id_number, current_detected_object.center
         )
-        new_mObject.last_detected_object = current_detected_object
-        new_mObject.add_position([current_detected_object.center])
-        new_mObject.init_kalman_filter()
-        filtered_state_means, filtered_state_covariances = new_mObject.kf.filter(
-            new_mObject.position
+        new_moving_object.last_detected_object = current_detected_object
+        new_moving_object.add_position([current_detected_object.center])
+        new_moving_object.init_kalman_filter()
+        filtered_state_means, filtered_state_covariances = new_moving_object.kf.filter(
+            new_moving_object.position
         )
-        new_mObject.set_next_mean(filtered_state_means[-1])
-        new_mObject.set_next_covariance(filtered_state_covariances[-1])
-        new_mObject.counted += 1
+        new_moving_object.set_next_mean(filtered_state_means[-1])
+        new_moving_object.set_next_covariance(filtered_state_covariances[-1])
+        new_moving_object.counted += 1
 
-        # print(
-        #     "New moving object added with the id of "
-        #     + str(self.moving_object_id_number)
-        #     + " detected as "
-        #     + current_detected_object.mess
-        #     + " in position : "
-        #     + str(current_detected_object.left)
-        #     + " "
-        #     + str(current_detected_object.right)
-        #     + " "
-        #     + str(current_detected_object.top)
-        #     + " "
-        #     + str(current_detected_object.bot)
-        # )
         # add to current_tracks
-        self.lastFrameMovingObjects.append(new_mObject)
+        self.last_frame_moving_objects.append(new_moving_object)
 
-    def createContourForCurrentObjects(self, detected_objects):
+    def create_contour_for_current_objects(self, detected_objects):
 
-        detectedObjectsWithValidContours = []
+        detected_objects_with_valid_contours = []
 
         for obj in detected_objects:
             (left, right, top, bot, mess, max_indx, confidence) = obj.box
-            # 04/03/2018 exclude pedestrian inside of car by bbox size and shape
+            detected_objects_with_valid_contours.append(obj)
 
-            # commented since time of testing car countters whihch was caused problem
-            # for ped counter
-            # if (
-            #     mess=='person' and
-            #     (
-            #         ((right-left)*(bot-top) < self.PED_AREA_THRESHOLD) or
-            #         (bot-top) < (right-left) * 1.5)
-            # ):
-            # 	continue
+        return detected_objects_with_valid_contours
 
-            detectedObjectsWithValidContours.append(obj)
-
-        return detectedObjectsWithValidContours
-
-    def calculateCostMatrixForMovingObjects(self, currentDetectedObjects):
-        def get_costs(curObject, cur_detected_objects):
+    def calculate_cost_matrix_for_moving_objects(self, current_detected_objects):
+        def get_costs(current_object, cur_detected_objects):
             distances = []
             for obj in cur_detected_objects:
 
                 dis = math.floor(
                     math.sqrt(
-                        (obj.center_x - curObject.predicted_position[-1][0]) ** 2
-                        + (obj.center_y - curObject.predicted_position[-1][1]) ** 2
+                        (obj.center_x - current_object.predicted_position[-1][0]) ** 2
+                        + (obj.center_y - current_object.predicted_position[-1][1]) ** 2
                     )
                 )
                 dis += abs(
-                    self.object_costs[curObject.last_detected_object.mess]
+                    self.object_costs[current_object.last_detected_object.mess]
                     - self.object_costs[obj.mess]
                 )
                 distances.append(dis)
-                # print(
-                #     "Distance between obj known "
-                #     + str(obj.mess)
-                #     + " at position "
-                #     + str(obj.left)
-                #     + " "
-                #     + str(obj.right)
-                #     + " "
-                #     + str(obj.top)
-                #     + " "
-                #     + str(obj.bot)
-                #     + " with object with id "
-                #     + str(curObject.id)
-                #     + " known as "
-                #     + curObject.last_detected_object.mess
-                #     + " is "
-                #     + str(dis)
-                # )
             return distances
 
-        def get_costs_extended(last_frame_detected, cur_detected_objects):
-            distances = []
-            coefficient = 1
-            for obj in cur_detected_objects:
-                distances.append(
-                    math.floor(
-                        math.sqrt(
-                            (
-                                obj.center_x
-                                - last_frame_detected.predicted_position[-1][0]
-                            )
-                            ** 2
-                            + (
-                                obj.center_y
-                                - last_frame_detected.predicted_position[-1][1]
-                            )
-                            ** 2
-                        )
-                    )
-                    + coefficient
-                    * math.floor(
-                        math.sqrt(
-                            (
-                                obj.getWidth()
-                                - last_frame_detected.last_detected_object.getWidth()
-                            )
-                            ** 2
-                            + (
-                                obj.getHeigth()
-                                - last_frame_detected.last_detected_object.getHeigth()
-                            )
-                            ** 2
-                        )
-                    )
-                )
-            return distances
-
-        lastFrameMovingObjectsCostMatrix = []
-        validMovingObjects = []
-        for index, obj in enumerate(self.lastFrameMovingObjects):
+        last_frame_moving_objects_cost_matrix = []
+        valid_moving_objects = []
+        for index, obj in enumerate(self.last_frame_moving_objects):
             # calculate costs for each tracked movingObjects using their predicted
             # position
-            costs = get_costs(obj, currentDetectedObjects)
+            costs = get_costs(obj, current_detected_objects)
 
             # if moving object to all contours distances are too large, then not to
             # consider it at all
@@ -303,33 +215,27 @@ class ObjectTracker:
                 threshold = config.TRUCK_COST_THRESHOLD
 
             if all(c > threshold for c in costs):
-                # print(
-                #     "object id "
-                #     + str(obj.id)
-                #     + " cost with all other detected objects is more than threshold "
-                #     + "and is counted as missing in kalman"
-                # )
                 # update it with KF predicted position
                 obj.kalman_update_missing(obj.predicted_position[-1])
                 # skip this moving object
                 continue
 
-            lastFrameMovingObjectsCostMatrix.append(costs)
+            last_frame_moving_objects_cost_matrix.append(costs)
             # only valid moving objects are added to available_objecs
-            validMovingObjects.append(obj)
+            valid_moving_objects.append(obj)
 
-        return lastFrameMovingObjectsCostMatrix, validMovingObjects
+        return last_frame_moving_objects_cost_matrix, valid_moving_objects
 
     def update_skipped_frame(
         self, thresh,
     ):
 
-        self.printDataReportOnFrame()
+        self.print_data_report_on_frame()
 
-        self.removeTrackedObjects(thresh)
+        self.remove_tracked_objects(thresh)
         print("update skipped frame")
 
-    def trackObjects(self, args):
+    def track_objects(self, args):
 
         anchors = parse_anchors(args.anchor_path)
         classes = read_class_names(args.class_name_path)
@@ -342,8 +248,8 @@ class ObjectTracker:
         self.image_processing_size = args.new_size
 
         file = self.video_filename
-        SaveVideo = args.save_video
-        print("save : " + str(SaveVideo))
+        save_video = args.save_video
+        print("save : " + str(save_video))
 
         print("video : ", file)
 
@@ -371,31 +277,24 @@ class ObjectTracker:
         self.video_width = int(camera.get(3))
         self.video_height = int(camera.get(4))
 
-        # if file == 0:
-        # 	tfnetObject.say('Press [ESC] to quit demo')
-
         assert camera.isOpened(), "Cannot capture source"
 
         if self.input_camera_type == "webcam":
-            # cv2.namedWindow('', self.camera_id)
-            # _, frame = camera.read()
-            # height, width, _ = frame.shape
-            # cv2.resizeWindow('', self.video_width, self.video_height)
             pass
 
-        if SaveVideo:
+        if save_video:
             fourcc = cv2.VideoWriter_fourcc(*"XVID")
             outfile = vfname + "_result.mp4"
             print(outfile)
             if self.input_camera_type == "webcam":
-                # fps = 1 / tfnetObject._get_fps(frame)
+                # TODO: what is going on here??
                 fps = 1
                 if fps < 1:
                     fps = 1
             else:
                 fps = round(camera.get(cv2.CAP_PROP_FPS))
 
-            videoWriter = cv2.VideoWriter(
+            video_writer = cv2.VideoWriter(
                 outfile, fourcc, fps, (self.video_width, self.video_height)
             )
 
@@ -427,7 +326,7 @@ class ObjectTracker:
                 [1, args.new_size[1], args.new_size[0], 3],
                 name="input_data",
             )
-            yolo_model = yolov3(num_class, anchors)
+            yolo_model = YoloV3(num_class, anchors)
             with tf.variable_scope("yolov3"):
                 pred_feature_maps = yolo_model.forward(input_data, False)
             pred_boxes, pred_confs, pred_probs = yolo_model.predict(pred_feature_maps)
@@ -443,11 +342,10 @@ class ObjectTracker:
                 nms_thresh=0.5,
             )
 
-            # Set the AWS region for the Tensorflow S3 adapter.
-            # TODO: figure out a more robust way of handling this, so
-            # that we can have multiple regions or different storage backends.
             restore_path = args.restore_path
             scheme = urlparse(restore_path).scheme
+            # If there is a file scheme, it may be remote data hosted on s3/gcs.
+            # In that case, cache the weights locally.
             if scheme:
                 import fsspec
                 from fsspec.implementations.cached import WholeFileCacheFileSystem
@@ -477,14 +375,14 @@ class ObjectTracker:
                 camera.isOpened() and not self.stop_thread or not self.stop_thread.get()
             ):
 
-                self.currentFrameNumber += 1
+                self.current_frame_number += 1
 
                 # Check for the need to generate the value of counters periodically
                 if self.periodic_counter_interval != 0:
-                    if self.currentFrameNumber % self.periodic_counter_interval == 0:
+                    if self.current_frame_number % self.periodic_counter_interval == 0:
                         self.object_counter.export_counter_threading()
 
-                elapsed = self.currentFrameNumber
+                elapsed = self.current_frame_number
 
                 ret, img_ori = camera.read()
 
@@ -517,7 +415,7 @@ class ObjectTracker:
                     [bxs, scrs, lbls], feed_dict={input_data: img}
                 )
 
-                boxes, boxes_drawing = self.convertY3BoxesToBoxes(
+                boxes, boxes_drawing = self.convert_y3_boxes_to_boxes(
                     boxes_, scores_, labels_, img_ori, args.new_size, classes
                 )
 
@@ -525,26 +423,28 @@ class ObjectTracker:
 
                 self.current_frame = Frame(postprocessed, boxes)
 
-                nodup_objects = self.current_frame.getNoDuplicateObjects()
+                nodup_objects = self.current_frame.get_no_duplicate_objects()
 
-                noins_objects = self.current_frame.removeObjectsInsideOtherObjects(
+                noins_objects = self.current_frame.remove_objects_inside_other_objects(
                     nodup_objects
                 )
 
-                detected_objects = self.createContourForCurrentObjects(noins_objects)
+                detected_objects = self.create_contour_for_current_objects(
+                    noins_objects
+                )
 
                 # first moving object
-                if len(self.lastFrameMovingObjects) == 0:
+                if len(self.last_frame_moving_objects) == 0:
                     # for cont in contours:
                     for obj in noins_objects:
-                        self.addNewMovingObject(obj)
+                        self.add_new_moving_object(obj)
 
-                    if SaveVideo:
-                        videoWriter.write(self.current_frame.postprocessed_frame)
+                    if save_video:
+                        video_writer.write(self.current_frame.postprocessed_frame)
                     if self.frame_listener:
                         self.update_frame_listener(
                             self.current_frame.postprocessed_frame,
-                            self.currentFrameNumber,
+                            self.current_frame_number,
                         )
 
                     if self.input_camera_type == "webcam" and not config.cli:
@@ -562,12 +462,12 @@ class ObjectTracker:
                         n = n + 1
                         self.update_skipped_frame(config.MISSING_THRESHOLD)
 
-                        if SaveVideo:
-                            videoWriter.write(self.current_frame.postprocessed_frame)
+                        if save_video:
+                            video_writer.write(self.current_frame.postprocessed_frame)
                         if self.frame_listener:
                             self.update_frame_listener(
                                 self.current_frame.postprocessed_frame,
-                                self.currentFrameNumber,
+                                self.current_frame_number,
                             )
 
                         if self.input_camera_type == "webcam" and not config.cli:
@@ -581,7 +481,7 @@ class ObjectTracker:
                     (
                         matrix_h,
                         cur_frame_available_moving_objects,
-                    ) = self.calculateCostMatrixForMovingObjects(detected_objects)
+                    ) = self.calculate_cost_matrix_for_moving_objects(detected_objects)
 
                     print(str(matrix_h))
                     # when matrix is empty, skip this frame
@@ -590,12 +490,12 @@ class ObjectTracker:
                         n = n + 1
                         self.update_skipped_frame(config.MISSING_THRESHOLD)
 
-                        if SaveVideo:
-                            videoWriter.write(self.current_frame.postprocessed_frame)
+                        if save_video:
+                            video_writer.write(self.current_frame.postprocessed_frame)
                         if self.frame_listener:
                             self.update_frame_listener(
                                 self.current_frame.postprocessed_frame,
-                                self.currentFrameNumber,
+                                self.current_frame_number,
                             )
 
                         if self.input_camera_type == "webcam" and not config.cli:
@@ -603,25 +503,18 @@ class ObjectTracker:
 
                         continue
 
-                    self.predictMovingObjectsNewPosition(
+                    self.predit_moving_objects_new_position(
                         matrix_h, cur_frame_available_moving_objects, detected_objects
                     )
 
-                    self.printDataReportOnFrame()
+                    self.print_data_report_on_frame()
 
-                    # if self.periodic_counter_interval != 0:
-                    #     if (
-                    #         self.currentFrameNumber % self.periodic_counter_interval
-                    #         == 0
-                    #     ):
-                    #         self.object_counter.export_counter_threading()
-
-                    if SaveVideo:
-                        videoWriter.write(self.current_frame.postprocessed_frame)
+                    if save_video:
+                        video_writer.write(self.current_frame.postprocessed_frame)
                     if self.frame_listener:
                         self.update_frame_listener(
                             self.current_frame.postprocessed_frame,
-                            self.currentFrameNumber,
+                            self.current_frame_number,
                         )
 
                     if self.input_camera_type == "webcam" and not config.cli:
@@ -636,8 +529,8 @@ class ObjectTracker:
                     if choice == 27:
                         break
 
-        if SaveVideo:
-            videoWriter.release()
+        if save_video:
+            video_writer.release()
         camera.release()
         if self.input_camera_type == "webcam" and not config.cli:
             cv2.destroyAllWindows()
@@ -654,41 +547,40 @@ class ObjectTracker:
 
         self.object_counter.counter_thread.join()
 
-    def removeTrackedObjects(self, thresh):
-        # MISSING_THREASHOLD = 90
+    def remove_tracked_objects(self, thresh):
 
-        for index, obj in enumerate(self.lastFrameMovingObjects):
+        for index, obj in enumerate(self.last_frame_moving_objects):
             obj.frames_since_seen += 1
 
             # if a moving object hasn't been updated for 10 frames then remove it
             if obj.frames_since_seen > thresh:
-                del self.lastFrameMovingObjects[index]
+                del self.last_frame_moving_objects[index]
 
             # if the object is out of the scene then remove from current tracking right
             # away
             h, w = self.current_frame.postprocessed_frame.shape[:2]
             if obj.position[-1][0] < 0 or obj.position[-1][0] > w:
-                del self.lastFrameMovingObjects[index]
+                del self.last_frame_moving_objects[index]
 
             elif obj.position[-1][1] < 0 or obj.position[-1][1] > h:
-                del self.lastFrameMovingObjects[index]
+                del self.last_frame_moving_objects[index]
 
             elif self.masked_image != [] and not self.check_object_is_in_aoi(obj):
-                del self.lastFrameMovingObjects[index]
+                del self.last_frame_moving_objects[index]
 
-    def predictMovingObjectsNewPosition(
-        self, costMatrix, availableTrackedMovingObjects, cur_detected_objects
+    def predit_moving_objects_new_position(
+        self, cost_matrix, available_tracked_moving_objects, cur_detected_objects
     ):
 
         munkres = Munkres()
 
-        indexes = munkres.compute(costMatrix)
+        indexes = munkres.compute(cost_matrix)
 
         print("indexes = " + str(indexes))
 
         total = 0
         for row, column in indexes:
-            value = costMatrix[row][column]
+            value = cost_matrix[row][column]
             total += value
 
         indexes_np = np.array(indexes)
@@ -709,32 +601,32 @@ class ObjectTracker:
 
                 threshold = config.PED_COST_THRESHOLD
                 if (
-                    availableTrackedMovingObjects[
+                    available_tracked_moving_objects[
                         tracked_obj_index
                     ].last_detected_object.mess
                     == "bus"
                 ):
                     threshold = config.BUS_COST_THRESHOLD
                 elif (
-                    availableTrackedMovingObjects[
+                    available_tracked_moving_objects[
                         tracked_obj_index
                     ].last_detected_object.mess
                     == "truck"
                 ):
                     threshold = config.TRUCK_COST_THRESHOLD
 
-                if costMatrix[tracked_obj_index][detected_object_index] > threshold:
+                if cost_matrix[tracked_obj_index][detected_object_index] > threshold:
                     print(
                         "Object id "
-                        + str(availableTrackedMovingObjects[tracked_obj_index].id)
+                        + str(available_tracked_moving_objects[tracked_obj_index].id)
                         + " is going to add as a new object because of cost threshold"
                     )
-                    self.addNewMovingObject(detected_object)
+                    self.add_new_moving_object(detected_object)
                     continue
 
                 print(
                     "object "
-                    + str(availableTrackedMovingObjects[tracked_obj_index].id)
+                    + str(available_tracked_moving_objects[tracked_obj_index].id)
                     + " has been assigned to object detected at "
                     + " position : "
                     + str(cur_detected_objects[detected_object_index].left)
@@ -746,26 +638,26 @@ class ObjectTracker:
                     + str(cur_detected_objects[detected_object_index].bot)
                 )
 
-                obj_m = availableTrackedMovingObjects[tracked_obj_index]
+                obj_m = available_tracked_moving_objects[tracked_obj_index]
                 # get corresponding contour position, update kalman filter
                 position_new = cur_detected_objects[detected_object_index].center
                 obj_m.last_detected_object = cur_detected_objects[detected_object_index]
                 obj_m.kalman_update(position_new)
                 obj_m.counted += 1
                 print("counted " + str(obj_m.id) + " " + str(obj_m.counted))
-                self.addNewMovingObjectToCounter(
+                self.add_new_moving_object_to_counter(
                     obj_m, position_new, self.current_frame.postprocessed_frame
                 )
 
-                self.drawBoxesOnFrame(obj_m)
+                self.draw_boxes_on_frame(obj_m)
 
             else:
                 position_new = cur_detected_objects[detected_object_index]
-                self.addNewMovingObject(position_new)
+                self.add_new_moving_object(position_new)
 
         # these are tracks missed either because they disappeared
         # or because they are temporarily invisable
-        for index, obj in enumerate(availableTrackedMovingObjects):
+        for index, obj in enumerate(available_tracked_moving_objects):
             if index not in indexes_np[:, 0]:
                 # not update in this frame, increase frames_since_seen
                 obj.frames_since_seen += 1
@@ -776,13 +668,13 @@ class ObjectTracker:
                 )
 
         # remove movingObj not updated for more than threasholds numbers of frames
-        for index, obj in enumerate(self.lastFrameMovingObjects):
+        for index, obj in enumerate(self.last_frame_moving_objects):
 
             h, w = self.current_frame.postprocessed_frame.shape[:2]
 
-            self.checkObjectForDeletion(obj, index)
+            self.check_object_for_deletion(obj, index)
 
-    def checkObjectForDeletion(self, obj, index):
+    def check_object_for_deletion(self, obj, index):
 
         if obj.frames_since_seen > config.MISSING_THRESHOLD:
             if (
@@ -792,7 +684,7 @@ class ObjectTracker:
                 or obj.position[-1][1] > self.video_height - self.BOUNDRY
             ):
                 print("Delete tracking", obj.position[-1][0], obj.position[-1][1])
-                del self.lastFrameMovingObjects[index]
+                del self.last_frame_moving_objects[index]
             elif obj.frames_since_seen > config.MISSING_THRESHOLD:
                 print(
                     "object id: "
@@ -804,13 +696,13 @@ class ObjectTracker:
                     obj.last_detected_object.box[4]
                     + " Delete tracking over max missing threshold"
                 )
-                del self.lastFrameMovingObjects[index]
+                del self.last_frame_moving_objects[index]
 
-    def convertY3BoxesToBoxes(
-        self, boxes_, scores_, labels_, originalImage, new_size, object_class
+    def convert_y3_boxes_to_boxes(
+        self, boxes_, scores_, labels_, original_image, new_size, object_class
     ):
 
-        height_ori, width_ori = originalImage.shape[:2]
+        height_ori, width_ori = original_image.shape[:2]
 
         boxes_[:, 0] *= width_ori / float(new_size[0])
         boxes_[:, 2] *= width_ori / float(new_size[0])
@@ -824,13 +716,10 @@ class ObjectTracker:
         for i in range(0, len(boxes_)):
             mess = object_class[labels_[i]]
             if mess in self.object_classes:
-                # cx = self.left + int((self.right-self.left)/2)
-                # cy = self.top + int((self.bot-self.top)/2)
                 cx = boxes_[i][0] + int((boxes_[i][2] - boxes_[i][0]) / 2)
                 cy = boxes_[i][1] + int((boxes_[i][3] - boxes_[i][1]) / 2)
 
                 # Specifying the area of interest
-                # if ((cx>0 and cx<width_ori) and (cy>160 and cy<height_ori)):
                 if (0 < cx < width_ori) and (0 < cy < height_ori):
                     if labels_[i] < 8:
                         boxes_counting.append(
@@ -858,7 +747,7 @@ class ObjectTracker:
 
         return boxes_counting, boxes_drawing
 
-    def drawBoxesOnFrame(self, obj):
+    def draw_boxes_on_frame(self, obj):
         x0 = obj.last_detected_object.left
         y0 = obj.last_detected_object.top
         x1 = obj.last_detected_object.right
@@ -892,10 +781,6 @@ class ObjectTracker:
                 label="Truck",
                 color=self.color_table["truck"],
             )
-        # else:
-        #     plot_one_box(
-        #         img_ori, [x0, y0, x1, y1], label=mess, color=self.color_table[mess]
-        #     )
 
     def update_frame_listener(self, frame, frame_number):
         self.frame_listener(frame, frame_number)
