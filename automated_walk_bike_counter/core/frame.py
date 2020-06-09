@@ -9,6 +9,8 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
+
 import numpy as np
 
 from .bounding_box.biker import Biker
@@ -90,11 +92,12 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                print("overlap: ", o_rate)
+                logging.debug("Biker overlap: ", o_rate)
                 if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
-                    print(
-                        "exclude for duplicates:", ped.left, ped.right, ped.top, ped.bot
+                    logging.debug(
+                        "Pedestrian excluded as duplicate: "
+                        f"{ped.left}, {ped.right}, {ped.top}, {ped.bot}"
                     )
 
         for ped1 in self.pedestrians:
@@ -119,11 +122,12 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                print("overlap: ", o_rate)
+                logging.debug("Motorbike overlap: ", o_rate)
                 if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
-                    print(
-                        "exclude for duplicates:", ped.left, ped.right, ped.top, ped.bot
+                    logging.debug(
+                        "Pedestrian excluded as duplicate of motorbike: "
+                        f"{ped.left}, {ped.right}, {ped.top}, {ped.bot}"
                     )
 
         for car1 in self.cars:
@@ -136,15 +140,12 @@ class Frame:
                         ]
                     )
                     o_rate = overlap_area(boxes_2compare)
-                    print("overlap: ", o_rate)
+                    logging.debug("Car overlap: ", o_rate)
                     if o_rate > self.DUPLICATE_CAR_THRESHOLD:
                         ped_boxes_dup_dict[car2] = 1
-                        print(
-                            "car exclude for car duplicates:",
-                            car2.left,
-                            car2.right,
-                            car2.top,
-                            car2.bot,
+                        logging.debug(
+                            "Car excluded as duplicate: "
+                            f"{car2.left}, {car2.right}, {car2.top}, {car2.bot}"
                         )
 
         for truck1 in self.trucks:
@@ -157,15 +158,12 @@ class Frame:
                         ]
                     )
                     o_rate = overlap_area(boxes_2compare)
-                    print("overlap: ", o_rate)
+                    logging.debug("Truck overlap: ", o_rate)
                     if o_rate > self.DUPLICATE_TRUCK_THRESHOLD:
                         ped_boxes_dup_dict[truck2] = 1
-                        print(
-                            "truck exclude for truck duplicates:",
-                            truck2.left,
-                            truck2.right,
-                            truck2.top,
-                            truck2.bot,
+                        logging.debug(
+                            "Truck excluded as duplicate: "
+                            f"{truck2.left}, {truck2.right}, {truck2.top}, {truck2.bot}"
                         )
 
         for car in self.cars:
@@ -178,15 +176,12 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                print("overlap: ", o_rate)
+                logging.debug("Car/truck overlap: ", o_rate)
                 if o_rate > self.CAR_TRUCK_DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[truck] = 1
-                    print(
-                        "truck exclude for duplicates with car:",
-                        truck.left,
-                        truck.right,
-                        truck.top,
-                        truck.bot,
+                    logging.debug(
+                        "Truck excluded as duplicate of car: "
+                        f"{ped.left}, {ped.right}, {ped.top}, {ped.bot}"
                     )
 
         for car in self.cars:
@@ -198,11 +193,11 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                print("overlap: ", o_rate)
+                logging.debug("Car/ped overlap: ", o_rate)
                 if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
-                    print(
-                        "Car excluded for duplication with pedestrian :",
+                    logging.debug(
+                        "Pedestrian excluded as duplicate of car:",
                         ped.left,
                         ped.right,
                         ped.top,
@@ -273,16 +268,11 @@ class Frame:
                         and mbox.bot - margin <= nbox.bot
                     ):
                         insider_dict[mbox] = 1  # ---- item caused different counter
-                        print(
-                            mbox.left,
-                            mbox.right,
-                            mbox.top,
-                            mbox.bot,
-                            " inside of ",
-                            nbox.left,
-                            nbox.right,
-                            nbox.top,
-                            nbox.bot,
+                        logging.debug(
+                            "Removing "
+                            f"{mbox.left}, {mbox.right}, {mbox.top}, {mbox.bot}"
+                            " as it is inside of "
+                            f"{nbox.left}, {nbox.right}, {nbox.top}, {nbox.bot}"
                         )
 
         for obj in list_of_objects:
