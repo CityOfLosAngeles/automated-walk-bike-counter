@@ -12,8 +12,6 @@
 # for more details about the yolo darknet weights file, refer to
 # https://itnext.io/implementing-yolo-v3-in-tensorflow-tf-slim-c3c55ff59dbe
 
-from __future__ import division, print_function
-
 import tensorflow as tf
 
 from automated_walk_bike_counter.core.model import YoloV3
