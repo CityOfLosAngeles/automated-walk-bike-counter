@@ -79,8 +79,6 @@ class Cli:
             objects.append("bicycle")
             colors["bicycle"] = (255, 255, 255)
 
-        print(str(objects))
-        print(str(colors))
         return objects, colors
 
     def get_mask_image(self):
@@ -105,6 +103,7 @@ class Cli:
     def run(self):
         output_video = None
         object_classes, color_table = self.get_objects_colors_list()
+        print("Tracked objects: {str(color_table)}")
         mask = []
         if self.aoi_points and len(self.aoi_points) > 2:
             mask = self.get_mask_image()
@@ -118,7 +117,6 @@ class Cli:
                 output_video.has_AOI = True
             tracker.video = video
             tracker.output_video = output_video
-            print(">> Video Filename : ", video.filename)
 
         tracker.valid_selected_objects = [
             "pedestrian" if item == "person" else item
@@ -138,9 +136,9 @@ def main():
     if config.cli:
 
         if config.input_type == "file":
-            print(config.file_name)
+            print(f"Running with file name {config.file_name}")
         else:
-            print(config.camera_id)
+            print(f"Running with camera ID: {config.camera_id}")
         cli = Cli()
         cli.run()
     else:

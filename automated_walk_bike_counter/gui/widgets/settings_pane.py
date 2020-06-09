@@ -114,4 +114,4 @@ class SettingsPane(LabelFrame):
     def set_output_video_opaque(self, value):
         self.controller.output_video.opaque = math.floor(float(value))
         self.scale_value.set(math.floor(float(value)))
-        print(str(self.controller.output_video.opaque))
+        logging.debug(f"New opacity: {str(self.controller.output_video.opaque)}")
