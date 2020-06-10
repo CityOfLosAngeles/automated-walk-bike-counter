@@ -9,6 +9,8 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
+
 import cv2
 
 

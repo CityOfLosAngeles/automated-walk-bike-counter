@@ -305,4 +305,4 @@ class ObjectCounter:
         self.last_exported_truck_counter = cur_truck_counter
         self.last_exported_bus_counter = cur_bus_counter
 
-        print("Counter exported to the csv file.........")
+        print("Counter exported to CSV")

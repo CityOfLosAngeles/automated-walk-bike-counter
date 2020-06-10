@@ -9,6 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
 import math
 from tkinter import DISABLED, HORIZONTAL, E, Label, LabelFrame, StringVar, W
 from tkinter.ttk import Combobox, Scale
