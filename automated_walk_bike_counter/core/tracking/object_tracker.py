@@ -740,9 +740,6 @@ class ObjectTracker:
                     label="Cyclist",
                     color=self.color_table["cyclist"],
                 )
-        elif mess == "bicycle":
-            # TODO: what is the point of this branch?
-            print("Bicycle detected...")
         elif obj.id in self.object_counter.Cars:
             plot_one_box(
                 img_ori, [x0, y0, x1, y1], label="Car", color=self.color_table["car"]
