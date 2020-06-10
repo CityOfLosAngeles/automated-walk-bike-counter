@@ -9,6 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
 import tkinter as tk
 
 import cv2
@@ -132,9 +133,9 @@ class Cli:
 
 
 def main():
+    logging.basicConfig(level=config.log)
 
     if config.cli:
-
         if config.input_type == "file":
             print(f"Running with file name {config.file_name}")
         else:

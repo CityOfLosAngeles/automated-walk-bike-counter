@@ -514,7 +514,7 @@ class ObjectTracker:
 
                 if elapsed % 5 == 0:
                     logging.debug(
-                        f"Processed frames per second: {(elapsed/timer()-start):3.3f}"
+                        f"Processed frames per second: {(elapsed/(timer()-start)):3.3f}"
                     )
                 if self.input_camera_type == "webcam" and not config.cli:
                     choice = cv2.waitKey(1)

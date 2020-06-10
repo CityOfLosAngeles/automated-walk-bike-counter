@@ -92,7 +92,7 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                logging.debug("Biker overlap: ", o_rate)
+                logging.debug(f"Biker overlap: {o_rate}")
                 if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
                     logging.debug(
@@ -122,7 +122,7 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                logging.debug("Motorbike overlap: ", o_rate)
+                logging.debug(f"Motorbike overlap: {o_rate}")
                 if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
                     logging.debug(
@@ -140,7 +140,7 @@ class Frame:
                         ]
                     )
                     o_rate = overlap_area(boxes_2compare)
-                    logging.debug("Car overlap: ", o_rate)
+                    logging.debug(f"Car overlap: {o_rate}")
                     if o_rate > self.DUPLICATE_CAR_THRESHOLD:
                         ped_boxes_dup_dict[car2] = 1
                         logging.debug(
@@ -158,7 +158,7 @@ class Frame:
                         ]
                     )
                     o_rate = overlap_area(boxes_2compare)
-                    logging.debug("Truck overlap: ", o_rate)
+                    logging.debug(f"Truck overlap: {o_rate}")
                     if o_rate > self.DUPLICATE_TRUCK_THRESHOLD:
                         ped_boxes_dup_dict[truck2] = 1
                         logging.debug(
@@ -176,7 +176,7 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                logging.debug("Car/truck overlap: ", o_rate)
+                logging.debug(f"Car/truck overlap: {o_rate}")
                 if o_rate > self.CAR_TRUCK_DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[truck] = 1
                     logging.debug(
@@ -193,7 +193,7 @@ class Frame:
                     ]
                 )
                 o_rate = overlap_area(boxes_2compare)
-                logging.debug("Car/ped overlap: ", o_rate)
+                logging.debug(f"Car/ped overlap: {o_rate}")
                 if o_rate > self.DUPLICATE_THRESHOLD:
                     ped_boxes_dup_dict[ped] = 1
                     logging.debug(
