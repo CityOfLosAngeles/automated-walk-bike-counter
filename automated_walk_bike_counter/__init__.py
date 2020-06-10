@@ -15,5 +15,13 @@ Automated Walk Bike Counter
 A computer vision application for automating the detection of pedestrians,
 cyclists, and cars from traffic cameras.
 """
+import logging
+import warnings
 
 from ._version import __version__  # noqa: F401
+
+# Suppress some annoying warnings from Tensorflow
+logging.getLogger("tensorflow").setLevel(logging.ERROR)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+del logging, warnings

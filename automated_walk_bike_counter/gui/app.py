@@ -133,6 +133,7 @@ class Cli:
 
 
 def main():
+    # Set logging level
     logging.basicConfig(level=config.log)
 
     if config.cli:
