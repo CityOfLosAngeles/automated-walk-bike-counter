@@ -51,7 +51,7 @@ class ObjectCounter:
         cur_detected_object = obj.last_detected_object
         cont_m = cur_detected_object.mess
 
-        print(f"Object {obj.id} identified as {cont_m}")
+        print(f"\tObject {obj.id} identified as {cont_m}")
 
         # for duplicated detection for bikers, when biker and motorbikers get detected
         # as pedestrian first
@@ -66,15 +66,15 @@ class ObjectCounter:
                     self.Cyclists[obj.id] = self.COUNTER_c
                     self.Pedestrians.pop(obj.id)
                     logging.debug(
-                        f"Person {obj.id} has been counted as a bicycle"
-                        "3 or more times, and has been re-identified as a cyclist"
+                        f"\tPerson {obj.id} has been counted as a bicycle"
+                        "2 or more times, and has been re-identified as a cyclist"
                     )
 
                 elif cont_m == "bicycle" and obj.counted_biker < 2:
                     # increase counter
                     obj.counted_biker += 1
                     logging.debug(
-                        f"Person {obj.id} identified as a bicycle"
+                        f"\tPerson {obj.id} identified as a bicycle"
                         f"{obj.counted_biker} times."
                     )
 
@@ -143,7 +143,7 @@ class ObjectCounter:
                         self.Buses[obj.id] = self.COUNTER_bus
                         self.Trucks.pop(obj.id)
                         logging.debug(
-                            f"Truck {obj.id} has been counted as a bus"
+                            f"\tTruck {obj.id} has been counted as a bus"
                             "3 or more times, and has been re-identified as a bus"
                         )
 
@@ -154,14 +154,14 @@ class ObjectCounter:
                         self.Cars[obj.id] = self.COUNTER_car
                         self.Cars.pop(obj.id)
                         logging.debug(
-                            f"Truck {obj.id} has been counted as a car"
+                            f"\tTruck {obj.id} has been counted as a car"
                             "3 or more times, and has been re-identified as a car"
                         )
 
                     elif cont_m == "bus" and obj.counted_bus < 3:
                         obj.counted_bus += 1
                         logging.debug(
-                            f"Object {obj.id} identified as a bus"
+                            f"\tObject {obj.id} identified as a bus"
                             f"{obj.counted_bus} times."
                         )
 
@@ -173,14 +173,14 @@ class ObjectCounter:
                         self.Buses[obj.id] = self.COUNTER_bus
                         self.Cars.pop(obj.id)
                         logging.debug(
-                            f"Car {obj.id} has been counted as a bus"
+                            f"\tCar {obj.id} has been counted as a bus"
                             "3 or more times, and has been re-identified as a bus"
                         )
 
                     elif cont_m == "bus" and obj.counted_bus < 3:
                         obj.counted_bus += 1
                         logging.debug(
-                            f"Object {obj.id} identified as a bus"
+                            f"\tObject {obj.id} identified as a bus"
                             f"{obj.counted_bus} times."
                         )
 
@@ -188,7 +188,7 @@ class ObjectCounter:
                     if cont_m == "truck" and obj.counted_truck < 3:
                         obj.counted_truck += 1
                         logging.debug(
-                            f"Object {obj.id} identified as a truck"
+                            f"\tObject {obj.id} identified as a truck"
                             f"{obj.counted_bus} times."
                         )
 

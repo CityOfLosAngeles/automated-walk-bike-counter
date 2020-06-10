@@ -13,7 +13,6 @@ import logging
 import math
 import os
 import re
-import sys
 from time import time as timer
 from urllib.parse import urlparse
 
@@ -514,9 +513,9 @@ class ObjectTracker:
                         cv2.imshow("", self.current_frame.postprocessed_frame)
 
                 if elapsed % 5 == 0:
-                    sys.stdout.write("\r")
-                    sys.stdout.write("{0:3.3f} FPS".format(elapsed / (timer() - start)))
-                    sys.stdout.flush()
+                    logging.debug(
+                        f"Processed frames per second: {(elapsed/timer()-start):3.3f}"
+                    )
                 if self.input_camera_type == "webcam" and not config.cli:
                     choice = cv2.waitKey(1)
                     if choice == 27:
@@ -605,7 +604,7 @@ class ObjectTracker:
 
                 if cost_matrix[tracked_obj_index][detected_object_index] > threshold:
                     print(
-                        "Object ID "
+                        "\tObject ID "
                         + str(available_tracked_moving_objects[tracked_obj_index].id)
                         + " will be added as a new object because of the cost threshold"
                     )
@@ -613,16 +612,13 @@ class ObjectTracker:
                     continue
 
                 print(
-                    "Object ID "
-                    + str(available_tracked_moving_objects[tracked_obj_index].id)
-                    + " has been assigned to object detected at "
-                    + str(cur_detected_objects[detected_object_index].left)
-                    + " "
-                    + str(cur_detected_objects[detected_object_index].right)
-                    + " "
-                    + str(cur_detected_objects[detected_object_index].top)
-                    + " "
-                    + str(cur_detected_objects[detected_object_index].bot)
+                    "\tObject ID "
+                    f"{available_tracked_moving_objects[tracked_obj_index].id}"
+                    " has been assigned to object detected at "
+                    f"{cur_detected_objects[detected_object_index].left:.0f} "
+                    f"{cur_detected_objects[detected_object_index].right:.0f} "
+                    f"{cur_detected_objects[detected_object_index].top:.0f} "
+                    f"{cur_detected_objects[detected_object_index].bot:.0f}"
                 )
 
                 obj_m = available_tracked_moving_objects[tracked_obj_index]
@@ -632,7 +628,7 @@ class ObjectTracker:
                 obj_m.kalman_update(position_new)
                 obj_m.counted += 1
                 print(
-                    "Counted object "
+                    "\tCounted object "
                     + str(obj_m.id)
                     + " "
                     + str(obj_m.counted)
