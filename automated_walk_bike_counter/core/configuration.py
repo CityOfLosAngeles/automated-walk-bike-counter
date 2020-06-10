@@ -77,7 +77,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD",
     help="Count threshold",
-    default=7,
+    default=8,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD",
@@ -85,7 +85,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD_BIKE",
     help="Count threshold for bikes",
-    default=3,
+    default=1,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BIKE",
@@ -101,7 +101,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD_CAR",
     help="Count threshold for cars",
-    default=3,
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_CAR",
@@ -109,7 +109,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD_BUS",
     help="Count threshold for buses",
-    default=3,
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BUS",
@@ -117,7 +117,7 @@ parser.add_argument(
 parser.add_argument(
     "--COUNT_THRESHOLD_TRUCK",
     help="Count threshold for trucks",
-    default=3,
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_TRUCK",
