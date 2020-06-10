@@ -203,11 +203,11 @@ class ObjectTracker:
 
             # if moving object to all contours distances are too large, then not to
             # consider it at all
-            threshold = config.PED_COST_THRESHOLD
+            threshold = config.ped_cost_threshold
             if obj.last_detected_object.mess == "bus":
-                threshold = config.BUS_COST_THRESHOLD
+                threshold = config.bus_cost_threshold
             elif obj.last_detected_object.mess == "truck":
-                threshold = config.TRUCK_COST_THRESHOLD
+                threshold = config.truck_cost_threshold
 
             if all(c > threshold for c in costs):
                 # update it with KF predicted position
@@ -455,7 +455,7 @@ class ObjectTracker:
 
                     if len(detected_objects) == 0:
                         n = n + 1
-                        self.update_skipped_frame(config.MISSING_THRESHOLD)
+                        self.update_skipped_frame(config.missing_threshold)
 
                         if save_video:
                             video_writer.write(self.current_frame.postprocessed_frame)
@@ -483,7 +483,7 @@ class ObjectTracker:
                     if len(matrix_h) < 1:
 
                         n = n + 1
-                        self.update_skipped_frame(config.MISSING_THRESHOLD)
+                        self.update_skipped_frame(config.missing_threshold)
 
                         if save_video:
                             video_writer.write(self.current_frame.postprocessed_frame)
@@ -594,21 +594,21 @@ class ObjectTracker:
 
                 tracked_obj_index = indexes_np[index_m, 0]
 
-                threshold = config.PED_COST_THRESHOLD
+                threshold = config.ped_cost_threshold
                 if (
                     available_tracked_moving_objects[
                         tracked_obj_index
                     ].last_detected_object.mess
                     == "bus"
                 ):
-                    threshold = config.BUS_COST_THRESHOLD
+                    threshold = config.bus_cost_threshold
                 elif (
                     available_tracked_moving_objects[
                         tracked_obj_index
                     ].last_detected_object.mess
                     == "truck"
                 ):
-                    threshold = config.TRUCK_COST_THRESHOLD
+                    threshold = config.truck_cost_threshold
 
                 if cost_matrix[tracked_obj_index][detected_object_index] > threshold:
                     print(
@@ -671,7 +671,7 @@ class ObjectTracker:
 
     def check_object_for_deletion(self, obj, index):
 
-        if obj.frames_since_seen > config.MISSING_THRESHOLD:
+        if obj.frames_since_seen > config.missing_threshold:
             if (
                 obj.position[-1][0] < self.BOUNDRY
                 or obj.position[-1][0] > self.video_width - self.BOUNDRY
@@ -680,7 +680,7 @@ class ObjectTracker:
             ):
                 print("Delete tracking", obj.position[-1][0], obj.position[-1][1])
                 del self.last_frame_moving_objects[index]
-            elif obj.frames_since_seen > config.MISSING_THRESHOLD:
+            elif obj.frames_since_seen > config.missing_threshold:
                 print(
                     "object id: "
                     + str(obj.id)
