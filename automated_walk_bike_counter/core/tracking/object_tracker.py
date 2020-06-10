@@ -229,7 +229,7 @@ class ObjectTracker:
         self.print_data_report_on_frame()
 
         self.remove_tracked_objects(thresh)
-        print("update skipped frame")
+        print("Skipping frame due to no objects being tracked")
 
     def track_objects(self, args):
 
@@ -245,9 +245,6 @@ class ObjectTracker:
 
         file = self.video_filename
         save_video = args.save_video
-        print("save : " + str(save_video))
-
-        print("video : ", file)
 
         # check if the video is reading from a file or from the webcam
         if self.input_camera_type == "webcam":
@@ -479,7 +476,7 @@ class ObjectTracker:
                         cur_frame_available_moving_objects,
                     ) = self.calculate_cost_matrix_for_moving_objects(detected_objects)
 
-                    print(str(matrix_h))
+                    logging.debug(f"Distance matrix: {str(matrix_h)}")
                     # when matrix is empty, skip this frame
                     if len(matrix_h) < 1:
 
@@ -619,7 +616,6 @@ class ObjectTracker:
                     "Object ID "
                     + str(available_tracked_moving_objects[tracked_obj_index].id)
                     + " has been assigned to object detected at "
-                    + " position: "
                     + str(cur_detected_objects[detected_object_index].left)
                     + " "
                     + str(cur_detected_objects[detected_object_index].right)
@@ -635,7 +631,13 @@ class ObjectTracker:
                 obj_m.last_detected_object = cur_detected_objects[detected_object_index]
                 obj_m.kalman_update(position_new)
                 obj_m.counted += 1
-                print("counted " + str(obj_m.id) + " " + str(obj_m.counted))
+                print(
+                    "Counted object "
+                    + str(obj_m.id)
+                    + " "
+                    + str(obj_m.counted)
+                    + " times."
+                )
                 self.add_new_moving_object_to_counter(
                     obj_m, position_new, self.current_frame.postprocessed_frame
                 )
@@ -672,19 +674,11 @@ class ObjectTracker:
                 or obj.position[-1][1] < self.BOUNDRY
                 or obj.position[-1][1] > self.video_height - self.BOUNDRY
             ):
-                print("Delete tracking", obj.position[-1][0], obj.position[-1][1])
+                print(f"Deleting {obj.id} as it has left the frame")
                 del self.last_frame_moving_objects[index]
             elif obj.frames_since_seen > config.missing_threshold:
-                print(
-                    "Object id: "
-                    + str(obj.id)
-                    + " frames_since_last_seen : "
-                    + str(obj.frames_since_seen)
-                )
-                print(
-                    obj.last_detected_object.box[4]
-                    + " Delete tracking over max missing threshold"
-                )
+                # TODO: this if check seems like a bug: redundant
+                print(f"Deleting {obj.id} as it has disappeared from the frame")
                 del self.last_frame_moving_objects[index]
 
     def convert_y3_boxes_to_boxes(
@@ -758,7 +752,8 @@ class ObjectTracker:
                     color=self.color_table["cyclist"],
                 )
         elif mess == "bicycle":
-            print("Bicycle detected....")
+            # TODO: what is the point of this branch?
+            print("Bicycle detected...")
         elif obj.id in self.object_counter.Cars:
             plot_one_box(
                 img_ori, [x0, y0, x1, y1], label="Car", color=self.color_table["car"]

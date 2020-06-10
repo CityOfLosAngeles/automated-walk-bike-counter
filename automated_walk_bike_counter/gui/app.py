@@ -103,7 +103,7 @@ class Cli:
     def run(self):
         output_video = None
         object_classes, color_table = self.get_objects_colors_list()
-        print("Tracked objects: {str(color_table)}")
+        print(f"Tracked objects: {str(color_table)}")
         mask = []
         if self.aoi_points and len(self.aoi_points) > 2:
             mask = self.get_mask_image()

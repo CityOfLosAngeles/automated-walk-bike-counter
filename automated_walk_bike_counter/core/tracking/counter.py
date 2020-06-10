@@ -11,6 +11,7 @@
 
 import csv
 import datetime
+import logging
 import os
 import threading
 
@@ -50,7 +51,7 @@ class ObjectCounter:
         cur_detected_object = obj.last_detected_object
         cont_m = cur_detected_object.mess
 
-        print("Counting for object id:" + str(obj.id) + " as " + cont_m)
+        print(f"Object {obj.id} identified as {cont_m}")
 
         # for duplicated detection for bikers, when biker and motorbikers get detected
         # as pedestrian first
@@ -64,22 +65,17 @@ class ObjectCounter:
                     self.COUNTER_c += 1
                     self.Cyclists[obj.id] = self.COUNTER_c
                     self.Pedestrians.pop(obj.id)
-                    print(
-                        "Person "
-                        + str(obj.id)
-                        + " counted for equal or more than 3 times for bicycle and "
-                        + "detected as cyclist"
+                    logging.debug(
+                        f"Person {obj.id} has been counted as a bicycle"
+                        "3 or more times, and has been re-identified as a cyclist"
                     )
 
                 elif cont_m == "bicycle" and obj.counted_biker < 2:
                     # increase counter
                     obj.counted_biker += 1
-                    print(
-                        "Person "
-                        + str(obj.id)
-                        + " counted for bicycle for "
-                        + str(obj.counted_biker)
-                        + " times."
+                    logging.debug(
+                        f"Person {obj.id} identified as a bicycle"
+                        f"{obj.counted_biker} times."
                     )
 
                 if cont_m == "motorbike" and obj.counted_moter >= 2:
@@ -99,7 +95,6 @@ class ObjectCounter:
             ):
 
                 if cont_m == "person" and obj.counted >= config.count_threshold:
-                    print("counted person " + str(obj.id) + " " + str(obj.counted))
                     (position_x, position_y) = obj.position[-1]
                     self.COUNTER_p += 1
                     self.Pedestrians[obj.id] = self.COUNTER_p
@@ -109,7 +104,6 @@ class ObjectCounter:
                     # ever detected as pedestrian, added 4/18 for prevent detecting
                     # bicycle without rider
                     if obj.pedestrian_id == 1:
-                        print("counted bicycle " + str(obj.id) + " " + str(obj.counted))
 
                         self.COUNTER_c += 1
                         self.Cyclists[obj.id] = self.COUNTER_c
@@ -119,7 +113,6 @@ class ObjectCounter:
                     cont_m == "motorbike"
                     and obj.counted >= config.count_threshold_motor
                 ):
-                    print("counted motorbike " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_o += 1
                     self.Motorbikes[obj.id] = self.COUNTER_o
         else:
@@ -130,22 +123,16 @@ class ObjectCounter:
                 and (obj.id not in self.Trucks.keys())
             ):
                 if cont_m == "car" and obj.counted >= config.count_threshold_car:
-                    print("counted car " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_car += 1
                     self.Cars[obj.id] = self.COUNTER_car
-                    print(">>" + str(obj.id) + " detected as new car")
 
                 elif cont_m == "bus" and obj.counted >= config.count_threshold_bus:
-                    print("counted bus " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_bus += 1
                     self.Buses[obj.id] = self.COUNTER_bus
-                    print(">>" + str(obj.id) + " detected as new bus")
 
                 elif cont_m == "truck" and obj.counted >= config.count_threshold_truck:
-                    print("counted truck " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_truck += 1
                     self.Trucks[obj.id] = self.COUNTER_truck
-                    print(">>" + str(obj.id) + " detected as new truck")
             else:
 
                 if obj.id in self.Trucks.keys():
@@ -155,27 +142,27 @@ class ObjectCounter:
                         self.COUNTER_bus += 1
                         self.Buses[obj.id] = self.COUNTER_bus
                         self.Trucks.pop(obj.id)
-                        print(
-                            ">>" + str(obj.id) + " detected as a truck converted to bus"
+                        logging.debug(
+                            f"Truck {obj.id} has been counted as a bus"
+                            "3 or more times, and has been re-identified as a bus"
                         )
 
                     elif cont_m == "car" and obj.counted_car >= 3:
-                        # this is probably a bus not a truck
+                        # this is probably a car not a truck
                         self.COUNTER_truck -= 1
                         self.COUNTER_car += 1
                         self.Cars[obj.id] = self.COUNTER_car
                         self.Cars.pop(obj.id)
-                        print(
-                            ">>" + str(obj.id) + " detected as a truck converted to car"
+                        logging.debug(
+                            f"Truck {obj.id} has been counted as a car"
+                            "3 or more times, and has been re-identified as a car"
                         )
 
                     elif cont_m == "bus" and obj.counted_bus < 3:
                         obj.counted_bus += 1
-                        print(
-                            ">>"
-                            + str(obj.id)
-                            + " detected as a bus just set the counted_bus = "
-                            + str(obj.counted_bus)
+                        logging.debug(
+                            f"Object {obj.id} identified as a bus"
+                            f"{obj.counted_bus} times."
                         )
 
                 if obj.id in self.Cars.keys():
@@ -185,27 +172,24 @@ class ObjectCounter:
                         self.COUNTER_bus += 1
                         self.Buses[obj.id] = self.COUNTER_bus
                         self.Cars.pop(obj.id)
-                        print(
-                            ">>" + str(obj.id) + " detected as a car converted to bus"
+                        logging.debug(
+                            f"Car {obj.id} has been counted as a bus"
+                            "3 or more times, and has been re-identified as a bus"
                         )
 
                     elif cont_m == "bus" and obj.counted_bus < 3:
                         obj.counted_bus += 1
-                        print(
-                            ">>"
-                            + str(obj.id)
-                            + " detected as a bus just set the counted_bus = "
-                            + str(obj.counted_bus)
+                        logging.debug(
+                            f"Object {obj.id} identified as a bus"
+                            f"{obj.counted_bus} times."
                         )
 
                 if obj.id in self.Buses.keys():
                     if cont_m == "truck" and obj.counted_truck < 3:
                         obj.counted_truck += 1
-                        print(
-                            ">>"
-                            + str(obj.id)
-                            + " detected as a truck just set the counted_truck = "
-                            + str(obj.counted_truck)
+                        logging.debug(
+                            f"Object {obj.id} identified as a truck"
+                            f"{obj.counted_bus} times."
                         )
 
     def export_counter_initialization(self):
@@ -234,7 +218,7 @@ class ObjectCounter:
         self.export_counter += 1
 
         ped_output_counter = 0
-        cyclyst_output_counter = 0
+        cyclist_output_counter = 0
         car_output_counter = 0
         truck_output_counter = 0
         bus_output_counter = 0
@@ -252,11 +236,11 @@ class ObjectCounter:
                     ped_output_counter = 0
             elif item.lower() == "cyclist":
                 cur_cyclist_counter = self.COUNTER_c
-                cyclyst_output_counter = (
+                cyclist_output_counter = (
                     cur_cyclist_counter - self.last_exported_cyclist_counter
                 )
-                if cyclyst_output_counter < 0:
-                    cyclyst_output_counter = 0
+                if cyclist_output_counter < 0:
+                    cyclist_output_counter = 0
             elif item.lower() == "car":
                 cur_car_counter = self.COUNTER_car
                 car_output_counter = cur_car_counter - self.last_exported_car_counter
@@ -288,7 +272,7 @@ class ObjectCounter:
                 elif item.lower() == "pedestrian":
                     data_object[item] = str(ped_output_counter)
                 elif item.lower() == "cyclist":
-                    data_object[item] = str(cyclyst_output_counter)
+                    data_object[item] = str(cyclist_output_counter)
                 elif item.lower() == "car":
                     data_object[item] = str(car_output_counter)
                 elif item.lower() == "truck":
