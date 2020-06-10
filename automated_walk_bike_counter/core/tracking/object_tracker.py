@@ -32,12 +32,7 @@ from ..tracking.counter import ObjectCounter
 
 
 class ObjectTracker:
-
     BOUNDRY = 30
-
-    COUNT_THRESHOLD = 7
-    COUNT_THRESHOLD_BIKE = 3
-    COUNT_THRESHOLD_MOTOR = 3
 
     def __init__(self, mask_image):
         self.last_frame_moving_objects = []
