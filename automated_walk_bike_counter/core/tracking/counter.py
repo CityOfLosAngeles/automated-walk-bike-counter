@@ -51,7 +51,10 @@ class ObjectCounter:
         cur_detected_object = obj.last_detected_object
         cont_m = cur_detected_object.mess
 
-        print(f"\tObject {obj.id} identified as {cont_m}")
+        print(
+            f"\tObject {obj.id} identified as {cont_m}, and has been counted "
+            f"{obj.counted} times"
+        )
 
         # for duplicated detection for bikers, when biker and motorbikers get detected
         # as pedestrian first

@@ -378,7 +378,7 @@ class ObjectTracker:
 
                 ret, img_ori = camera.read()
 
-                print("Frame No. : " + str(elapsed))
+                print("Frame Number: " + str(elapsed))
                 if img_ori is None:
                     print("\nEnd of Video")
                     break
@@ -627,13 +627,6 @@ class ObjectTracker:
                 obj_m.last_detected_object = cur_detected_objects[detected_object_index]
                 obj_m.kalman_update(position_new)
                 obj_m.counted += 1
-                print(
-                    "\tCounted object "
-                    + str(obj_m.id)
-                    + " "
-                    + str(obj_m.counted)
-                    + " times."
-                )
                 self.add_new_moving_object_to_counter(
                     obj_m, position_new, self.current_frame.postprocessed_frame
                 )
@@ -652,7 +645,7 @@ class ObjectTracker:
                 obj.frames_since_seen += 1
                 # but we update KF with predicted location
                 obj.kalman_update_missing(obj.predicted_position[-1])
-                print("Object " + str(obj.id) + " has disappeared from this frame.")
+                print("\tObject " + str(obj.id) + " has disappeared from this frame.")
 
         # remove movingObj not updated for more than threasholds numbers of frames
         for index, obj in enumerate(self.last_frame_moving_objects):
@@ -670,11 +663,11 @@ class ObjectTracker:
                 or obj.position[-1][1] < self.BOUNDRY
                 or obj.position[-1][1] > self.video_height - self.BOUNDRY
             ):
-                print(f"Deleting {obj.id} as it has left the frame")
+                print(f"\tDeleting {obj.id} as it has left the frame")
                 del self.last_frame_moving_objects[index]
             elif obj.frames_since_seen > config.missing_threshold:
                 # TODO: this if check seems like a bug: redundant
-                print(f"Deleting {obj.id} as it has disappeared from the frame")
+                print(f"\tDeleting {obj.id} as it has disappeared from the frame")
                 del self.last_frame_moving_objects[index]
 
     def convert_y3_boxes_to_boxes(
