@@ -64,14 +64,6 @@ parser.add_argument(
     type=float,
     env_var="MISSING_THRESHOLD",
 )
-parser.add_argument(
-    "--missing_threshold_max",
-    help="Missing threshold maximum",
-    default=300,
-    required=False,
-    type=float,
-    env_var="MISSING_THRESHOLD_MAX",
-)
 
 # Duplicate thersholds
 parser.add_argument(
