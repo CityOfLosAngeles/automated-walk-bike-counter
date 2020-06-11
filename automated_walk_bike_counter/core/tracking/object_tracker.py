@@ -228,7 +228,7 @@ class ObjectTracker:
         self.print_data_report_on_frame()
 
         self.remove_tracked_objects(thresh)
-        print("Skipping frame due to no objects being tracked")
+        print("No objects in current frame, updating tracked objects.")
 
     def track_objects(self, args):
 
