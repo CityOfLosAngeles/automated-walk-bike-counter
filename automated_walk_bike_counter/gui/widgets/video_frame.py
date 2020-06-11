@@ -18,11 +18,9 @@ import cv2
 from PIL import Image, ImageTk
 
 
-class Video_Frame(Frame):
+class VideoFrame(Frame):
     def __init__(self, parent, controller):
-        # super(Video_Frame, self).__init__(parent, bg='green', height=600)
-        super(Video_Frame, self).__init__(parent, height=600)
-        # self.style = Style().configure('TFrame', background="green")
+        super(VideoFrame, self).__init__(parent, height=600)
 
         self.controller = controller
         self.object_detection_thread = None
@@ -51,8 +49,6 @@ class Video_Frame(Frame):
             row=1, column=0, padx=(0, 0), pady=(0, 0), sticky=(E, W, S)
         )
         self.grid_columnconfigure(0, weight=1)
-        # self.grid_rowconfigure(0, weight=1)
-        # self.grid_rowconfigure(1, weight=1)
 
         self.controller.video_frame = self
 

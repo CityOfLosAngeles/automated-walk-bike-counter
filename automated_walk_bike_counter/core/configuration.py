@@ -134,16 +134,6 @@ parser.add_argument(
     env_var="VALID_OBJECTS",
 )
 
-# Storage backend settings
-parser.add_argument(
-    "--AWS_REGION",
-    help="AWS region for when the weights are stored in S3",
-    required=False,
-    type=str,
-    default="us-west-1",
-    env_var="AWS_REGION",
-)
-
 parser.add_argument(
     "--anchor_path",
     type=str,

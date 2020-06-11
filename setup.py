@@ -31,6 +31,8 @@ develop_requires = [
     "isort",
 ]
 
+gpu_requires = ["tensorflow-gpu"]
+
 setup(
     name="automated-walk-bike-counter",
     description=(
@@ -53,7 +55,7 @@ setup(
     package_dir={"automated_walk_bike_counter": "automated_walk_bike_counter"},
     include_package_data=True,
     install_requires=requires,
-    extras_require={"develop": develop_requires},
+    extras_require={"develop": develop_requires, "gpu": gpu_requires},
     entry_points={
         "console_scripts": [
             "automated-walk-bike-counter = automated_walk_bike_counter.gui.app:main"

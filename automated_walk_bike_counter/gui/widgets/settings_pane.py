@@ -42,10 +42,6 @@ class SettingsPane(LabelFrame):
                 self.controller.video.width > predef_sizes[-1]
                 and self.controller.video.height > predef_sizes[-1]
             ):
-                # if self.controller.video.width>=self.controller.video.height:
-                #     predef_sizes.append(self.controller.video.height)
-                # else:
-                #     predef_sizes.append(self.controller.video.width)
                 predef_sizes.append(self.controller.video.height)
                 predef_sizes.append(self.controller.video.width)
 

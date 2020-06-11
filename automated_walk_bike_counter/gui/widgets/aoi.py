@@ -202,7 +202,6 @@ class AOIDialog:
         ori_x = int(self.get_convert_to_original_coefficient() * x)
         ori_y = int(self.get_convert_to_original_coefficient() * y)
 
-        # if len(self.points) > 0:
         if self.drawing:
             self.canvas.create_line(
                 self.points[-1][0],
@@ -222,7 +221,6 @@ class AOIDialog:
             )
         else:
             self.drawing = True
-            # self.clear()
 
         self.points.append((x, y))
         self.ori_points.append((ori_x, ori_y))
@@ -251,7 +249,6 @@ class AOIDialog:
             self.mask_image, np.array(self.ori_points, "int32"), (255, 255, 255), 8, 0
         )
         self.drawing = False
-        # cv2.imshow("image", self.mask_image)
 
     def on_mouse_move_callback(self, event):
         x = event.x
