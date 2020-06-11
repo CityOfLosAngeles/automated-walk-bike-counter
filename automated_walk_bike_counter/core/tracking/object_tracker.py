@@ -282,12 +282,10 @@ class ObjectTracker:
             outfile = vfname + "_result.mp4"
             print(outfile)
             if self.input_camera_type == "webcam":
-                # TODO: what is going on here??
+                # TODO: figure out appropriate FPS handling for streaming video.
                 fps = 1
-                if fps < 1:
-                    fps = 1
             else:
-                fps = round(camera.get(cv2.CAP_PROP_FPS))
+                fps = camera.get(cv2.CAP_PROP_FPS)
 
             video_writer = cv2.VideoWriter(
                 outfile, fourcc, fps, (self.video_width, self.video_height)
