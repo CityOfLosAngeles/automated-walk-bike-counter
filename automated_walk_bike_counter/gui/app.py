@@ -44,7 +44,7 @@ class Cli:
         self.set_valid_selected_objects()
 
     def set_valid_selected_objects(self):
-        allowed_objects = config.VALID_OBJECTS
+        allowed_objects = config.valid_objects
         for i in range(len(allowed_objects)):
 
             if allowed_objects[i] in config.search_objects:

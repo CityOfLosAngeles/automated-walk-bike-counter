@@ -18,16 +18,6 @@ from ..configuration import config
 
 
 class ObjectCounter:
-
-    # change to 10 from 20 on 2/26 because biker doesn't get counted correctly
-    COUNT_THRESHOLD = 8
-
-    COUNT_THRESHOLD_BIKE = 1
-    COUNT_THRESHOLD_MOTOR = 3
-    COUNT_THRESHOLD_CAR = 5
-    COUNT_THRESHOLD_BUS = 5
-    COUNT_THRESHOLD_TRUCK = 5
-
     Motorbikes = {}
     Duplicates = {}
 
@@ -108,14 +98,14 @@ class ObjectCounter:
                 and obj.id not in self.Motorbikes.keys()
             ):
 
-                if cont_m == "person" and obj.counted >= self.COUNT_THRESHOLD:
+                if cont_m == "person" and obj.counted >= config.count_threshold:
                     print("counted person " + str(obj.id) + " " + str(obj.counted))
                     (position_x, position_y) = obj.position[-1]
                     self.COUNTER_p += 1
                     self.Pedestrians[obj.id] = self.COUNTER_p
                     obj.pedestrian_id = 1
                     # mark the moving object with the id
-                elif cont_m == "bicycle" and obj.counted >= self.COUNT_THRESHOLD_BIKE:
+                elif cont_m == "bicycle" and obj.counted >= config.count_threshold_bike:
                     # ever detected as pedestrian, added 4/18 for prevent detecting
                     # bicycle without rider
                     if obj.pedestrian_id == 1:
@@ -126,7 +116,8 @@ class ObjectCounter:
                         # mark the moving object with the id
                 # added on 7/23
                 elif (
-                    cont_m == "motorbike" and obj.counted >= self.COUNT_THRESHOLD_MOTOR
+                    cont_m == "motorbike"
+                    and obj.counted >= config.count_threshold_motor
                 ):
                     print("counted motorbike " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_o += 1
@@ -138,19 +129,19 @@ class ObjectCounter:
                 and (obj.id not in self.Buses.keys())
                 and (obj.id not in self.Trucks.keys())
             ):
-                if cont_m == "car" and obj.counted >= self.COUNT_THRESHOLD_CAR:
+                if cont_m == "car" and obj.counted >= config.count_threshold_car:
                     print("counted car " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_car += 1
                     self.Cars[obj.id] = self.COUNTER_car
                     print(">>" + str(obj.id) + " detected as new car")
 
-                elif cont_m == "bus" and obj.counted >= self.COUNT_THRESHOLD_BUS:
+                elif cont_m == "bus" and obj.counted >= config.count_threshold_bus:
                     print("counted bus " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_bus += 1
                     self.Buses[obj.id] = self.COUNTER_bus
                     print(">>" + str(obj.id) + " detected as new bus")
 
-                elif cont_m == "truck" and obj.counted >= self.COUNT_THRESHOLD_TRUCK:
+                elif cont_m == "truck" and obj.counted >= config.count_threshold_truck:
                     print("counted truck " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_truck += 1
                     self.Trucks[obj.id] = self.COUNTER_truck
