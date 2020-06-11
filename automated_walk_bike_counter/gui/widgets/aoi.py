@@ -76,7 +76,7 @@ class AOIDialog:
         self.video_frame.grid(row=2, column=1, columnspan=4, sticky=(W, E))
         buttons_frame.grid(row=3, column=1, columnspan=4, sticky=(W, E, N, S))
 
-        btn_save = Button(
+        self.btn_save = Button(
             buttons_frame, text="Save AOI", width=20, command=self.save_mask
         )
         btn_clear = Button(buttons_frame, text="Clear", width=20, command=self.clear)
@@ -91,7 +91,7 @@ class AOIDialog:
         else:
             self.btn_delete.config(state=DISABLED)
 
-        btn_save.grid(row=0, column=1, padx=(0, 10), pady=(5, 20), sticky=(W, E))
+        self.btn_save.grid(row=0, column=1, padx=(0, 10), pady=(5, 20), sticky=(W, E))
         btn_clear.grid(row=0, column=2, padx=(10, 10), pady=(5, 20), sticky=(W, E))
         btn_cancel.grid(row=0, column=3, padx=(10, 10), pady=(5, 20), sticky=(W, E))
         self.btn_delete.grid(row=0, column=4, padx=(10, 0), pady=(5, 20), sticky=(W, E))
@@ -110,6 +110,8 @@ class AOIDialog:
         top.columnconfigure(4, weight=0)
         top.columnconfigure(5, weight=1)
         top.rowconfigure(2, weight=1)
+
+        self.initialize_subclass_components()
 
         top.protocol("WM_DELETE_WINDOW", self.close_window)
         top.geometry("850x630+100+100")
@@ -289,3 +291,38 @@ class AOIDialog:
     def get_empty_mask_image(self):
         img = Image.new("RGB", (self.video_width, self.video_height), 0)
         return np.asarray(img)
+
+    def initialize_subclass_components(self):
+        pass
+
+
+class AONIDialog(AOIDialog):
+    def __init__(self, parent, filename, controller):
+        AOIDialog.__init__(self, parent, filename, controller)
+
+    def initialize_subclass_components(self):
+        self.btn_save.config(text="Save AONI")
+        self.btn_delete.config(text="Delete AONI")
+
+        if len(self.controller.video.area_of_not_interest_mask) == 0:
+            self.mask_image = self.get_empty_mask_image()
+        else:
+            self.mask_image = self.controller.video.area_of_not_interest_mask
+
+    def on_mouse_right_click(self, event):
+        AOIDialog.on_mouse_right_click(self, event)
+
+    def save_mask(self):
+
+        if (
+            not (
+                np.array_equal(np.asarray(self.mask_image), self.get_empty_mask_image())
+            )
+            and len(self.points) > 2
+        ):
+            self.controller.video.area_of_not_interest_mask = self.mask_image
+            self.close_window()
+        else:
+            self.top.messagebox.showwarning(
+                "Warning", "You have not determined a valid AOI!"
+            )

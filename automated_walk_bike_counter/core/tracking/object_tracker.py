@@ -506,6 +506,11 @@ class ObjectTracker:
                 else:
                     img = cv2.resize(img_ori, tuple(args.new_size))
 
+                if len(self.video.area_of_not_interest_mask):
+                    mask_inv = cv2.bitwise_not(self.video.area_of_not_interest_mask)
+                    masked = cv2.bitwise_and(img_ori, mask_inv)
+                    img = cv2.resize(masked, tuple(args.new_size))
+
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 img = np.asarray(img, np.float32)
                 img = img[np.newaxis, :] / 255.0

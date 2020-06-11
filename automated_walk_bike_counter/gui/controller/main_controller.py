@@ -16,7 +16,7 @@ import cv2
 from ...core.configuration import config
 from ...core.tracking.object_tracker import ObjectTracker
 from ..video import OutputVideo, Video
-from ..widgets.aoi import AOIDialog
+from ..widgets.aoi import AOIDialog, AONIDialog
 from .base import BaseController
 
 
@@ -81,6 +81,12 @@ class MainController(BaseController):
     def add_new_aoi(self):
         if self.video:
             AOIDialog(self.view.parent, self.video.filename, self)
+        else:
+            messagebox.showwarning("Warning", "Please select a file!")
+
+    def add_new_aoni(self):
+        if self.video:
+            AONIDialog(self.view.parent, self.video.filename, self)
         else:
             messagebox.showwarning("Warning", "Please select a file!")
 
