@@ -84,9 +84,6 @@ class MainController(BaseController):
         else:
             messagebox.showwarning("Warning", "Please select a file!")
 
-    # def show_mask(self):
-    #     cv2.imshow("image", self.mask)
-
     def refresh_aoi_status(self):
         self.view.update_setting_aoi_status()
 
