@@ -98,6 +98,10 @@ class ObjectCounter:
             ):
 
                 if cont_m == "person" and obj.counted >= config.count_threshold:
+                    logging.debug(
+                        f"Starting to track pedestrian {obj.id} "
+                        "as it as passed the count threshold."
+                    )
                     (position_x, position_y) = obj.position[-1]
                     self.COUNTER_p += 1
                     self.Pedestrians[obj.id] = self.COUNTER_p
@@ -107,6 +111,10 @@ class ObjectCounter:
                     # ever detected as pedestrian, added 4/18 for prevent detecting
                     # bicycle without rider
                     if obj.pedestrian_id == 1:
+                        logging.debug(
+                            f"Starting to track cyclist {obj.id} "
+                            "as it as passed the count threshold."
+                        )
 
                         self.COUNTER_c += 1
                         self.Cyclists[obj.id] = self.COUNTER_c
@@ -116,6 +124,10 @@ class ObjectCounter:
                     cont_m == "motorbike"
                     and obj.counted >= config.count_threshold_motor
                 ):
+                    logging.debug(
+                        f"Starting to track motorbike {obj.id} "
+                        "as it as passed the count threshold."
+                    )
                     self.COUNTER_o += 1
                     self.Motorbikes[obj.id] = self.COUNTER_o
         else:
@@ -126,14 +138,26 @@ class ObjectCounter:
                 and (obj.id not in self.Trucks.keys())
             ):
                 if cont_m == "car" and obj.counted >= config.count_threshold_car:
+                    logging.debug(
+                        f"Starting to track car {obj.id} "
+                        "as it as passed the count threshold."
+                    )
                     self.COUNTER_car += 1
                     self.Cars[obj.id] = self.COUNTER_car
 
                 elif cont_m == "bus" and obj.counted >= config.count_threshold_bus:
+                    logging.debug(
+                        f"Starting to track bus {obj.id} "
+                        "as it as passed the count threshold."
+                    )
                     self.COUNTER_bus += 1
                     self.Buses[obj.id] = self.COUNTER_bus
 
                 elif cont_m == "truck" and obj.counted >= config.count_threshold_truck:
+                    logging.debug(
+                        f"Starting to track truck {obj.id} "
+                        "as it as passed the count threshold."
+                    )
                     self.COUNTER_truck += 1
                     self.Trucks[obj.id] = self.COUNTER_truck
             else:
