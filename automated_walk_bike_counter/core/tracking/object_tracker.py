@@ -668,8 +668,7 @@ class ObjectTracker:
             ):
                 print(f"\tDeleting {obj.id} as it has left the frame")
                 del self.last_frame_moving_objects[index]
-            elif obj.frames_since_seen > config.missing_threshold:
-                # TODO: this if check seems like a bug: redundant
+            else:
                 print(f"\tDeleting {obj.id} as it has disappeared from the frame")
                 del self.last_frame_moving_objects[index]
 
