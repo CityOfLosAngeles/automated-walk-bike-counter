@@ -9,8 +9,6 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
-from __future__ import division, print_function
-
 import tensorflow as tf
 
 slim = tf.contrib.slim

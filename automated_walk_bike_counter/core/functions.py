@@ -45,19 +45,6 @@ def get_costs(pos, points):
     return distances
 
 
-def update_skipped_frame(frame, fname, tracks, thresh):
-
-    h, w = frame.shape[:2]
-
-    # update tracking objects
-    for obj in tracks:
-        obj.frames_since_seen += 1
-    new_tracks = remove_tracked_objects(tracks, frame, thresh)
-    print("update skipped frame")
-
-    return new_tracks
-
-
 def remove_tracked_objects(tracking_arr, frame, thresh):
     for index, obj in enumerate(tracking_arr):
         # if a moving object hasn't been updated for 10 frames then remove it

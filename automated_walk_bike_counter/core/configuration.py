@@ -217,4 +217,12 @@ parser.add_argument(
     help="Interval (in minutes) to output the periodic counter",
 )
 
+parser.add_argument(
+    "--log",
+    type=str,
+    help="The log level for the application (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+    default="WARNING",
+)
+
+
 config = parser.parse_known_args()[0]

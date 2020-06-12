@@ -9,6 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
 from tkinter import Canvas, E, Frame, IntVar, LabelFrame, N, S, W
 from tkinter.colorchooser import askcolor
 from tkinter.ttk import Checkbutton, Style
@@ -80,14 +81,15 @@ class LeftFrame(Frame):
         list_data = list(tuple_data)
         list_data[-1] = self.checkbox_variables[index].get()
         self.controller.valid_selected_objects[index] = tuple(list_data)
-        print(str(self.controller.valid_selected_objects))
+        logging.debug(
+            "New list of valid objects: " + str(self.controller.valid_selected_objects)
+        )
 
     def open_color_pallet_window(self, event, index):
         color = askcolor()
-        print(color)
+        logging.debug(f"Color selected: {str(color)}")
         self.color_objects[index].configure(background=str(color[1]))
         tuple_data = self.controller.valid_selected_objects[index]
         list_data = list(tuple_data)
         list_data[1] = color
         self.controller.valid_selected_objects[index] = tuple(list_data)
-        print(str(self.controller.valid_selected_objects))
