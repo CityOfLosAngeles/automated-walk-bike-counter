@@ -9,6 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
 from tkinter import Canvas, E, Frame, IntVar, LabelFrame, N, S, W
 from tkinter.colorchooser import askcolor
 from tkinter.ttk import Checkbutton, Style
@@ -17,16 +18,14 @@ from ...core.configuration import config
 from .settings_pane import SettingsPane
 
 
-class Left_Frame(Frame):
+class LeftFrame(Frame):
     def __init__(self, parent, controller):
-        super(Left_Frame, self).__init__(parent, height=600)
+        super(LeftFrame, self).__init__(parent, height=600)
         self.style = Style().configure("TFrame.TFrame", background="yellow")
         self.controller = controller
         self.checkbox_variables = []
         self.color_objects = []
-        self.allowed_objects = (
-            config.VALID_OBJECTS
-        )  # ['Person', 'Cyclist', 'Car', 'Truck', 'Bus']
+        self.allowed_objects = config.valid_objects
         self.settings_pane = None
         self.create_objects_list_frame()
 
@@ -82,14 +81,15 @@ class Left_Frame(Frame):
         list_data = list(tuple_data)
         list_data[-1] = self.checkbox_variables[index].get()
         self.controller.valid_selected_objects[index] = tuple(list_data)
-        print(str(self.controller.valid_selected_objects))
+        logging.debug(
+            "New list of valid objects: " + str(self.controller.valid_selected_objects)
+        )
 
     def open_color_pallet_window(self, event, index):
         color = askcolor()
-        print(color)
+        logging.debug(f"Color selected: {str(color)}")
         self.color_objects[index].configure(background=str(color[1]))
         tuple_data = self.controller.valid_selected_objects[index]
         list_data = list(tuple_data)
         list_data[1] = color
         self.controller.valid_selected_objects[index] = tuple(list_data)
-        print(str(self.controller.valid_selected_objects))

@@ -33,10 +33,6 @@ class MovingObject(object):
         self.pedestrian_id = -1
         self.last_detected_object = None
 
-    def count_frames(self):
-        self.frame_since_start = self.frame_since_start + 1
-        return self.frame_since_start
-
     def add_position(self, position_new):
         self.position = np.append(self.position, position_new, axis=0)
         self.frames_since_seen = 0
@@ -102,8 +98,6 @@ class MovingObject(object):
         self.set_next_mean(adjusted_next_mean)
         self.set_next_covariance(next_covariance)
         self.add_predicted_position([self.next_mean[:2]])
-
-        # self.update_last_detected_object_values(self.next_mean[:2])
         self.frames_since_seen += 1
 
     def set_next_mean(self, mean):
@@ -111,24 +105,3 @@ class MovingObject(object):
 
     def set_next_covariance(self, covariance):
         self.next_covariance = covariance
-
-    def set_frames_since_seen(self, num):
-        self.frames_since_seen = num
-
-    def detection_increase(self):
-        self.detection += 1
-
-    def update_last_detected_object_values(self, newCenterPosition):
-        center_x, center_y = newCenterPosition
-        w = self.last_detected_object.left - self.last_detected_object.right
-        h = self.last_detected_object.top - self.last_detected_object.bot
-
-        new_left = int(center_x - w / 2)
-        new_top = int(center_y - h / 2)
-        new_right = int(center_x + w / 2)
-        new_bot = int(center_y + h / 2)
-
-        self.last_detected_object.left = new_left
-        self.last_detected_object.right = new_right
-        self.last_detected_object.top = new_top
-        self.last_detected_object.bot = new_bot

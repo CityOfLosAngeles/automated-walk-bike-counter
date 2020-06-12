@@ -12,9 +12,9 @@
 import os
 from tkinter import Button, E, Frame, N, W, messagebox
 
-from ..widgets.left_frame import Left_Frame
-from ..widgets.menu import App_Menu
-from ..widgets.video_frame import Video_Frame
+from ..widgets.left_frame import LeftFrame
+from ..widgets.menu import AppMenu
+from ..widgets.video_frame import VideoFrame
 from .base import BaseView
 
 
@@ -51,8 +51,8 @@ class MainView(BaseView):
         self.parent.grid_rowconfigure(1, weight=1)
         self.parent.grid_rowconfigure(2, weight=1)
 
-        self.left_frame = Left_Frame(middle_frame, self.controller)
-        self.video_frame = Video_Frame(middle_frame, self.controller)
+        self.left_frame = LeftFrame(middle_frame, self.controller)
+        self.video_frame = VideoFrame(middle_frame, self.controller)
 
         self.left_frame.grid(row=0, column=0, sticky=W + E + N)
         self.video_frame.grid(row=0, column=1)
@@ -63,7 +63,7 @@ class MainView(BaseView):
         self.initialize_top_frame(top_frame)
 
     def initialize_menu(self):
-        App_Menu(self.parent, self.controller)
+        AppMenu(self.parent, self.controller)
 
     def initialize_top_frame(self, parent):
         frame = Frame(master=parent, width=1220)

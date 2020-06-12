@@ -31,7 +31,7 @@ parser.add_argument(
 
 # Cost thresholds
 parser.add_argument(
-    "--PED_COST_THRESHOLD",
+    "--ped_cost_threshold",
     help="Pedestrian cost threshold",
     required=False,
     default=90,
@@ -39,7 +39,7 @@ parser.add_argument(
     env_var="PED_COST_THRESHOLD",
 )
 parser.add_argument(
-    "--BUS_COST_THRESHOLD",
+    "--bus_cost_threshold",
     help="Bus cost threshold",
     default=110,
     required=False,
@@ -47,7 +47,7 @@ parser.add_argument(
     env_var="BUS_COST_THRESHOLD",
 )
 parser.add_argument(
-    "--TRUCK_COST_THRESHOLD",
+    "--truck_cost_threshold",
     help="Truck cost threshold",
     default=110,
     required=False,
@@ -57,41 +57,33 @@ parser.add_argument(
 
 # Missing thresholds
 parser.add_argument(
-    "--MISSING_THRESHOLD",
+    "--missing_threshold",
     help="Missing threshold",
     default=90,
     required=False,
     type=float,
     env_var="MISSING_THRESHOLD",
 )
-parser.add_argument(
-    "--MISSING_THRESHOLD_MAX",
-    help="Missing threshold maximum",
-    default=300,
-    required=False,
-    type=float,
-    env_var="MISSING_THRESHOLD_MAX",
-)
 
 # Duplicate thersholds
 parser.add_argument(
-    "--COUNT_THRESHOLD",
+    "--count_threshold",
     help="Count threshold",
-    default=7,
+    default=8,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_BIKE",
+    "--count_threshold_bike",
     help="Count threshold for bikes",
-    default=3,
+    default=1,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BIKE",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_MOTOR",
+    "--count_threshold_motor",
     help="Count threshold for...",
     default=3,
     required=False,
@@ -99,25 +91,25 @@ parser.add_argument(
     env_var="COUNT_THRESHOLD_MOTOR",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_CAR",
+    "--count_threshold_car",
     help="Count threshold for cars",
-    default=3,
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_CAR",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_BUS",
+    "--count_threshold_bus",
     help="Count threshold for buses",
-    default=3,
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BUS",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_TRUCK",
+    "--count_threshold_truck",
     help="Count threshold for trucks",
-    default=3,
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_TRUCK",
@@ -125,23 +117,13 @@ parser.add_argument(
 
 # Tracking settings
 parser.add_argument(
-    "--VALID_OBJECTS",
+    "--valid_objects",
     nargs="+",
     help="List of valid objects",
     required=False,
     default=["Person", "Cyclist", "Car", "Truck", "Bus"],
     type=str,
     env_var="VALID_OBJECTS",
-)
-
-# Storage backend settings
-parser.add_argument(
-    "--AWS_REGION",
-    help="AWS region for when the weights are stored in S3",
-    required=False,
-    type=str,
-    default="us-west-1",
-    env_var="AWS_REGION",
 )
 
 parser.add_argument(
@@ -234,5 +216,13 @@ parser.add_argument(
     default=15,
     help="Interval (in minutes) to output the periodic counter",
 )
+
+parser.add_argument(
+    "--log",
+    type=str,
+    help="The log level for the application (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+    default="WARNING",
+)
+
 
 config = parser.parse_known_args()[0]

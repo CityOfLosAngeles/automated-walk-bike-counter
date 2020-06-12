@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - configargparse=0.14
-  - fsspec=0.7.2
+  - fsspec=0.7.3
   - libtiff=4.0
   - munkres=1
   - pillow=6

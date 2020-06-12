@@ -9,6 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
 import math
 from tkinter import DISABLED, HORIZONTAL, E, Label, LabelFrame, StringVar, W
 from tkinter.ttk import Combobox, Scale
@@ -42,10 +43,6 @@ class SettingsPane(LabelFrame):
                 self.controller.video.width > predef_sizes[-1]
                 and self.controller.video.height > predef_sizes[-1]
             ):
-                # if self.controller.video.width>=self.controller.video.height:
-                #     predef_sizes.append(self.controller.video.height)
-                # else:
-                #     predef_sizes.append(self.controller.video.width)
                 predef_sizes.append(self.controller.video.height)
                 predef_sizes.append(self.controller.video.width)
 
@@ -118,4 +115,4 @@ class SettingsPane(LabelFrame):
     def set_output_video_opaque(self, value):
         self.controller.output_video.opaque = math.floor(float(value))
         self.scale_value.set(math.floor(float(value)))
-        print(str(self.controller.output_video.opaque))
+        logging.debug(f"New opacity: {str(self.controller.output_video.opaque)}")

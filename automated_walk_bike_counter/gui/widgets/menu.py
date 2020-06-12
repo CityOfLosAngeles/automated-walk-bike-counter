@@ -12,7 +12,7 @@
 from tkinter import FALSE, Menu
 
 
-class App_Menu(Menu):
+class AppMenu(Menu):
     def __init__(self, parent, controller):
         self.controller = controller
 
@@ -34,6 +34,7 @@ class App_Menu(Menu):
         menu_file.add_command(label="Exit", command=parent.quit)
 
         menu_tools.add_command(label="Add AOI", command=controller.add_new_aoi)
+        menu_tools.add_command(label="Add AONI", command=controller.add_new_aoni)
 
         menu_source.add_checkbutton(
             label="Built-in Webcam",

@@ -9,6 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import logging
 import tkinter as tk
 
 import cv2
@@ -44,7 +45,7 @@ class Cli:
         self.set_valid_selected_objects()
 
     def set_valid_selected_objects(self):
-        allowed_objects = config.VALID_OBJECTS
+        allowed_objects = config.valid_objects
         for i in range(len(allowed_objects)):
 
             if allowed_objects[i] in config.search_objects:
@@ -79,8 +80,6 @@ class Cli:
             objects.append("bicycle")
             colors["bicycle"] = (255, 255, 255)
 
-        print(str(objects))
-        print(str(colors))
         return objects, colors
 
     def get_mask_image(self):
@@ -105,10 +104,10 @@ class Cli:
     def run(self):
         output_video = None
         object_classes, color_table = self.get_objects_colors_list()
+        print(f"Tracked objects: {str(color_table)}")
         mask = []
         if self.aoi_points and len(self.aoi_points) > 2:
             mask = self.get_mask_image()
-        # cv2.imshow('aaa', mask)
         tracker = ObjectTracker(mask)
 
         if config.file_name != "":
@@ -119,7 +118,6 @@ class Cli:
                 output_video.has_AOI = True
             tracker.video = video
             tracker.output_video = output_video
-            print(">> Video Filename : ", video.filename)
 
         tracker.valid_selected_objects = [
             "pedestrian" if item == "person" else item
@@ -131,17 +129,18 @@ class Cli:
         tracker.color_table = color_table
         tracker.input_camera_type = config.input_type
         tracker.camera_id = config.camera_id
-        tracker.trackObjects(config)
+        tracker.track_objects(config)
 
 
 def main():
+    # Set logging level
+    logging.basicConfig(level=config.log)
 
     if config.cli:
-
         if config.input_type == "file":
-            print(config.file_name)
+            print(f"Running with file name {config.file_name}")
         else:
-            print(config.camera_id)
+            print(f"Running with camera ID: {config.camera_id}")
         cli = Cli()
         cli.run()
     else:
