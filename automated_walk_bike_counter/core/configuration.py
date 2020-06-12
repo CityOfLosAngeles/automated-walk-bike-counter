@@ -41,7 +41,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--bus_cost_threshold",
-    help="Maximum distance between two pedestrian objects in two frames that we can use"
+    help="Maximum distance between two bus objects in two frames that we can use"
     " to assign those objects together",
     default=110,
     required=False,
@@ -50,7 +50,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--truck_cost_threshold",
-    help="Maximum distance between two pedestrian objects in two frames that we can use"
+    help="Maximum distance between two truck objects in two frames that we can use"
     " to assign those objects together",
     default=110,
     required=False,
@@ -116,7 +116,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--count_threshold_truck",
-    help="The minimum number of frames that a pedestrian should be seen in order to be"
+    help="The minimum number of frames that a truck should be seen in order to be"
     " counted",
     default=5,
     required=False,
@@ -208,7 +208,7 @@ parser.add_argument(
 parser.add_argument(
     "--aoi",
     type=list_of_tuples,
-    help="The list of coordinates that are used to" " indicate the area of interest.",
+    help="The list of coordinates that are used to indicate the area of interest.",
 )
 
 parser.add_argument(
