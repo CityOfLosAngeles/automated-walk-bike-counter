@@ -77,6 +77,18 @@ pip install .
 
 ## Running the application
 
+Generally speaking, the application takes a video source as input
+and counts pedestrians an cyclists that it sees in the video.
+It can produce two kinds of output:
+
+1. A new video that is the same as the input, but with boxes drawn around the identified objects.
+1. A comma-separated-variable (CSV) text file that has time-binned counts for the identified objects.
+
+Each of these output files is placed next to the original input file.
+
+The application has two interfaces: a graphical user interface (GUI),
+and a command line interface (CLI):
+
 #### GUI
 
 In order to run the GUI, you must have an X server running on your machine.
