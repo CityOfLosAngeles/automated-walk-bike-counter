@@ -50,7 +50,7 @@ class AOIDialog:
         self.btn_delete = None
         self.initialize_video_thread()
 
-        label1 = Label(
+        self.label1 = Label(
             top,
             text=(
                 "Please select your area of interest (must be a polygon) on your video:"
@@ -71,7 +71,7 @@ class AOIDialog:
 
         buttons_frame = Frame(top)
 
-        label1.grid(row=0, column=1, columnspan=6, sticky=(W, N))
+        self.label1.grid(row=0, column=1, columnspan=6, sticky=(W, N))
         label2.grid(row=1, column=1, columnspan=6, sticky=(W, N))
         self.video_frame.grid(row=2, column=1, columnspan=4, sticky=(W, E))
         buttons_frame.grid(row=3, column=1, columnspan=4, sticky=(W, E, N, S))
@@ -112,7 +112,6 @@ class AOIDialog:
         top.rowconfigure(2, weight=1)
 
         self.initialize_subclass_components()
-
         top.protocol("WM_DELETE_WINDOW", self.close_window)
         top.geometry("850x630+100+100")
 
@@ -290,7 +289,7 @@ class AOIDialog:
         return np.asarray(img)
 
     def initialize_subclass_components(self):
-        pass
+        self.top.title("Selecting the area of interest")
 
 
 class AONIDialog(AOIDialog):
@@ -298,6 +297,13 @@ class AONIDialog(AOIDialog):
         AOIDialog.__init__(self, parent, filename, controller)
 
     def initialize_subclass_components(self):
+        self.top.title("Selecting the area of non-interest")
+        self.label1.config(
+            text=(
+                "Please select your area of non-interest (must be a polygon) on your "
+                "video:"
+            )
+        )
         self.btn_save.config(text="Save AONI")
         self.btn_delete.config(text="Delete AONI")
 
