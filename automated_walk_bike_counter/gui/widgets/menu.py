@@ -35,6 +35,7 @@ class AppMenu(Menu):
 
         menu_tools.add_command(label="Add AOI", command=controller.add_new_aoi)
         menu_tools.add_command(label="Add AONI", command=controller.add_new_aoni)
+        menu_tools.add_command(label="Add LOI", command=controller.add_new_loi)
 
         menu_source.add_checkbutton(
             label="Built-in Webcam",

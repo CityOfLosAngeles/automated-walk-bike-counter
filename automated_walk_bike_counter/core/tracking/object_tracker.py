@@ -314,6 +314,9 @@ class ObjectTracker:
             # self.periodic_counter_interval =
             #           config.periodic_counter_time * self.video.fps
 
+        if len(self.video.line_of_interest_mask) > 0:
+            self.object_counter.line_of_interest_is_active = True
+
         start = timer()
         n = 0
 
@@ -411,6 +414,19 @@ class ObjectTracker:
                     mask_inv = cv2.bitwise_not(self.video.area_of_not_interest_mask)
                     masked = cv2.bitwise_and(img_ori, mask_inv)
                     img = cv2.resize(masked, tuple(args.new_size))
+
+                if len(self.video.line_of_interest_mask) > 0:
+                    img_ori_copy = img_ori.copy()
+                    cv2.line(
+                        img_ori_copy,
+                        self.video.line_of_interest_points[0],
+                        self.video.line_of_interest_points[1],
+                        (0, 0, 120),
+                        4,
+                    )
+                    cv2.addWeighted(
+                        img_ori_copy, 20 / 100, img_ori, 1 - (20 / 100), 0, img_ori
+                    )
 
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
                 img = np.asarray(img, np.float32)
@@ -647,6 +663,13 @@ class ObjectTracker:
                 # get corresponding contour position, update kalman filter
                 position_new = cur_detected_objects[detected_object_index].center
                 obj_m.last_detected_object = cur_detected_objects[detected_object_index]
+                if len(self.video.line_of_interest_mask) > 0:
+                    obj_m.set_last_lof_mask_color(
+                        self.check_pixel_color_in_line_of_interest_area(
+                            int(cur_detected_objects[detected_object_index].center[0]),
+                            int(cur_detected_objects[detected_object_index].center[1]),
+                        )
+                    )
                 obj_m.kalman_update(position_new)
                 obj_m.counted += 1
                 print("counted " + str(obj_m.id) + " " + str(obj_m.counted))
@@ -793,3 +816,7 @@ class ObjectTracker:
     def check_object_is_in_aoi(self, obj):
 
         return True
+
+    def check_pixel_color_in_line_of_interest_area(self, x, y):
+
+        return self.video.line_of_interest_mask[y, x, 0]

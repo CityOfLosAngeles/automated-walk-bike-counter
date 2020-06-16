@@ -55,6 +55,7 @@ class ObjectCounter:
         self.export_counter = 0
         self.counter_thread = None
         self.valid_selected_objects = []
+        self.line_of_interest_is_active = False
 
     def add_new_moving_object_for_counting(self, obj, position_new, postprocessed):
         cur_detected_object = obj.last_detected_object
@@ -68,7 +69,12 @@ class ObjectCounter:
 
             if obj.id in self.Pedestrians.keys():
 
-                if cont_m == "bicycle" and obj.counted_biker >= 2:
+                if (
+                    cont_m == "bicycle"
+                    and obj.counted_biker >= 2
+                    and self.check_object_can_be_counted(obj)
+                ):
+
                     # this is probably a biker not a pedestrian
                     self.COUNTER_p -= 1
                     self.COUNTER_c += 1
@@ -92,7 +98,11 @@ class ObjectCounter:
                         + " times."
                     )
 
-                if cont_m == "motorbike" and obj.counted_moter >= 2:
+                if (
+                    cont_m == "motorbike"
+                    and obj.counted_moter >= 2
+                    and self.check_object_can_be_counted(obj)
+                ):
                     # this is probably a moterbiker
                     self.COUNTER_p -= 1
                     self.COUNTER_o += 1
@@ -108,7 +118,11 @@ class ObjectCounter:
                 and obj.id not in self.Motorbikes.keys()
             ):
 
-                if cont_m == "person" and obj.counted >= self.COUNT_THRESHOLD:
+                if (
+                    cont_m == "person"
+                    and obj.counted >= self.COUNT_THRESHOLD
+                    and self.check_object_can_be_counted(obj)
+                ):
                     print("counted person " + str(obj.id) + " " + str(obj.counted))
                     (position_x, position_y) = obj.position[-1]
                     self.COUNTER_p += 1
@@ -118,7 +132,7 @@ class ObjectCounter:
                 elif cont_m == "bicycle" and obj.counted >= self.COUNT_THRESHOLD_BIKE:
                     # ever detected as pedestrian, added 4/18 for prevent detecting
                     # bicycle without rider
-                    if obj.pedestrian_id == 1:
+                    if obj.pedestrian_id == 1 and self.check_object_can_be_counted(obj):
                         print("counted bicycle " + str(obj.id) + " " + str(obj.counted))
 
                         self.COUNTER_c += 1
@@ -126,11 +140,14 @@ class ObjectCounter:
                         # mark the moving object with the id
                 # added on 7/23
                 elif (
-                    cont_m == "motorbike" and obj.counted >= self.COUNT_THRESHOLD_MOTOR
+                    cont_m == "motorbike"
+                    and obj.counted >= self.COUNT_THRESHOLD_MOTOR
+                    and self.check_object_can_be_counted(obj)
                 ):
                     print("counted motorbike " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_o += 1
                     self.Motorbikes[obj.id] = self.COUNTER_o
+
         else:
 
             if (
@@ -138,27 +155,44 @@ class ObjectCounter:
                 and (obj.id not in self.Buses.keys())
                 and (obj.id not in self.Trucks.keys())
             ):
-                if cont_m == "car" and obj.counted >= self.COUNT_THRESHOLD_CAR:
+                if (
+                    cont_m == "car"
+                    and obj.counted >= self.COUNT_THRESHOLD_CAR
+                    and self.check_object_can_be_counted(obj)
+                ):
                     print("counted car " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_car += 1
                     self.Cars[obj.id] = self.COUNTER_car
                     print(">>" + str(obj.id) + " detected as new car")
 
-                elif cont_m == "bus" and obj.counted >= self.COUNT_THRESHOLD_BUS:
+                elif (
+                    cont_m == "bus"
+                    and obj.counted >= self.COUNT_THRESHOLD_BUS
+                    and self.check_object_can_be_counted(obj)
+                ):
                     print("counted bus " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_bus += 1
                     self.Buses[obj.id] = self.COUNTER_bus
                     print(">>" + str(obj.id) + " detected as new bus")
 
-                elif cont_m == "truck" and obj.counted >= self.COUNT_THRESHOLD_TRUCK:
+                elif (
+                    cont_m == "truck"
+                    and obj.counted >= self.COUNT_THRESHOLD_TRUCK
+                    and self.check_object_can_be_counted(obj)
+                ):
                     print("counted truck " + str(obj.id) + " " + str(obj.counted))
                     self.COUNTER_truck += 1
                     self.Trucks[obj.id] = self.COUNTER_truck
                     print(">>" + str(obj.id) + " detected as new truck")
+
             else:
 
                 if obj.id in self.Trucks.keys():
-                    if cont_m == "bus" and obj.counted_bus >= 3:
+                    if (
+                        cont_m == "bus"
+                        and obj.counted_bus >= 3
+                        and self.check_object_can_be_counted(obj)
+                    ):
                         # this is probably a bus not a truck
                         self.COUNTER_truck -= 1
                         self.COUNTER_bus += 1
@@ -168,7 +202,11 @@ class ObjectCounter:
                             ">>" + str(obj.id) + " detected as a truck converted to bus"
                         )
 
-                    elif cont_m == "car" and obj.counted_car >= 3:
+                    elif (
+                        cont_m == "car"
+                        and obj.counted_car >= 3
+                        and self.check_object_can_be_counted(obj)
+                    ):
                         # this is probably a bus not a truck
                         self.COUNTER_truck -= 1
                         self.COUNTER_car += 1
@@ -178,7 +216,11 @@ class ObjectCounter:
                             ">>" + str(obj.id) + " detected as a truck converted to car"
                         )
 
-                    elif cont_m == "bus" and obj.counted_bus < 3:
+                    elif (
+                        cont_m == "bus"
+                        and obj.counted_bus < 3
+                        and self.check_object_can_be_counted(obj)
+                    ):
                         obj.counted_bus += 1
                         print(
                             ">>"
@@ -188,7 +230,11 @@ class ObjectCounter:
                         )
 
                 if obj.id in self.Cars.keys():
-                    if cont_m == "bus" and obj.counted_bus >= 3:
+                    if (
+                        cont_m == "bus"
+                        and obj.counted_bus >= 3
+                        and self.check_object_can_be_counted(obj)
+                    ):
                         # this is probably a bus not a truck
                         self.COUNTER_car -= 1
                         self.COUNTER_bus += 1
@@ -198,7 +244,11 @@ class ObjectCounter:
                             ">>" + str(obj.id) + " detected as a car converted to bus"
                         )
 
-                    elif cont_m == "bus" and obj.counted_bus < 3:
+                    elif (
+                        cont_m == "bus"
+                        and obj.counted_bus < 3
+                        and self.check_object_can_be_counted(obj)
+                    ):
                         obj.counted_bus += 1
                         print(
                             ">>"
@@ -208,7 +258,11 @@ class ObjectCounter:
                         )
 
                 if obj.id in self.Buses.keys():
-                    if cont_m == "truck" and obj.counted_truck < 3:
+                    if (
+                        cont_m == "truck"
+                        and obj.counted_truck < 3
+                        and self.check_object_can_be_counted(obj)
+                    ):
                         obj.counted_truck += 1
                         print(
                             ">>"
@@ -315,3 +369,6 @@ class ObjectCounter:
         self.last_exported_bus_counter = cur_bus_counter
 
         print("Counter exported to the csv file.........")
+
+    def check_object_can_be_counted(self, obj):
+        return not self.line_of_interest_is_active or obj.object_passed_loi
