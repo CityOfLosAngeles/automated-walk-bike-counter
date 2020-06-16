@@ -56,7 +56,7 @@ class AOIDialog:
                 "Please select your area of interest (must be a polygon) on your video:"
             ),
         )
-        label2 = Label(
+        self.label2 = Label(
             top,
             text=(
                 "Hint: to add a new vertex left click and to close the polygon right"
@@ -72,7 +72,7 @@ class AOIDialog:
         buttons_frame = Frame(top)
 
         self.label1.grid(row=0, column=1, columnspan=6, sticky=(W, N))
-        label2.grid(row=1, column=1, columnspan=6, sticky=(W, N))
+        self.label2.grid(row=1, column=1, columnspan=6, sticky=(W, N))
         self.video_frame.grid(row=2, column=1, columnspan=4, sticky=(W, E))
         buttons_frame.grid(row=3, column=1, columnspan=4, sticky=(W, E, N, S))
 
@@ -337,6 +337,16 @@ class LOIDialog(AOIDialog):
         AOIDialog.__init__(self, parent, filename, controller)
 
     def initialize_subclass_components(self):
+        self.top.title("Specifying the line of interest")
+        self.label1.config(
+            text=(
+                "Please select your line of interest (must be just a line) on your "
+                "video:"
+            )
+        )
+        self.label2.config(
+            text=("Hint: to add a line just specify two pints of it by left click")
+        )
         self.btn_save.config(text="Save LOI")
         self.btn_delete.config(text="Delete LOI", command=self.delete_loi)
 
