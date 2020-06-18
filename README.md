@@ -19,7 +19,7 @@ This approach allows cities and others to implement CV pedestrian and bicycle co
 ## Sponsors
 
 This work has been generously sponsored by a
-[grant](https://ladot.lacity.org/sites/g/files/wph266/f/Press%20Release%20LADOT%20Awarded%20Mobility%20Grant%2C%20Will%20Conduct%20Department%27s%20First%20Count%20of%20Walkers%20and%20Bicyclists.pdf) from the Toyota Mobility Foundation (TMF).
+[grant](https://cityclerk.lacity.org/lacityclerkconnect/index.cfm?fa=ccfi.viewrecord&cfnumber=18-0175-S1) from the Toyota Mobility Foundation (TMF).
 
 ## Partners
 
