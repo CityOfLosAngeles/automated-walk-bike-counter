@@ -56,23 +56,23 @@ dependency manangement will likely be more difficult.
 Instructions for installation and running are as follows:
 
 1. Create a conda environment for the project. If running without GPUs, run
-```bash
-conda env create -f environment.yml
-```
-If running with GPUs, run
-```bash
-conda env create -f environment-gpu.yml
-```
-The given `environment.yml` files are known to work on at least some Linux, Windows, and Mac machines,
-though you may want to choose a custom Tensorflow distribution depending on your deployment.
+    ```bash
+    conda env create -f environment.yml
+    ```
+    If running with GPUs, run
+    ```bash
+    conda env create -f environment-gpu.yml
+    ```
+    The given `environment.yml` files are known to work on at least some Linux, Windows, and Mac machines,
+    though you may want to choose a custom Tensorflow distribution depending on your deployment.
 1. Activate the environment:
-```bash
-conda activate automated-walk-bike-counter
-```
+    ```bash
+    conda activate automated-walk-bike-counter
+    ```
 1. Install the application into the environment by running
-```bash
-pip install .
-```
+    ```bash
+    pip install .
+    ```
 1. Launch the GUI by running `automated-walk-bike-counter`
 
 ## Running the application
