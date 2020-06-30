@@ -31,24 +31,27 @@ parser.add_argument(
 
 # Cost thresholds
 parser.add_argument(
-    "--PED_COST_THRESHOLD",
-    help="Pedestrian cost threshold",
+    "--ped_cost_threshold",
+    help="Maximum distance between two pedestrian objects in two frames that we can use"
+    " to assign those objects together",
     required=False,
     default=90,
     type=float,
     env_var="PED_COST_THRESHOLD",
 )
 parser.add_argument(
-    "--BUS_COST_THRESHOLD",
-    help="Bus cost threshold",
+    "--bus_cost_threshold",
+    help="Maximum distance between two bus objects in two frames that we can use"
+    " to assign those objects together",
     default=110,
     required=False,
     type=float,
     env_var="BUS_COST_THRESHOLD",
 )
 parser.add_argument(
-    "--TRUCK_COST_THRESHOLD",
-    help="Truck cost threshold",
+    "--truck_cost_threshold",
+    help="Maximum distance between two truck objects in two frames that we can use"
+    " to assign those objects together",
     default=110,
     required=False,
     type=float,
@@ -57,67 +60,65 @@ parser.add_argument(
 
 # Missing thresholds
 parser.add_argument(
-    "--MISSING_THRESHOLD",
-    help="Missing threshold",
+    "--missing_threshold",
+    help="Maximum number of frames that an object can be missing in sequential frames",
     default=90,
     required=False,
     type=float,
     env_var="MISSING_THRESHOLD",
 )
-parser.add_argument(
-    "--MISSING_THRESHOLD_MAX",
-    help="Missing threshold maximum",
-    default=300,
-    required=False,
-    type=float,
-    env_var="MISSING_THRESHOLD_MAX",
-)
 
 # Duplicate thersholds
 parser.add_argument(
-    "--COUNT_THRESHOLD",
-    help="Count threshold",
-    default=7,
+    "--count_threshold",
+    help="The minimum number of frames that a pedestrian should be seen in order to be"
+    " counted",
+    default=8,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_BIKE",
-    help="Count threshold for bikes",
-    default=3,
+    "--count_threshold_bike",
+    help="The minimum number of frames that a cyclist should be seen in order to be"
+    " counted",
+    default=1,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BIKE",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_MOTOR",
-    help="Count threshold for...",
+    "--count_threshold_motor",
+    help="The minimum number of frames that a motor cyclist should be seen in order"
+    " to be counted",
     default=3,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_MOTOR",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_CAR",
-    help="Count threshold for cars",
-    default=3,
+    "--count_threshold_car",
+    help="The minimum number of frames that a car should be seen in order to be"
+    " counted",
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_CAR",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_BUS",
-    help="Count threshold for buses",
-    default=3,
+    "--count_threshold_bus",
+    help="The minimum number of frames that a bus should be seen in order to be"
+    " counted",
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_BUS",
 )
 parser.add_argument(
-    "--COUNT_THRESHOLD_TRUCK",
-    help="Count threshold for trucks",
-    default=3,
+    "--count_threshold_truck",
+    help="The minimum number of frames that a truck should be seen in order to be"
+    " counted",
+    default=5,
     required=False,
     type=int,
     env_var="COUNT_THRESHOLD_TRUCK",
@@ -125,9 +126,9 @@ parser.add_argument(
 
 # Tracking settings
 parser.add_argument(
-    "--VALID_OBJECTS",
+    "--valid_objects",
     nargs="+",
-    help="List of valid objects",
+    help="List of objects that are shown to the user to choose for tracking",
     required=False,
     default=["Person", "Cyclist", "Car", "Truck", "Bus"],
     type=str,
@@ -191,19 +192,23 @@ parser.add_argument(
     "--search_objects",
     type=list_of_items,
     default=["Person", "Cyclist"],
-    help="The list of valid objects comma separated like Person,Cyclist.",
+    help="The list of the selected objects from VALID_OBJECTS which is used in "
+    "command prompt, comma separated like Person,Cyclist.",
 )
 
 parser.add_argument(
     "--objects_colors",
     type=list,
     default=["#ff0000", "#00ff00"],
-    help="The list of objects' colors.",
+    help="The colors that we want to use to highlight the objects, that we have "
+    "in search_objects, in the output",
 )
 
 
 parser.add_argument(
-    "--aoi", type=list_of_tuples, help="The list of aoi coordinates.",
+    "--aoi",
+    type=list_of_tuples,
+    help="The list of coordinates that are used to indicate the area of interest.",
 )
 
 parser.add_argument(
@@ -222,7 +227,15 @@ parser.add_argument(
     "--periodic_counter_time",
     type=int,
     default=15,
-    help="Interval (in minutes) to output the periodic counter",
+    help="The interval (in minutes) that we want to export the counters based on",
 )
+
+parser.add_argument(
+    "--log",
+    type=str,
+    help="The log level for the application (DEBUG, INFO, WARNING, ERROR, CRITICAL)",
+    default="WARNING",
+)
+
 
 config = parser.parse_known_args()[0]

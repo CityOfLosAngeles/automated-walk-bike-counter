@@ -68,7 +68,6 @@ class MainController(BaseController):
         tracker.camera_id = self.camera_id
         tracker.stop_thread = self.stop_thread
         tracker.output_video = self.output_video
-        print(listener_object.handle_post_processed_frame)
         tracker.frame_listener = listener_object.handle_post_processed_frame
         tracker.track_objects(config)
 

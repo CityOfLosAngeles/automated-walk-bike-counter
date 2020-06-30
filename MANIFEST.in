@@ -1,12 +1,6 @@
-recursive_include automated_walk_bike_counter *.py
-recursive_include automated_walk_bike_counter *.ini
-recursive_include automated_walk_bike_counter *.names
-recursive_include automated_walk_bike_counter *.txt
-recursive_include automated_walk_bike_counter *.gif
+recursive-include automated_walk_bike_counter *.names
+recursive-include automated_walk_bike_counter *.txt
 
-
-include setup.py
-include README.md
+include convert_weight.py
 include LICENSE
-include MANIFEST.in
 include requirements.txt
