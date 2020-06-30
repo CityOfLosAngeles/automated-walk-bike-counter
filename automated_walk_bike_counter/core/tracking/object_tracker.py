@@ -421,11 +421,11 @@ class ObjectTracker:
                         img_ori_copy,
                         self.video.line_of_interest_points[0],
                         self.video.line_of_interest_points[1],
-                        (0, 0, 120),
+                        (0, 0, 180),
                         4,
                     )
                     cv2.addWeighted(
-                        img_ori_copy, 20 / 100, img_ori, 1 - (20 / 100), 0, img_ori
+                        img_ori_copy, 90 / 100, img_ori, 1 - (90 / 100), 0, img_ori
                     )
 
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
