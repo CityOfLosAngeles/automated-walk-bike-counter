@@ -23,6 +23,7 @@ from tkinter import (
     S,
     Toplevel,
     W,
+    messagebox,
 )
 
 import cv2
@@ -334,6 +335,10 @@ class AONIDialog(AOIDialog):
 class LOIDialog(AOIDialog):
     def __init__(self, parent, filename, controller):
         self.line_of_interest_points = []
+        self.polygon_A = None
+        self.polygon_B = None
+        self.loi_identified = False
+        self.frame_areas_image = []
         AOIDialog.__init__(self, parent, filename, controller)
 
     def initialize_subclass_components(self):
@@ -362,54 +367,87 @@ class LOIDialog(AOIDialog):
             )
             self.btn_delete.config(state=NORMAL)
 
+        self.frame_areas_image = np.asarray(
+            Image.new("RGB", (self.video_frame_width, self.video_frame_height), 0)
+        )
+
     def on_mouse_right_click(self, event):
         AOIDialog.on_mouse_right_click(self, event)
 
     def on_mouse_click(self, event):
         x = event.x
         y = event.y
+        if not self.loi_identified:
+            if self.drawing:
+                x0 = self.points[0][0]
+                y0 = self.points[0][1]
 
-        if self.drawing:
-            x0 = self.points[0][0]
-            y0 = self.points[0][1]
+                if x0 == x and y0 == y:
+                    messagebox.showerror(
+                        "Error",
+                        "Start point and end point can not be the same.",
+                        parent=self.top,
+                    )
+                    self.clear()
+                else:
+                    self.draw_line_splited_areas(x0, y0, x, y)
 
-            self.draw_line_splited_areas(x0, y0, x, y)
+                self.drawing = False
+            else:
+                if len(self.points) > 0:
+                    message_box = messagebox.askquestion(
+                        "Warning",
+                        "You are drawing a new line. Are you sure?",
+                        icon="warning",
+                        parent=self.top,
+                    )
+                    if message_box == "yes":
+                        self.clear()
+                    else:
+                        return
 
-            self.drawing = False
+                self.drawing = True
+                self.points.append((x, y))
         else:
-            self.drawing = True
-
-        self.points.append((x, y))
+            self.get_the_polygon(x, y)
 
     def draw_line_splited_areas(self, px1, py1, px2, py2):
-        slope = (py2 - py1) / (px2 - px1)
 
-        # Line equation is : ax + by + c = 0
-        # slope = (y - y1)/(x - x1)
-        # y = slope*x - slope*x1 + y1
-        # slope * x - y - (slope * x1) + y1 = 0
+        if px1 != px2:
+            slope = (py2 - py1) / (px2 - px1)
 
         image_edge_intersects = []
-
         y1 = 0
-        top_horizontal_intersect_x = (y1 - py1) / slope + px1
-        if 0 <= top_horizontal_intersect_x <= self.video_frame_width:
-            image_edge_intersects.append((top_horizontal_intersect_x, y1))
+        if py2 != py1:
+            if px1 == px2:
+                top_horizontal_intersect_x = px1
+            else:
+                top_horizontal_intersect_x = (y1 - py1) / slope + px1
+
+            if 0 <= top_horizontal_intersect_x <= self.video_frame_width:
+                image_edge_intersects.append((top_horizontal_intersect_x, y1))
 
         x1 = self.video_frame_width
-        right_vertical_intersect_y = slope * x1 - slope * px1 + py1
-        if 0 <= right_vertical_intersect_y <= self.video_frame_height:
-            image_edge_intersects.append((x1, right_vertical_intersect_y))
+        if px1 != px2:
+            right_vertical_intersect_y = slope * x1 - slope * px1 + py1
+            if 0 <= right_vertical_intersect_y <= self.video_frame_height:
+                image_edge_intersects.append((x1, right_vertical_intersect_y))
 
         y1 = self.video_frame_height
-        bottom_horizontal_intersect_x = (y1 - py1) / slope + px1
-        if 0 <= bottom_horizontal_intersect_x <= self.video_frame_width:
-            image_edge_intersects.append((bottom_horizontal_intersect_x, y1))
+        if py2 != py1:
+            if px1 == px2:
+                bottom_horizontal_intersect_x = px1
+            else:
+                bottom_horizontal_intersect_x = (y1 - py1) / slope + px1
+
+            if 0 <= bottom_horizontal_intersect_x <= self.video_frame_width:
+                image_edge_intersects.append((bottom_horizontal_intersect_x, y1))
 
         x1 = 0
-        left_vertical_intersect_y = slope * x1 - slope * px1 + py1
-        if 0 <= left_vertical_intersect_y <= self.video_frame_height:
-            image_edge_intersects.append((x1, left_vertical_intersect_y))
+        if px1 != px2:
+            left_vertical_intersect_y = slope * x1 - slope * px1 + py1
+            if 0 <= left_vertical_intersect_y <= self.video_frame_height:
+                image_edge_intersects.append((x1, left_vertical_intersect_y))
 
         start_point = (image_edge_intersects[0][0], image_edge_intersects[0][1])
         self.ori_points.append(
@@ -434,36 +472,27 @@ class LOIDialog(AOIDialog):
             )
         )
 
-        while start_point[0] != end_point[0] and start_point[1] != end_point[1]:
-            if start_point[0] == 0:
-                start_point = (0, 0)
-            elif start_point[1] == 0 and start_point[0] != self.video_frame_width:
-                start_point = (self.video_frame_width, 0)
-            elif (
-                start_point[0] == self.video_frame_width
-                and start_point[1] != self.video_frame_height
-            ):
-                start_point = (self.video_frame_width, self.video_frame_height)
-            elif start_point[1] == self.video_frame_height:
-                start_point = (0, self.video_frame_height)
-            self.ori_points.append(
-                (
-                    int(self.get_convert_to_original_coefficient() * start_point[0]),
-                    int(self.get_convert_to_original_coefficient() * start_point[1]),
-                )
-            )
-
-        self.draw_line(start_point[0], start_point[1], end_point[0], end_point[1])
-        self.ori_points.append(
-            (
-                int(self.get_convert_to_original_coefficient() * end_point[0]),
-                int(self.get_convert_to_original_coefficient() * end_point[1]),
-            )
+        area_1_points = self.get_line_borders_intersection_points(
+            start_point[0], start_point[1], end_point[0], end_point[1]
         )
+
+        self.draw_polygon_on_areas_image("polygon_A", area_1_points)
+
+        self.ori_points = self.convert_points_dimensions_to_original(area_1_points)
 
         self.mask_image = cv2.fillConvexPoly(
             self.mask_image, np.array(self.ori_points, "int32"), (255, 255, 255), 8, 0
         )
+
+        self.loi_identified = True
+
+    def polygone_click(self, event, polygone_object):
+        text = ""
+        if polygone_object == self.polygon_A:
+            text = "Polygon_A"
+        elif polygone_object == self.polygon_B:
+            text = "Polygon_B"
+        messagebox.showinfo("Test", text)
 
     def draw_line(self, px1, py1, px2, py2):
 
@@ -483,8 +512,8 @@ class LOIDialog(AOIDialog):
             self.controller.video.line_of_interest_points = self.line_of_interest_points
             self.close_window()
         else:
-            self.top.messagebox.showwarning(
-                "Warning", "You have not determined a valid LOI!"
+            messagebox.showwarning(
+                "Warning", "You have not determined a valid LOI!", parent=self.top
             )
 
     def delete_loi(self):
@@ -492,3 +521,85 @@ class LOIDialog(AOIDialog):
         self.controller.video.line_of_interest_points = []
         self.btn_delete.config(state=DISABLED)
         self.close_window()
+
+    def clear(self):
+        AOIDialog.clear(self)
+        self.loi_identified = False
+        self.frame_areas_image = np.asarray(
+            Image.new("RGB", (self.video_frame_width, self.video_frame_height), 0)
+        )
+
+    def get_line_borders_intersection_points(
+        self, start_point_x, start_point_y, end_point_x, end_point_y
+    ):
+        # This function returns the list of points which is the collection of
+        # intersections of the line and the image borders and also the coordinates
+        # of the other corners of the image that can be used to compose one of the
+        # polygons that are created by splitting the image through the line
+
+        is_start_point = True
+
+        polygon_points = [[start_point_x, start_point_y]]
+
+        while (
+            start_point_x != end_point_x
+            and start_point_y != end_point_y
+            or is_start_point
+        ):
+            if start_point_x == 0 and start_point_y != 0:
+                start_point_x, start_point_y = 0, 0
+            elif start_point_y == 0 and start_point_x != self.video_frame_width:
+                start_point_x, start_point_y = self.video_frame_width, 0
+            elif (
+                start_point_x == self.video_frame_width
+                and start_point_y != self.video_frame_height
+            ):
+                start_point_x, start_point_y = (
+                    self.video_frame_width,
+                    self.video_frame_height,
+                )
+            elif start_point_y == self.video_frame_height:
+                start_point_x, start_point_y = 0, self.video_frame_height
+
+            polygon_points.append((start_point_x, start_point_y))
+
+            if is_start_point:
+                is_start_point = False
+
+        polygon_points.append([end_point_x, end_point_y])
+
+        return polygon_points
+
+    def convert_points_dimensions_to_original(self, points):
+
+        for (x, y) in points:
+
+            x = int(self.get_convert_to_original_coefficient() * x)
+            y = int(self.get_convert_to_original_coefficient() * y)
+
+        return points
+
+    def convert_to_normal_list_format(self, points):
+
+        points_in_list_format = []
+
+        for (x, y) in points:
+            points_in_list_format.append(x)
+            points_in_list_format.append(y)
+
+        return points_in_list_format
+
+    def draw_polygon_on_areas_image(self, area_name, points):
+
+        if area_name == "polygon_A":
+            cv2.fillConvexPoly(
+                self.frame_areas_image, np.array(points, "int32"), (255, 255, 255), 8, 0
+            )
+
+    def get_the_polygon(self, x, y):
+
+        color_code = self.frame_areas_image[y, x, 0]
+        if color_code == 255:
+            print("Polygon A")
+        else:
+            print("Polygon B")
