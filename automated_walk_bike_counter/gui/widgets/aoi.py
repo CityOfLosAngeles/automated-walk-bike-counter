@@ -56,7 +56,7 @@ class AOIDialog:
                 "Please select your area of interest (must be a polygon) on your video:"
             ),
         )
-        label2 = Label(
+        self.label2 = Label(
             top,
             text=(
                 "Hint: to add a new vertex left click and to close the polygon right"
@@ -72,7 +72,7 @@ class AOIDialog:
         buttons_frame = Frame(top)
 
         self.label1.grid(row=0, column=1, columnspan=6, sticky=(W, N))
-        label2.grid(row=1, column=1, columnspan=6, sticky=(W, N))
+        self.label2.grid(row=1, column=1, columnspan=6, sticky=(W, N))
         self.video_frame.grid(row=2, column=1, columnspan=4, sticky=(W, E))
         buttons_frame.grid(row=3, column=1, columnspan=4, sticky=(W, E, N, S))
 
@@ -327,5 +327,168 @@ class AONIDialog(AOIDialog):
             self.close_window()
         else:
             self.top.messagebox.showwarning(
-                "Warning", "You have not determined a valid AOI!"
+                "Warning", "You have not determined a valid AONI!"
             )
+
+
+class LOIDialog(AOIDialog):
+    def __init__(self, parent, filename, controller):
+        self.line_of_interest_points = []
+        AOIDialog.__init__(self, parent, filename, controller)
+
+    def initialize_subclass_components(self):
+        self.top.title("Specifying the line of interest")
+        self.label1.config(
+            text=(
+                "Please select your line of interest (must be just a line) on your "
+                "video:"
+            )
+        )
+        self.label2.config(
+            text=("Hint: to add a line just specify two pints of it by left click")
+        )
+        self.btn_save.config(text="Save LOI")
+        self.btn_delete.config(text="Delete LOI", command=self.delete_loi)
+
+        if len(self.controller.video.line_of_interest_points) == 0:
+            self.mask_image = self.get_empty_mask_image()
+        else:
+            self.points = self.controller.video.line_of_interest_points
+            self.draw_line_splited_areas(
+                self.points[0][0],
+                self.points[0][1],
+                self.points[1][0],
+                self.points[1][1],
+            )
+            self.btn_delete.config(state=NORMAL)
+
+    def on_mouse_right_click(self, event):
+        AOIDialog.on_mouse_right_click(self, event)
+
+    def on_mouse_click(self, event):
+        x = event.x
+        y = event.y
+
+        if self.drawing:
+            x0 = self.points[0][0]
+            y0 = self.points[0][1]
+
+            self.draw_line_splited_areas(x0, y0, x, y)
+
+            self.drawing = False
+        else:
+            self.drawing = True
+
+        self.points.append((x, y))
+
+    def draw_line_splited_areas(self, px1, py1, px2, py2):
+        slope = (py2 - py1) / (px2 - px1)
+
+        # Line equation is : ax + by + c = 0
+        # slope = (y - y1)/(x - x1)
+        # y = slope*x - slope*x1 + y1
+        # slope * x - y - (slope * x1) + y1 = 0
+
+        image_edge_intersects = []
+
+        y1 = 0
+        top_horizontal_intersect_x = (y1 - py1) / slope + px1
+        if 0 <= top_horizontal_intersect_x <= self.video_frame_width:
+            image_edge_intersects.append((top_horizontal_intersect_x, y1))
+
+        x1 = self.video_frame_width
+        right_vertical_intersect_y = slope * x1 - slope * px1 + py1
+        if 0 <= right_vertical_intersect_y <= self.video_frame_height:
+            image_edge_intersects.append((x1, right_vertical_intersect_y))
+
+        y1 = self.video_frame_height
+        bottom_horizontal_intersect_x = (y1 - py1) / slope + px1
+        if 0 <= bottom_horizontal_intersect_x <= self.video_frame_width:
+            image_edge_intersects.append((bottom_horizontal_intersect_x, y1))
+
+        x1 = 0
+        left_vertical_intersect_y = slope * x1 - slope * px1 + py1
+        if 0 <= left_vertical_intersect_y <= self.video_frame_height:
+            image_edge_intersects.append((x1, left_vertical_intersect_y))
+
+        start_point = (image_edge_intersects[0][0], image_edge_intersects[0][1])
+        self.ori_points.append(
+            (
+                int(self.get_convert_to_original_coefficient() * start_point[0]),
+                int(self.get_convert_to_original_coefficient() * start_point[1]),
+            )
+        )
+        end_point = (image_edge_intersects[1][0], image_edge_intersects[1][1])
+        self.draw_line(start_point[0], start_point[1], end_point[0], end_point[1])
+
+        self.line_of_interest_points.append(
+            (
+                int(self.get_convert_to_original_coefficient() * start_point[0]),
+                int(self.get_convert_to_original_coefficient() * start_point[1]),
+            )
+        )
+        self.line_of_interest_points.append(
+            (
+                int(self.get_convert_to_original_coefficient() * end_point[0]),
+                int(self.get_convert_to_original_coefficient() * end_point[1]),
+            )
+        )
+
+        while start_point[0] != end_point[0] and start_point[1] != end_point[1]:
+            if start_point[0] == 0:
+                start_point = (0, 0)
+            elif start_point[1] == 0 and start_point[0] != self.video_frame_width:
+                start_point = (self.video_frame_width, 0)
+            elif (
+                start_point[0] == self.video_frame_width
+                and start_point[1] != self.video_frame_height
+            ):
+                start_point = (self.video_frame_width, self.video_frame_height)
+            elif start_point[1] == self.video_frame_height:
+                start_point = (0, self.video_frame_height)
+            self.ori_points.append(
+                (
+                    int(self.get_convert_to_original_coefficient() * start_point[0]),
+                    int(self.get_convert_to_original_coefficient() * start_point[1]),
+                )
+            )
+
+        self.draw_line(start_point[0], start_point[1], end_point[0], end_point[1])
+        self.ori_points.append(
+            (
+                int(self.get_convert_to_original_coefficient() * end_point[0]),
+                int(self.get_convert_to_original_coefficient() * end_point[1]),
+            )
+        )
+
+        self.mask_image = cv2.fillConvexPoly(
+            self.mask_image, np.array(self.ori_points, "int32"), (255, 255, 255), 8, 0
+        )
+
+    def draw_line(self, px1, py1, px2, py2):
+
+        self.canvas.create_line(
+            px1, py1, px2, py2, fill="#FF0000", width=4, tag="foreground",
+        )
+
+    def save_mask(self):
+
+        if (
+            not (
+                np.array_equal(np.asarray(self.mask_image), self.get_empty_mask_image())
+            )
+            and len(self.points) > 1
+        ):
+            self.controller.video.line_of_interest_mask = self.mask_image
+            self.controller.video.line_of_interest_points = self.line_of_interest_points
+            self.close_window()
+        else:
+            self.top.messagebox.showwarning(
+                "Warning", "You have not determined a valid LOI!"
+            )
+
+    def delete_loi(self):
+        self.controller.video.line_of_interest_mask = None
+        self.controller.video.line_of_interest_points = []
+        self.btn_delete.config(state=DISABLED)
+        self.close_window()

@@ -32,6 +32,8 @@ class MovingObject(object):
         self.detection = 0
         self.pedestrian_id = -1
         self.last_detected_object = None
+        self.last_lof_mask_color = -1
+        self.object_passed_loi = False
 
     def add_position(self, position_new):
         self.position = np.append(self.position, position_new, axis=0)
@@ -105,3 +107,10 @@ class MovingObject(object):
 
     def set_next_covariance(self, covariance):
         self.next_covariance = covariance
+
+    def set_last_lof_mask_color(self, color):
+
+        if self.last_lof_mask_color >= 0 and self.last_lof_mask_color != color:
+            self.object_passed_loi = True
+
+        self.last_lof_mask_color = color

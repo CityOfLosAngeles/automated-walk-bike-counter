@@ -21,6 +21,9 @@ class Video:
         self.frame_count = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
         self.fps = camera.get(cv2.CAP_PROP_FPS)
         self.area_of_not_interest_mask = []
+        self.line_of_interest_mask = []
+        self.line_of_interest_points = []
+        self.line_of_interest_mask_resized = []
 
 
 class OutputVideo:
