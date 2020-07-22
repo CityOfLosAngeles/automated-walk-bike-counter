@@ -13,14 +13,19 @@ import threading
 from tkinter import (
     CENTER,
     DISABLED,
+    END,
     NORMAL,
+    BooleanVar,
     Button,
     Canvas,
+    Checkbutton,
     E,
+    Entry,
     Frame,
     Label,
     N,
     S,
+    StringVar,
     Toplevel,
     W,
     messagebox,
@@ -61,19 +66,22 @@ class AOIDialog:
             top,
             text=(
                 "Hint: to add a new vertex left click and to close the polygon right"
-                + "click"
+                + " click"
             ),
         )
+        self.get_areas_name_frame = Frame(top, width=400)
         video_new_height = self.get_video_resized_dimensions()[1]
-        self.video_frame = Frame(top, bg="green", width=800, height=600)
+        self.video_frame = Frame(top, width=800, height=600)
         self.canvas = self.initialize_canvas(video_new_height)
         self.canvas.grid(row=0, column=0, sticky=(W, E))
         self.video_frame.rowconfigure(0, weight=1)
-
         buttons_frame = Frame(top)
 
-        self.label1.grid(row=0, column=1, columnspan=6, sticky=(W, N))
-        self.label2.grid(row=1, column=1, columnspan=6, sticky=(W, N))
+        self.label1.grid(row=0, column=1, columnspan=2, sticky=(W, N))
+        self.label2.grid(row=1, column=1, columnspan=2, sticky=(W, N), pady=(5, 0))
+        self.get_areas_name_frame.grid(
+            row=0, column=3, rowspan=2, columnspan=4, sticky=(W, N)
+        )
         self.video_frame.grid(row=2, column=1, columnspan=4, sticky=(W, E))
         buttons_frame.grid(row=3, column=1, columnspan=4, sticky=(W, E, N, S))
 
@@ -335,13 +343,40 @@ class AONIDialog(AOIDialog):
 class LOIDialog(AOIDialog):
     def __init__(self, parent, filename, controller):
         self.line_of_interest_points = []
-        self.polygon_A = None
-        self.polygon_B = None
+        self.polygon_A_label = None
+        self.polygon_B_label = None
+        self.polygon_A_center = None
+        self.polygon_B_center = None
         self.loi_identified = False
         self.frame_areas_image = []
+        self.has_named_areas = None
+        self.are_areas_named = BooleanVar()
+        self.area1_name = StringVar()
+        self.area2_name = StringVar()
+        self.assign_name_frame = None
+        self.start_point = []
+        self.end_point = []
+        self.side_a_name = None
+        self.side_b_name = None
         AOIDialog.__init__(self, parent, filename, controller)
 
     def initialize_subclass_components(self):
+
+        self.has_named_areas = None
+        self.has_named_areas = Checkbutton(
+            master=self.get_areas_name_frame,
+            text="Named areas",
+            variable=self.are_areas_named,
+            command=self.has_named_areas_clicked,
+            state=DISABLED,
+        )
+        self.has_named_areas.grid(row=0, column=1, columnspan=5, sticky=W)
+
+        self.assign_name_frame = Frame(self.get_areas_name_frame)
+        self.assign_name_frame.grid(row=1, column=1, columnspan=5, sticky=(W, E))
+
+        self.assign_name_frame.grid_remove()
+
         self.top.title("Specifying the line of interest")
         self.label1.config(
             text=(
@@ -484,15 +519,10 @@ class LOIDialog(AOIDialog):
             self.mask_image, np.array(self.ori_points, "int32"), (255, 255, 255), 8, 0
         )
 
+        self.start_point = start_point
+        self.end_point = end_point
         self.loi_identified = True
-
-    def polygone_click(self, event, polygone_object):
-        text = ""
-        if polygone_object == self.polygon_A:
-            text = "Polygon_A"
-        elif polygone_object == self.polygon_B:
-            text = "Polygon_B"
-        messagebox.showinfo("Test", text)
+        self.has_named_areas.config(state=NORMAL)
 
     def draw_line(self, px1, py1, px2, py2):
 
@@ -528,6 +558,15 @@ class LOIDialog(AOIDialog):
         self.frame_areas_image = np.asarray(
             Image.new("RGB", (self.video_frame_width, self.video_frame_height), 0)
         )
+
+        if self.canvas.find_withtag("polygon_A"):
+            self.canvas.delete(self.canvas.find_withtag("polygon_A"))
+        if self.canvas.find_withtag("polygon_B"):
+            self.canvas.delete(self.canvas.find_withtag("polygon_B"))
+
+        self.are_areas_named.set(False)
+        self.has_named_areas.config(state=DISABLED)
+        self.assign_name_frame.grid_remove()
 
     def get_line_borders_intersection_points(
         self, start_point_x, start_point_y, end_point_x, end_point_y
@@ -603,3 +642,119 @@ class LOIDialog(AOIDialog):
             print("Polygon A")
         else:
             print("Polygon B")
+
+    def has_named_areas_clicked(self):
+        if not self.are_areas_named.get():
+            self.assign_name_frame.grid_remove()
+            self.canvas.delete(self.canvas.find_withtag("polygon_A"))
+            self.canvas.delete(self.canvas.find_withtag("polygon_B"))
+
+        else:
+            if self.loi_identified:
+                self.assign_name_frame.grid()
+
+                Label(master=self.assign_name_frame, text="Side-1 name:").grid(
+                    row=0, column=1, sticky=W
+                )
+
+                self.side_a_name = Entry(master=self.assign_name_frame)
+                self.side_a_name.grid(row=0, column=2)
+                self.side_a_name.bind(
+                    "<Key>",
+                    lambda event, args="SideA": self.areas_text_name_change(
+                        event, args
+                    ),
+                )
+                self.side_a_name.insert(END, "Side 1")
+
+                Label(master=self.assign_name_frame, text="Side-2 name:").grid(
+                    row=0, column=4
+                )
+
+                self.side_b_name = Entry(master=self.assign_name_frame)
+
+                self.side_b_name.grid(row=0, column=5)
+                self.side_b_name.bind(
+                    "<Key>",
+                    lambda event, args="SideB": self.areas_text_name_change(
+                        event, args
+                    ),
+                )
+                self.side_b_name.insert(END, "Side 2")
+
+                self.polygon_A_center = self.find_centroid(
+                    self.get_line_borders_intersection_points(
+                        self.start_point[0],
+                        self.start_point[1],
+                        self.end_point[0],
+                        self.end_point[1],
+                    )
+                )
+                self.polygon_B_center = self.find_centroid(
+                    self.get_line_borders_intersection_points(
+                        self.end_point[0],
+                        self.end_point[1],
+                        self.start_point[0],
+                        self.start_point[1],
+                    )
+                )
+
+                self.polygon_A_label = self.canvas.create_text(
+                    self.polygon_A_center[0],
+                    self.polygon_A_center[1],
+                    text="Side 1",
+                    font=("", 36),
+                    fill="#FFFFFF",
+                    tag="polygon_A",
+                )
+
+                self.polygon_B_label = self.canvas.create_text(
+                    self.polygon_B_center[0],
+                    self.polygon_B_center[1],
+                    text="Side 2",
+                    font=("", 36),
+                    fill="#FFFFFF",
+                    tag="polygon_B",
+                )
+
+    def find_centroid(self, points):
+        ans = [0, 0]
+
+        n = len(points)
+        signed_area = 0
+
+        # For all vertices
+        for i in range(len(points)):
+            x0 = points[i][0]
+            y0 = points[i][1]
+            x1 = points[(i + 1) % n][0]
+            y1 = points[(i + 1) % n][1]
+
+            # Calculate value of A
+            # using shoelace formula
+            A = (x0 * y1) - (x1 * y0)
+            signed_area += A
+
+            # Calculating coordinates of
+            # centroid of polygon
+            ans[0] += (x0 + x1) * A
+            ans[1] += (y0 + y1) * A
+
+        signed_area *= 0.5
+        ans[0] = (ans[0]) / (6 * signed_area)
+        ans[1] = (ans[1]) / (6 * signed_area)
+
+        return ans
+
+    def areas_text_name_change(self, event, name):
+        if name == "SideA":
+            self.canvas.itemconfig(
+                self.polygon_A_label, text=self.side_a_name.get() + event.char
+            )
+        else:
+            self.canvas.itemconfig(
+                self.polygon_B_label, text=self.side_b_name.get() + event.char
+            )
+        # print(repr(event.char)+"----------------------------")
+        # print(obj.get()+"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        # obj.set(obj.get() + repr(event.char))
