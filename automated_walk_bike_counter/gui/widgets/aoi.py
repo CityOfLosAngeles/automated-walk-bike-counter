@@ -385,7 +385,7 @@ class LOIDialog(AOIDialog):
             )
         )
         self.label2.config(
-            text=("Hint: to add a line just specify two pints of it by left click")
+            text="Hint: to add a line just specify two pints of it by left click"
         )
         self.btn_save.config(text="Save LOI")
         self.btn_delete.config(text="Delete LOI", command=self.delete_loi)
@@ -443,8 +443,6 @@ class LOIDialog(AOIDialog):
 
                 self.drawing = True
                 self.points.append((x, y))
-        else:
-            self.get_the_polygon(x, y)
 
     def draw_line_splited_areas(self, px1, py1, px2, py2):
 
@@ -618,30 +616,12 @@ class LOIDialog(AOIDialog):
 
         return points
 
-    def convert_to_normal_list_format(self, points):
-
-        points_in_list_format = []
-
-        for (x, y) in points:
-            points_in_list_format.append(x)
-            points_in_list_format.append(y)
-
-        return points_in_list_format
-
     def draw_polygon_on_areas_image(self, area_name, points):
 
         if area_name == "polygon_A":
             cv2.fillConvexPoly(
                 self.frame_areas_image, np.array(points, "int32"), (255, 255, 255), 8, 0
             )
-
-    def get_the_polygon(self, x, y):
-
-        color_code = self.frame_areas_image[y, x, 0]
-        if color_code == 255:
-            print("Polygon A")
-        else:
-            print("Polygon B")
 
     def has_named_areas_clicked(self):
         if not self.are_areas_named.get():
@@ -755,6 +735,3 @@ class LOIDialog(AOIDialog):
             self.canvas.itemconfig(
                 self.polygon_B_label, text=self.side_b_name.get() + event.char
             )
-        # print(repr(event.char)+"----------------------------")
-        # print(obj.get()+"<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
-        # obj.set(obj.get() + repr(event.char))
