@@ -13,7 +13,6 @@ import threading
 from tkinter import (
     CENTER,
     DISABLED,
-    END,
     NORMAL,
     BooleanVar,
     Button,
@@ -35,8 +34,10 @@ import cv2
 import numpy as np
 from PIL import Image, ImageTk
 
+from ...model.video.LOI_info import LOIInfo
 
-class AOIDialog:
+
+class AOIDialog(object):
     def __init__(self, parent, filename, controller):
         top = self.top = Toplevel(parent)
         self.filename = filename
@@ -48,9 +49,8 @@ class AOIDialog:
         self.drawing = False
         self.points = []
         self.ori_points = []
-        camera = cv2.VideoCapture(self.filename)
-        self.video_width = int(camera.get(3))
-        self.video_height = int(camera.get(4))
+        self.video_width = self.controller.video.width
+        self.video_height = self.controller.video.height
         self.empty_image = Image.new("RGB", (self.video_width, self.video_height), 0)
         self.mask_image = self.get_empty_mask_image()
         self.btn_delete = None
@@ -358,10 +358,13 @@ class LOIDialog(AOIDialog):
         self.end_point = []
         self.side_a_name = None
         self.side_b_name = None
+        self.resized_height = None
         AOIDialog.__init__(self, parent, filename, controller)
 
     def initialize_subclass_components(self):
-
+        self.area1_name.set("Side 1")
+        self.area2_name.set("Side 2")
+        self.resized_height = int(self.get_video_resized_dimensions()[1])
         self.has_named_areas = None
         self.has_named_areas = Checkbutton(
             master=self.get_areas_name_frame,
@@ -390,21 +393,29 @@ class LOIDialog(AOIDialog):
         self.btn_save.config(text="Save LOI")
         self.btn_delete.config(text="Delete LOI", command=self.delete_loi)
 
-        if len(self.controller.video.line_of_interest_points) == 0:
-            self.mask_image = self.get_empty_mask_image()
-        else:
-            self.points = self.controller.video.line_of_interest_points
-            self.draw_line_splited_areas(
-                self.points[0][0],
-                self.points[0][1],
-                self.points[1][0],
-                self.points[1][1],
-            )
-            self.btn_delete.config(state=NORMAL)
-
         self.frame_areas_image = np.asarray(
             Image.new("RGB", (self.video_frame_width, self.video_frame_height), 0)
         )
+
+        if self.controller.video.line_of_interest_info is None:
+            self.mask_image = self.get_empty_mask_image()
+        else:
+            if len(self.controller.video.line_of_interest_info.preview_points) > 0:
+                self.points = self.controller.video.line_of_interest_info.preview_points
+                self.draw_line_splited_areas(
+                    self.points[0][0],
+                    self.points[0][1],
+                    self.points[1][0],
+                    self.points[1][1],
+                )
+                self.btn_delete.config(state=NORMAL)
+            if self.controller.video.line_of_interest_info is not None:
+                self.area1_name.set(
+                    self.controller.video.line_of_interest_info.side_A_name
+                )
+                self.area2_name.set(
+                    self.controller.video.line_of_interest_info.side_B_name
+                )
 
     def on_mouse_right_click(self, event):
         AOIDialog.on_mouse_right_click(self, event)
@@ -442,7 +453,7 @@ class LOIDialog(AOIDialog):
                         return
 
                 self.drawing = True
-                self.points.append((x, y))
+            self.points.append((x, y))
 
     def draw_line_splited_areas(self, px1, py1, px2, py2):
 
@@ -482,14 +493,17 @@ class LOIDialog(AOIDialog):
             if 0 <= left_vertical_intersect_y <= self.video_frame_height:
                 image_edge_intersects.append((x1, left_vertical_intersect_y))
 
-        start_point = (image_edge_intersects[0][0], image_edge_intersects[0][1])
+        start_point = (
+            int(image_edge_intersects[0][0]),
+            int(image_edge_intersects[0][1]),
+        )
         self.ori_points.append(
             (
                 int(self.get_convert_to_original_coefficient() * start_point[0]),
                 int(self.get_convert_to_original_coefficient() * start_point[1]),
             )
         )
-        end_point = (image_edge_intersects[1][0], image_edge_intersects[1][1])
+        end_point = (int(image_edge_intersects[1][0]), int(image_edge_intersects[1][1]))
         self.draw_line(start_point[0], start_point[1], end_point[0], end_point[1])
 
         self.line_of_interest_points.append(
@@ -536,8 +550,22 @@ class LOIDialog(AOIDialog):
             )
             and len(self.points) > 1
         ):
-            self.controller.video.line_of_interest_mask = self.mask_image
-            self.controller.video.line_of_interest_points = self.line_of_interest_points
+            line_of_interest_info = LOIInfo()
+            line_of_interest_info.mask_image = self.mask_image
+            line_of_interest_info.points = self.line_of_interest_points
+            line_of_interest_info.preview_points = self.points
+            if self.are_areas_named.get():
+                line_of_interest_info.sides_have_name = True
+                line_of_interest_info.side_A_name = self.side_a_name.get()
+                line_of_interest_info.side_B_name = self.side_b_name.get()
+            else:
+                if line_of_interest_info.sides_have_name:
+                    line_of_interest_info.sides_have_name = False
+                    line_of_interest_info.side_A_name = None
+                    line_of_interest_info.side_B_name = None
+
+            self.controller.video.line_of_interest_info = line_of_interest_info
+
             self.close_window()
         else:
             messagebox.showwarning(
@@ -545,8 +573,7 @@ class LOIDialog(AOIDialog):
             )
 
     def delete_loi(self):
-        self.controller.video.line_of_interest_mask = None
-        self.controller.video.line_of_interest_points = []
+        self.controller.video.line_of_interest_info = None
         self.btn_delete.config(state=DISABLED)
         self.close_window()
 
@@ -556,6 +583,8 @@ class LOIDialog(AOIDialog):
         self.frame_areas_image = np.asarray(
             Image.new("RGB", (self.video_frame_width, self.video_frame_height), 0)
         )
+        self.points = []
+        self.line_of_interest_points = []
 
         if self.canvas.find_withtag("polygon_A"):
             self.canvas.delete(self.canvas.find_withtag("polygon_A"))
@@ -589,14 +618,14 @@ class LOIDialog(AOIDialog):
                 start_point_x, start_point_y = self.video_frame_width, 0
             elif (
                 start_point_x == self.video_frame_width
-                and start_point_y != self.video_frame_height
+                and start_point_y != self.resized_height
             ):
                 start_point_x, start_point_y = (
                     self.video_frame_width,
-                    self.video_frame_height,
+                    self.resized_height,
                 )
-            elif start_point_y == self.video_frame_height:
-                start_point_x, start_point_y = 0, self.video_frame_height
+            elif start_point_y == self.resized_height:
+                start_point_x, start_point_y = 0, self.resized_height
 
             polygon_points.append((start_point_x, start_point_y))
 
@@ -608,13 +637,14 @@ class LOIDialog(AOIDialog):
         return polygon_points
 
     def convert_points_dimensions_to_original(self, points):
-
+        new_points = []
         for (x, y) in points:
 
             x = int(self.get_convert_to_original_coefficient() * x)
             y = int(self.get_convert_to_original_coefficient() * y)
+            new_points.append((x, y))
 
-        return points
+        return new_points
 
     def draw_polygon_on_areas_image(self, area_name, points):
 
@@ -637,30 +667,47 @@ class LOIDialog(AOIDialog):
                     row=0, column=1, sticky=W
                 )
 
-                self.side_a_name = Entry(master=self.assign_name_frame)
+                validate_entry_input = (
+                    self.assign_name_frame.register(self.validate_entry),
+                    "%W",
+                    "%P",
+                    "%S",
+                )
+
+                self.side_a_name = Entry(
+                    master=self.assign_name_frame,
+                    textvariable=self.area1_name,
+                    validatecommand=validate_entry_input,
+                    validate="key",
+                )
                 self.side_a_name.grid(row=0, column=2)
                 self.side_a_name.bind(
-                    "<Key>",
+                    "<KeyRelease>",
                     lambda event, args="SideA": self.areas_text_name_change(
                         event, args
                     ),
                 )
-                self.side_a_name.insert(END, "Side 1")
+                # self.side_a_name.insert(END, self.area1_name.get())
 
                 Label(master=self.assign_name_frame, text="Side-2 name:").grid(
                     row=0, column=4
                 )
 
-                self.side_b_name = Entry(master=self.assign_name_frame)
+                self.side_b_name = Entry(
+                    master=self.assign_name_frame,
+                    textvariable=self.area2_name,
+                    validatecommand=validate_entry_input,
+                    validate="key",
+                )
 
                 self.side_b_name.grid(row=0, column=5)
                 self.side_b_name.bind(
-                    "<Key>",
+                    "<KeyRelease>",
                     lambda event, args="SideB": self.areas_text_name_change(
                         event, args
                     ),
                 )
-                self.side_b_name.insert(END, "Side 2")
+                # self.side_b_name.insert(END, self.area2_name.get())
 
                 self.polygon_A_center = self.find_centroid(
                     self.get_line_borders_intersection_points(
@@ -682,7 +729,7 @@ class LOIDialog(AOIDialog):
                 self.polygon_A_label = self.canvas.create_text(
                     self.polygon_A_center[0],
                     self.polygon_A_center[1],
-                    text="Side 1",
+                    text=self.area1_name.get(),
                     font=("", 36),
                     fill="#FFFFFF",
                     tag="polygon_A",
@@ -691,7 +738,7 @@ class LOIDialog(AOIDialog):
                 self.polygon_B_label = self.canvas.create_text(
                     self.polygon_B_center[0],
                     self.polygon_B_center[1],
-                    text="Side 2",
+                    text=self.area2_name.get(),
                     font=("", 36),
                     fill="#FFFFFF",
                     tag="polygon_B",
@@ -729,9 +776,24 @@ class LOIDialog(AOIDialog):
     def areas_text_name_change(self, event, name):
         if name == "SideA":
             self.canvas.itemconfig(
-                self.polygon_A_label, text=self.side_a_name.get() + event.char
+                # self.polygon_A_label, text=self.side_a_name.get() + event.char
+                self.polygon_A_label,
+                text=self.area1_name.get(),
             )
         else:
             self.canvas.itemconfig(
-                self.polygon_B_label, text=self.side_b_name.get() + event.char
+                # self.polygon_B_label, text=self.side_b_name.get() + event.char
+                self.polygon_B_label,
+                text=self.area2_name.get(),
             )
+
+    def validate_entry(self, widget_name, prev_value, inserted_text):
+        if len(prev_value) > 20:
+            messagebox.showerror(
+                "Error",
+                "The length of the name shouldn't be greater than 20.",
+                parent=self.assign_name_frame,
+            )
+            return False
+        else:
+            return True

@@ -13,7 +13,7 @@ from tkinter import BooleanVar, IntVar, filedialog, messagebox
 
 from ...core.configuration import config
 from ...core.tracking.object_tracker import ObjectTracker
-from ..video import OutputVideo, Video
+from ...model.video.video import OutputVideo, Video
 from ..widgets.aoi import AOIDialog, AONIDialog, LOIDialog
 from .base import BaseController
 
@@ -35,6 +35,7 @@ class MainController(BaseController):
         self.internal_webcam = IntVar()
         self.external_webcam = IntVar()
         self.stop_thread = BooleanVar()
+        self.tracker = None
 
     def open_file(self):
         file_name = filedialog.askopenfilename()
@@ -53,23 +54,23 @@ class MainController(BaseController):
         self.stop_thread.set(False)
         self.listener_object = listener_object
         object_classes, color_table = self.get_selected_objects_list()
-        tracker = ObjectTracker(self.mask)
+        self.tracker = ObjectTracker(self.mask)
         if self.video:
-            tracker.video_filename = self.video.filename
-        tracker.valid_selected_objects = [
+            self.tracker.video_filename = self.video.filename
+        self.tracker.valid_selected_objects = [
             "pedestrian" if item == "person" else item
             for item in object_classes
             if item != "bicycle"
         ]
-        tracker.object_classes = object_classes
-        tracker.color_table = color_table
-        tracker.video = self.video
-        tracker.input_camera_type = self.input_camera_type
-        tracker.camera_id = self.camera_id
-        tracker.stop_thread = self.stop_thread
-        tracker.output_video = self.output_video
-        tracker.frame_listener = listener_object.handle_post_processed_frame
-        tracker.track_objects(config)
+        self.tracker.object_classes = object_classes
+        self.tracker.color_table = color_table
+        self.tracker.video = self.video
+        self.tracker.input_camera_type = self.input_camera_type
+        self.tracker.camera_id = self.camera_id
+        self.tracker.stop_thread = self.stop_thread
+        self.tracker.output_video = self.output_video
+        self.tracker.frame_listener = listener_object.handle_post_processed_frame
+        self.tracker.track_objects(config)
 
     def add_new_aoi(self):
         if self.video:

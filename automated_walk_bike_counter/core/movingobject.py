@@ -33,6 +33,7 @@ class MovingObject(object):
         self.pedestrian_id = -1
         self.last_detected_object = None
         self.last_lof_mask_color = -1
+        self.moving_direction = ""
         self.object_passed_loi = False
 
     def add_position(self, position_new):
@@ -112,5 +113,6 @@ class MovingObject(object):
 
         if self.last_lof_mask_color >= 0 and self.last_lof_mask_color != color:
             self.object_passed_loi = True
+            print("Object " + str(self.id) + " Passes the line!!!!")
 
         self.last_lof_mask_color = color
