@@ -128,7 +128,7 @@ class ObjectCounter:
                 elif cont_m == "bicycle" and obj.counted >= config.count_threshold_bike:
                     # ever detected as pedestrian, added 4/18 for prevent detecting
                     # bicycle without rider
-                    self.predicted_as_cyclistc[obj.id] = True
+                    self.predicted_as_cyclist[obj.id] = True
                     if obj.pedestrian_id == 1 and self.check_object_can_be_counted(obj):
                         logging.debug(
                             f"Starting to track cyclist {obj.id} "
