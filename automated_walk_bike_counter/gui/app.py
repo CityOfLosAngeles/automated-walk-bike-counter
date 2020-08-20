@@ -18,8 +18,8 @@ from PIL import Image
 
 from ..core.configuration import config
 from ..core.tracking.object_tracker import ObjectTracker
+from ..model.video.video import OutputVideo, Video
 from .controller.main_controller import MainController
-from .video import OutputVideo, Video
 from .view.main import MainView
 
 

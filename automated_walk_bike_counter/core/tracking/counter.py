@@ -9,6 +9,7 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import copy
 import csv
 import datetime
 import logging
@@ -36,6 +37,7 @@ class ObjectCounter:
         self.Pedestrians = {}
         self.Cyclists = {}
         self.Trucks = {}
+        self.predicted_as_cyclist = {}
 
         self.output_counter_file_name = "counter"
         self.last_exported_ped_counter = 0
@@ -47,6 +49,8 @@ class ObjectCounter:
         self.counter_thread = None
         self.valid_selected_objects = []
         self.line_of_interest_is_active = False
+        self.video = None
+        self.detailed_counters = {}
 
     def add_new_moving_object_for_counting(self, obj, position_new, postprocessed):
         cur_detected_object = obj.last_detected_object
@@ -63,21 +67,19 @@ class ObjectCounter:
 
             if obj.id in self.Pedestrians.keys():
 
-                if (
-                    cont_m == "bicycle"
-                    and obj.counted_biker >= 2
-                    and self.check_object_can_be_counted(obj)
-                ):
-
-                    # this is probably a biker not a pedestrian
-                    self.COUNTER_p -= 1
-                    self.COUNTER_c += 1
-                    self.Cyclists[obj.id] = self.COUNTER_c
-                    self.Pedestrians.pop(obj.id)
-                    logging.debug(
-                        f"\tPerson {obj.id} has been counted as a bicycle"
-                        "2 or more times, and has been re-identified as a cyclist"
-                    )
+                if cont_m == "bicycle" and obj.counted_biker >= 2:
+                    if self.check_object_can_be_counted(obj):
+                        # this is probably a biker not a pedestrian
+                        self.COUNTER_p -= 1
+                        self.COUNTER_c += 1
+                        self.Cyclists[obj.id] = self.COUNTER_c
+                        self.Pedestrians.pop(obj.id)
+                        logging.debug(
+                            f"\tPerson {obj.id} has been counted as a bicycle"
+                            "2 or more times, and has been re-identified as a cyclist"
+                        )
+                    else:
+                        self.predicted_as_cyclistc[obj.id] = True
 
                 elif cont_m == "bicycle" and obj.counted_biker < 2:
                     # increase counter
@@ -119,13 +121,14 @@ class ObjectCounter:
 
                     (position_x, position_y) = obj.position[-1]
                     self.COUNTER_p += 1
+                    self.update_detailed_counter(obj, cont_m)
                     self.Pedestrians[obj.id] = self.COUNTER_p
                     obj.pedestrian_id = 1
                     # mark the moving object with the id
                 elif cont_m == "bicycle" and obj.counted >= config.count_threshold_bike:
                     # ever detected as pedestrian, added 4/18 for prevent detecting
                     # bicycle without rider
-
+                    self.predicted_as_cyclist[obj.id] = True
                     if obj.pedestrian_id == 1 and self.check_object_can_be_counted(obj):
                         logging.debug(
                             f"Starting to track cyclist {obj.id} "
@@ -277,7 +280,11 @@ class ObjectCounter:
 
     def export_counter_initialization(self):
 
-        header = ["Time"] + self.valid_selected_objects
+        header = (
+            ["Time"]
+            + self.valid_selected_objects
+            + self.create_detailed_counters_headers()
+        )
 
         self.output_counter_file_name = self.output_counter_file_name + ".csv"
 
@@ -289,6 +296,7 @@ class ObjectCounter:
             counters.writeheader()
 
     def export_counter_threading(self):
+
         self.counter_thread = threading.Thread(
             target=self.counter_export, args=(), daemon=True
         )
@@ -296,7 +304,14 @@ class ObjectCounter:
 
     def counter_export(self):
 
-        header = ["Time"] + self.valid_selected_objects
+        cur_detailed_counter = copy.deepcopy(self.detailed_counters)
+        self.detailed_counters = {}
+
+        header = (
+            ["Time"]
+            + self.valid_selected_objects
+            + self.create_detailed_counters_headers()
+        )
 
         self.export_counter += 1
 
@@ -349,7 +364,8 @@ class ObjectCounter:
             counters = csv.DictWriter(csvfile, fieldnames=header, lineterminator="\n")
             data_object = {}
 
-            for item in ["Time"] + self.valid_selected_objects:
+            # for item in ["Time"] + self.valid_selected_objects:
+            for item in header:
                 if item.lower() == "time":
                     data_object[item] = str(timedelta)
                 elif item.lower() == "pedestrian":
@@ -362,6 +378,11 @@ class ObjectCounter:
                     data_object[item] = str(truck_output_counter)
                 elif item.lower() == "bus":
                     data_object[item] = str(bus_output_counter)
+                else:
+                    if item in list(cur_detailed_counter.keys()):
+                        data_object[item] = str(cur_detailed_counter[item])
+                    else:
+                        data_object[item] = 0
 
             data = [data_object]
             counters.writerows(data)
@@ -376,3 +397,43 @@ class ObjectCounter:
 
     def check_object_can_be_counted(self, obj):
         return not self.line_of_interest_is_active or obj.object_passed_loi
+
+    def update_detailed_counter(self, obj, object_name):
+        if object_name == "person":
+            object_name = "Pedestrian"
+        elif object_name == "bicycle":
+            object_name = "Cyclist"
+
+        key = object_name + "_" + obj.moving_direction
+        if key in self.detailed_counters.keys():
+            self.detailed_counters[key] += 1
+        else:
+            self.detailed_counters[key] = 1
+
+    def create_detailed_counters_headers(self):
+
+        if self.video is not None and self.video.line_of_interest_info is not None:
+
+            header_list = []
+            for item in self.valid_selected_objects:
+                if item in ["pedestrian", "cyclist"]:
+
+                    header_list.append(
+                        item.capitalize()
+                        + "_from_"
+                        + self.video.line_of_interest_info.side_A_name
+                        + "_to_"
+                        + self.video.line_of_interest_info.side_B_name
+                    )
+
+                    header_list.append(
+                        item.capitalize()
+                        + "_from_"
+                        + self.video.line_of_interest_info.side_B_name
+                        + "_to_"
+                        + self.video.line_of_interest_info.side_A_name
+                    )
+
+            return header_list
+        else:
+            return []

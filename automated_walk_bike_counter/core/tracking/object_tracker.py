@@ -235,8 +235,8 @@ class ObjectTracker:
         anchors = parse_anchors(args.anchor_path)
         classes = read_class_names(args.class_name_path)
         self.object_counter.valid_selected_objects = self.valid_selected_objects
-        if config.save_periodic_counter:
-            self.object_counter.export_counter_initialization()
+        # if config.save_periodic_counter:
+        #     self.object_counter.export_counter_initialization()
 
         num_class = len(classes)
 
@@ -244,6 +244,13 @@ class ObjectTracker:
 
         file = self.video_filename
         save_video = args.save_video
+
+        if (
+            self.video.line_of_interest_info is not None
+            and len(self.video.line_of_interest_info.mask_image) > 0
+        ):
+            self.object_counter.line_of_interest_is_active = True
+            self.object_counter.video = self.video
 
         # check if the video is reading from a file or from the webcam
         if self.input_camera_type == "webcam":
@@ -304,8 +311,7 @@ class ObjectTracker:
             # self.periodic_counter_interval =
             #           config.periodic_counter_time * self.video.fps
 
-        if len(self.video.line_of_interest_mask) > 0:
-            self.object_counter.line_of_interest_is_active = True
+        # if len(self.video.line_of_interest_mask) > 0:
 
         start = timer()
         n = 0
@@ -405,12 +411,17 @@ class ObjectTracker:
                     masked = cv2.bitwise_and(img_ori, mask_inv)
                     img = cv2.resize(masked, tuple(args.new_size))
 
-                if len(self.video.line_of_interest_mask) > 0:
+                # if len(self.video.line_of_interest_mask) > 0:
+                if (
+                    self.video.line_of_interest_info is not None
+                    and len(self.video.line_of_interest_info.mask_image) > 0
+                ):
+
                     img_ori_copy = img_ori.copy()
                     cv2.line(
                         img_ori_copy,
-                        self.video.line_of_interest_points[0],
-                        self.video.line_of_interest_points[1],
+                        self.video.line_of_interest_info.points[0],
+                        self.video.line_of_interest_info.points[1],
                         (0, 0, 180),
                         4,
                     )
@@ -644,13 +655,20 @@ class ObjectTracker:
                 # get corresponding contour position, update kalman filter
                 position_new = cur_detected_objects[detected_object_index].center
                 obj_m.last_detected_object = cur_detected_objects[detected_object_index]
-                if len(self.video.line_of_interest_mask) > 0:
-                    obj_m.set_last_lof_mask_color(
-                        self.check_pixel_color_in_line_of_interest_area(
-                            int(cur_detected_objects[detected_object_index].center[0]),
-                            int(cur_detected_objects[detected_object_index].center[1]),
-                        )
+                # if len(self.video.line_of_interest_mask) > 0:
+                if (
+                    self.video.line_of_interest_info is not None
+                    and len(self.video.line_of_interest_info.mask_image) > 0
+                ):
+
+                    color_value = self.check_pixel_color_in_line_of_interest_area(
+                        int(cur_detected_objects[detected_object_index].center[0]),
+                        int(cur_detected_objects[detected_object_index].center[1]),
                     )
+
+                    obj_m.set_last_lof_mask_color(color_value)
+                    self.set_moving_direction_string(obj_m, color_value)
+
                 obj_m.kalman_update(position_new)
                 obj_m.counted += 1
                 self.add_new_moving_object_to_counter(
@@ -754,22 +772,22 @@ class ObjectTracker:
         img_ori = self.current_frame.postprocessed_frame
 
         if mess == "person":
-            if obj.id in self.object_counter.Pedestrians:
-                plot_one_box(
-                    img_ori, [x0, y0, x1, y1], label="", color=self.color_table[mess]
-                )
-            elif obj.id in self.object_counter.Cyclists:
+            if obj.id in self.object_counter.predicted_as_cyclist:
                 plot_one_box(
                     img_ori,
                     [x0, y0, x1, y1],
                     label="Cyclist",
                     color=self.color_table["cyclist"],
                 )
-        elif obj.id in self.object_counter.Cars:
+            else:
+                plot_one_box(
+                    img_ori, [x0, y0, x1, y1], label="", color=self.color_table[mess]
+                )
+        elif mess == "car":
             plot_one_box(
                 img_ori, [x0, y0, x1, y1], label="Car", color=self.color_table["car"]
             )
-        elif obj.id in self.object_counter.Trucks:
+        elif mess == "truck":
             plot_one_box(
                 img_ori,
                 [x0, y0, x1, y1],
@@ -785,5 +803,21 @@ class ObjectTracker:
         return True
 
     def check_pixel_color_in_line_of_interest_area(self, x, y):
+        return self.video.line_of_interest_info.mask_image[y, x, 0]
 
-        return self.video.line_of_interest_mask[y, x, 0]
+    def set_moving_direction_string(self, obj, color_value):
+
+        if color_value > 0:
+            obj.moving_direction = (
+                "from_"
+                + self.video.line_of_interest_info.side_A_name
+                + "_to_"
+                + self.video.line_of_interest_info.side_B_name
+            )
+        else:
+            obj.moving_direction = (
+                "from_"
+                + self.video.line_of_interest_info.side_B_name
+                + "_to_"
+                + self.video.line_of_interest_info.side_A_name
+            )
