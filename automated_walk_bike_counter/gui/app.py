@@ -18,7 +18,7 @@ from PIL import Image
 
 from ..core.configuration import config
 from ..core.tracking.object_tracker import ObjectTracker
-from ..model.video.video import OutputVideo, Video
+from ..model.video.video import OutputVideo, Stream
 from .controller.main_controller import MainController
 from .view.main import MainView
 
@@ -112,7 +112,7 @@ class Cli:
 
         if config.file_name != "":
             tracker.video_filename = config.file_name
-            video = Video(config.file_name)
+            video = Stream(config.file_name)
             output_video = OutputVideo(video)
             if self.aoi_points:
                 output_video.has_AOI = True

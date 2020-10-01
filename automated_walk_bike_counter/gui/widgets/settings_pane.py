@@ -38,10 +38,10 @@ class SettingsPane(LabelFrame):
 
     def initialize_resolution_combo(self):
         predef_sizes = [320, 416, 608]
-        if self.controller.video:
+        if self.controller.stream:
             if (
-                self.controller.video.width > predef_sizes[-1]
-                and self.controller.video.height > predef_sizes[-1]
+                self.controller.stream.width > predef_sizes[-1]
+                and self.controller.stream.height > predef_sizes[-1]
             ):
                 predef_sizes.append(self.controller.video.height)
                 predef_sizes.append(self.controller.video.width)

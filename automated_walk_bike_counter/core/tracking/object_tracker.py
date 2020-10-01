@@ -44,9 +44,8 @@ class ObjectTracker:
         self.video_width = 0
         self.video_height = 0
         self.roiBasePoint = []
-        self.video_filename = ""
         self.frame_listener = None
-        self.video = None
+        self.stream = None
         self.output_video = None
         self.color_table = {}
         self.image_processing_size = []
@@ -242,19 +241,19 @@ class ObjectTracker:
 
         self.image_processing_size = args.new_size
 
-        file = self.video_filename
+        file = self.stream.stream_source_path
         save_video = args.save_video
 
         if (
-            self.video.line_of_interest_info is not None
-            and len(self.video.line_of_interest_info.mask_image) > 0
+            self.stream.line_of_interest_info is not None
+            and len(self.stream.line_of_interest_info.mask_image) > 0
         ):
             self.object_counter.line_of_interest_is_active = True
-            self.object_counter.video = self.video
-
+            self.object_counter.video = self.stream
         # check if the video is reading from a file or from the webcam
         if self.input_camera_type == "webcam":
-            file = self.camera_id
+            # file = self.camera_id
+            file = self.stream.stream_source_path
             vfname = "camera"
         else:
             # get the video name to process
@@ -273,8 +272,8 @@ class ObjectTracker:
             camera.set(3, 1200)
             camera.set(4, 800)
 
-        self.video_width = int(camera.get(3))
-        self.video_height = int(camera.get(4))
+        self.video_width = self.stream.width
+        self.video_height = self.stream.height
 
         assert camera.isOpened(), "Cannot capture source"
 
@@ -305,7 +304,7 @@ class ObjectTracker:
             self.periodic_counter_interval = int(
                 # config.periodic_counter_time * self.video.fps * 60
                 config.periodic_counter_time
-                * self.video.fps
+                * self.stream.fps
             )
 
             # For testing purpose we can consider periodic_counter_time as seconds
@@ -373,7 +372,11 @@ class ObjectTracker:
             saver.restore(sess, restore_path)
 
             while (
-                camera.isOpened() and not self.stop_thread or not self.stop_thread.get()
+                # camera.isOpened() and not self.stop_thread or not
+                # self.stop_thread.get()
+                self.stream.more()
+                and not self.stop_thread
+                or not self.stop_thread.get()
             ):
 
                 self.current_frame_number += 1
@@ -385,7 +388,8 @@ class ObjectTracker:
 
                 elapsed = self.current_frame_number
 
-                ret, img_ori = camera.read()
+                # ret, img_ori = camera.read()
+                img_ori = self.stream.read()
 
                 print("Frame Number: " + str(elapsed))
                 if img_ori is None:
@@ -408,22 +412,22 @@ class ObjectTracker:
                 else:
                     img = cv2.resize(img_ori, tuple(args.new_size))
 
-                if len(self.video.area_of_not_interest_mask):
-                    mask_inv = cv2.bitwise_not(self.video.area_of_not_interest_mask)
+                if len(self.stream.area_of_not_interest_mask):
+                    mask_inv = cv2.bitwise_not(self.stream.area_of_not_interest_mask)
                     masked = cv2.bitwise_and(img_ori, mask_inv)
                     img = cv2.resize(masked, tuple(args.new_size))
 
                 # if len(self.video.line_of_interest_mask) > 0:
                 if (
-                    self.video.line_of_interest_info is not None
-                    and len(self.video.line_of_interest_info.mask_image) > 0
+                    self.stream.line_of_interest_info is not None
+                    and len(self.stream.line_of_interest_info.mask_image) > 0
                 ):
 
                     img_ori_copy = img_ori.copy()
                     cv2.line(
                         img_ori_copy,
-                        self.video.line_of_interest_info.points[0],
-                        self.video.line_of_interest_info.points[1],
+                        self.stream.line_of_interest_info.points[0],
+                        self.stream.line_of_interest_info.points[1],
                         (0, 0, 180),
                         4,
                     )
@@ -471,9 +475,6 @@ class ObjectTracker:
                             self.current_frame_number,
                         )
 
-                    if self.input_camera_type == "webcam" and not config.cli:
-                        cv2.imshow("", self.current_frame.postprocessed_frame)
-
                 # from the 2nd frame, calculate cost using predicted position and new
                 # contour positions
                 else:
@@ -493,10 +494,6 @@ class ObjectTracker:
                                 self.current_frame.postprocessed_frame,
                                 self.current_frame_number,
                             )
-
-                        if self.input_camera_type == "webcam" and not config.cli:
-                            temp_image = self.current_frame.postprocessed_frame
-                            cv2.imshow("", temp_image)
 
                         continue
 
@@ -522,9 +519,6 @@ class ObjectTracker:
                                 self.current_frame_number,
                             )
 
-                        if self.input_camera_type == "webcam" and not config.cli:
-                            cv2.imshow("", self.current_frame.postprocessed_frame)
-
                         continue
 
                     self.predict_moving_objects_new_position(
@@ -540,9 +534,6 @@ class ObjectTracker:
                             self.current_frame.postprocessed_frame,
                             self.current_frame_number,
                         )
-
-                    if self.input_camera_type == "webcam" and not config.cli:
-                        cv2.imshow("", self.current_frame.postprocessed_frame)
 
                 if elapsed % 5 == 0:
                     logging.debug(
@@ -659,8 +650,8 @@ class ObjectTracker:
                 obj_m.last_detected_object = cur_detected_objects[detected_object_index]
                 # if len(self.video.line_of_interest_mask) > 0:
                 if (
-                    self.video.line_of_interest_info is not None
-                    and len(self.video.line_of_interest_info.mask_image) > 0
+                    self.stream.line_of_interest_info is not None
+                    and len(self.stream.line_of_interest_info.mask_image) > 0
                 ):
 
                     color_value = self.check_pixel_color_in_line_of_interest_area(
@@ -805,21 +796,21 @@ class ObjectTracker:
         return True
 
     def check_pixel_color_in_line_of_interest_area(self, x, y):
-        return self.video.line_of_interest_info.mask_image[y, x, 0]
+        return self.stream.line_of_interest_info.mask_image[y, x, 0]
 
     def set_moving_direction_string(self, obj, color_value):
 
         if color_value > 0:
             obj.moving_direction = (
                 "from_"
-                + self.video.line_of_interest_info.side_A_name
+                + self.stream.line_of_interest_info.side_A_name
                 + "_to_"
-                + self.video.line_of_interest_info.side_B_name
+                + self.stream.line_of_interest_info.side_B_name
             )
         else:
             obj.moving_direction = (
                 "from_"
-                + self.video.line_of_interest_info.side_B_name
+                + self.stream.line_of_interest_info.side_B_name
                 + "_to_"
-                + self.video.line_of_interest_info.side_A_name
+                + self.stream.line_of_interest_info.side_A_name
             )

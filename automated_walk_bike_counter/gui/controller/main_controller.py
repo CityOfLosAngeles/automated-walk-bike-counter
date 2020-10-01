@@ -13,7 +13,8 @@ from tkinter import BooleanVar, IntVar, filedialog, messagebox
 
 from ...core.configuration import config
 from ...core.tracking.object_tracker import ObjectTracker
-from ...model.video.video import OutputVideo, Video
+from ...model.video.video import OutputVideo, VideoFile
+from ..view.open_stream_dialog import OpenStreamDialog
 from ..widgets.aoi import AOIDialog, AONIDialog, LOIDialog
 from .base import BaseController
 
@@ -24,8 +25,8 @@ class MainController(BaseController):
         self.view_video_player_widget = None
         self.mask = []
         self.valid_selected_objects = []
-        self.video = None
-        self.output_video = OutputVideo(self.video)
+        self.stream = None
+        self.output_video = OutputVideo(self.stream)
         self.listener_object = None
         # Should be corrected....
         self.video_settings_pane = None
@@ -40,7 +41,7 @@ class MainController(BaseController):
     def open_file(self):
         file_name = filedialog.askopenfilename()
         if file_name:
-            self.video = Video(file_name)
+            self.stream = VideoFile(file_name)
             self.input_camera_type = "file"
             self.camera_id = 0
             # Uncheck the selected cameras in source menu
@@ -50,13 +51,12 @@ class MainController(BaseController):
             self.video_frame.set_progressbar_maximum()
 
     def update_video_canvas(self, filename, listener_object):
-
         self.stop_thread.set(False)
         self.listener_object = listener_object
         object_classes, color_table = self.get_selected_objects_list()
         self.tracker = ObjectTracker(self.mask)
-        if self.video:
-            self.tracker.video_filename = self.video.filename
+        # if self.video:
+        #     self.tracker.video_filename = self.video.filename
         self.tracker.valid_selected_objects = [
             "pedestrian" if item == "person" else item
             for item in object_classes
@@ -64,29 +64,29 @@ class MainController(BaseController):
         ]
         self.tracker.object_classes = object_classes
         self.tracker.color_table = color_table
-        self.tracker.video = self.video
+        self.tracker.stream = self.stream
         self.tracker.input_camera_type = self.input_camera_type
         self.tracker.camera_id = self.camera_id
         self.tracker.stop_thread = self.stop_thread
-        self.tracker.output_video = self.output_video
+        self.tracker.output_video = OutputVideo(self.stream)
         self.tracker.frame_listener = listener_object.handle_post_processed_frame
         self.tracker.track_objects(config)
 
     def add_new_aoi(self):
-        if self.video:
-            AOIDialog(self.view.parent, self.video.filename, self)
+        if self.stream:
+            AOIDialog(self.view.parent, self.stream.stream_source_path, self)
         else:
             messagebox.showwarning("Warning", "Please select a file!")
 
     def add_new_aoni(self):
         if self.video:
-            AONIDialog(self.view.parent, self.video.filename, self)
+            AONIDialog(self.view.parent, self.stream.stream_source_path, self)
         else:
             messagebox.showwarning("Warning", "Please select a file!")
 
     def add_new_loi(self):
-        if self.video:
-            LOIDialog(self.view.parent, self.video.filename, self)
+        if self.stream:
+            LOIDialog(self.view.parent, self.stream.stream_source_path, self)
         else:
             messagebox.showwarning("Warning", "Please select a file!")
 
@@ -112,5 +112,9 @@ class MainController(BaseController):
 
     def cancel_tracking_process(self):
         self.stop_thread.set(True)
+        self.stream.stop()
         if self.listener_object:
             self.listener_object.stop_threads()
+
+    def open_stream(self):
+        OpenStreamDialog(self.view.parent, self)

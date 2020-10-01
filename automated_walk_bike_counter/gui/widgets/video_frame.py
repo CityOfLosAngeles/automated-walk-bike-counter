@@ -142,4 +142,4 @@ class VideoFrame(Frame):
         self.cur_fr_number.set(0)
 
     def set_progressbar_maximum(self):
-        self.progressbar["maximum"] = self.controller.video.frame_count
+        self.progressbar["maximum"] = self.controller.stream.frame_count

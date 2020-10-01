@@ -83,8 +83,9 @@ class MainView(BaseView):
         self.parent.grid_columnconfigure(2, weight=0)
 
     def generate_button_click(self, event):
+
         if self.controller.input_camera_type == "file":
-            if not self.controller.video:
+            if not self.controller.stream:
                 messagebox.showwarning("Warning", "Please select a file!")
             else:
                 self.video_frame.initialize_canvas()

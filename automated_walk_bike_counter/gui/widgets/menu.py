@@ -29,7 +29,8 @@ class AppMenu(Menu):
         menubar.add_cascade(menu=menu_tools, label="Tools")
         menubar.add_cascade(menu=menu_source, label="Source")
 
-        menu_file.add_command(label="Open...", command=controller.open_file)
+        menu_file.add_command(label="Open File...", command=controller.open_file)
+        menu_file.add_command(label="Open Stream...", command=controller.open_stream)
         menu_file.add_separator()
         menu_file.add_command(label="Exit", command=parent.quit)
 

@@ -49,8 +49,8 @@ class AOIDialog(object):
         self.drawing = False
         self.points = []
         self.ori_points = []
-        self.video_width = self.controller.video.width
-        self.video_height = self.controller.video.height
+        self.video_width = self.controller.stream.width
+        self.video_height = self.controller.stream.height
         self.empty_image = Image.new("RGB", (self.video_width, self.video_height), 0)
         self.mask_image = self.get_empty_mask_image()
         self.btn_delete = None
@@ -316,10 +316,10 @@ class AONIDialog(AOIDialog):
         self.btn_save.config(text="Save AONI")
         self.btn_delete.config(text="Delete AONI")
 
-        if len(self.controller.video.area_of_not_interest_mask) == 0:
+        if len(self.controller.stream.area_of_not_interest_mask) == 0:
             self.mask_image = self.get_empty_mask_image()
         else:
-            self.mask_image = self.controller.video.area_of_not_interest_mask
+            self.mask_image = self.controller.stream.area_of_not_interest_mask
 
     def on_mouse_right_click(self, event):
         AOIDialog.on_mouse_right_click(self, event)
@@ -332,7 +332,7 @@ class AONIDialog(AOIDialog):
             )
             and len(self.points) > 2
         ):
-            self.controller.video.area_of_not_interest_mask = self.mask_image
+            self.controller.stream.area_of_not_interest_mask = self.mask_image
             self.close_window()
         else:
             self.top.messagebox.showwarning(
@@ -397,11 +397,13 @@ class LOIDialog(AOIDialog):
             Image.new("RGB", (self.video_frame_width, self.video_frame_height), 0)
         )
 
-        if self.controller.video.line_of_interest_info is None:
+        if self.controller.stream.line_of_interest_info is None:
             self.mask_image = self.get_empty_mask_image()
         else:
-            if len(self.controller.video.line_of_interest_info.preview_points) > 0:
-                self.points = self.controller.video.line_of_interest_info.preview_points
+            if len(self.controller.stream.line_of_interest_info.preview_points) > 0:
+                self.points = (
+                    self.controller.stream.line_of_interest_info.preview_points
+                )
                 self.draw_line_splited_areas(
                     self.points[0][0],
                     self.points[0][1],
@@ -409,12 +411,12 @@ class LOIDialog(AOIDialog):
                     self.points[1][1],
                 )
                 self.btn_delete.config(state=NORMAL)
-            if self.controller.video.line_of_interest_info is not None:
+            if self.controller.stream.line_of_interest_info is not None:
                 self.area1_name.set(
-                    self.controller.video.line_of_interest_info.side_A_name
+                    self.controller.stream.line_of_interest_info.side_A_name
                 )
                 self.area2_name.set(
-                    self.controller.video.line_of_interest_info.side_B_name
+                    self.controller.stream.line_of_interest_info.side_B_name
                 )
 
     def on_mouse_right_click(self, event):
@@ -564,7 +566,7 @@ class LOIDialog(AOIDialog):
                     line_of_interest_info.side_A_name = None
                     line_of_interest_info.side_B_name = None
 
-            self.controller.video.line_of_interest_info = line_of_interest_info
+            self.controller.stream.line_of_interest_info = line_of_interest_info
 
             self.close_window()
         else:
@@ -573,7 +575,7 @@ class LOIDialog(AOIDialog):
             )
 
     def delete_loi(self):
-        self.controller.video.line_of_interest_info = None
+        self.controller.stream.line_of_interest_info = None
         self.btn_delete.config(state=DISABLED)
         self.close_window()
 
