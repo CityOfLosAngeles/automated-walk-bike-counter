@@ -16,9 +16,8 @@ import re
 from time import time as timer
 from urllib.parse import urlparse
 
-import numpy as np
-
 import cv2
+import numpy as np
 import tensorflow as tf
 from munkres import Munkres
 

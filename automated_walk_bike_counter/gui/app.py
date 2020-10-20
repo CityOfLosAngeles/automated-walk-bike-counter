@@ -12,10 +12,9 @@
 import logging
 import tkinter as tk
 
+import cv2
 import numpy as np
 from PIL import Image
-
-import cv2
 
 from ..core.configuration import config
 from ..core.tracking.object_tracker import ObjectTracker
