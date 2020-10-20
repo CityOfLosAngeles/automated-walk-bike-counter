@@ -30,9 +30,10 @@ from tkinter import (
     messagebox,
 )
 
-import cv2
 import numpy as np
 from PIL import Image, ImageTk
+
+import cv2
 
 from ...model.video.LOI_info import LOIInfo
 

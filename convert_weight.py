@@ -13,7 +13,6 @@
 # https://itnext.io/implementing-yolo-v3-in-tensorflow-tf-slim-c3c55ff59dbe
 
 import tensorflow as tf
-
 from automated_walk_bike_counter.core.model import YoloV3
 from automated_walk_bike_counter.utils.misc_utils import load_weights, parse_anchors
 
