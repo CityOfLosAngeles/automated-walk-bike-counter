@@ -14,14 +14,23 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: Set up conda
+      uses: s-weigand/setup-conda@v1
     - name: Install dependencies
       run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        $CONDA/bin/conda env update --file environment.yml --name base
-    - name: Lint with flake8
+        conda env update --file environment.yml --name base
+        pip install .[develop]
+        conda list
+    - name: Smoke test application
+      run: automated-walk-bike-counter --help
+    - name: Run pre-commit hooks
+      uses: pre-commit/action@v2.0.0
+    - name: Test application
       run: |
-        $CONDA/bin/conda install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        $CONDA/bin/flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        $CONDA/bin/flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        set -euxo pipefail
+        source activate automated-walk-bike-counter
+        pip install .
+        automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True --periodic_counter_time 1 --input_type file --search_objects Person,Cyclist
+        diff ./ci/a-trip-down-market.csv ./ci/results-1.csv
+        automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True --periodic_counter_time 1 --input_type file --search_objects Person
+        diff ./ci/a-trip-down-market.csv ./ci/results-2.csv
