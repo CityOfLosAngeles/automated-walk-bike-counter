@@ -27,8 +27,6 @@ jobs:
         conda list
     - name: Smoke test application
       run: automated-walk-bike-counter --help
-    - name: Run pre-commit hooks
-      uses: pre-commit/action@v2.0.0
     - name: Test application
       run: |
         set -euxo pipefail
