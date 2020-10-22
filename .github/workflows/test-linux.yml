@@ -1,0 +1,36 @@
+name: Test on Linux
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+
+jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Set up conda
+      uses: s-weigand/setup-conda@v1
+    - name: Install dependencies
+      run: |
+        conda env update --file environment.yml --name base
+        pip install .
+        conda list
+    - name: Smoke test application
+      run: automated-walk-bike-counter --help
+    - name: Test application
+      run: |
+        set -euxo pipefail
+        automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True --periodic_counter_time 1 --input_type file --search_objects Person,Cyclist
+        diff ./ci/a-trip-down-market.csv ./ci/results-1.csv
+        automated-walk-bike-counter --cli True --file_name ./ci/a-trip-down-market.mp4 --save_periodic_counter True --periodic_counter_time 1 --input_type file --search_objects Person
+        diff ./ci/a-trip-down-market.csv ./ci/results-2.csv

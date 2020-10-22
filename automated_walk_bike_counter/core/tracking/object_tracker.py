@@ -354,7 +354,7 @@ class ObjectTracker:
                 basename = os.path.basename(path)
                 dirname = os.path.dirname(path)
                 target = fsspec.filesystem(scheme, **kwargs)
-                cache_dir = "/tmp/awbc/"
+                cache_dir = os.path.expanduser("~/.awbc")
                 fs = WholeFileCacheFileSystem(
                     fs=target, cache_storage=cache_dir, same_names=True,
                 )
