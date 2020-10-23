@@ -64,6 +64,7 @@ class ObjectTracker:
         self.background_frame = None
         self.periodic_counter_interval = 0
         self.valid_selected_objects = []
+        self.stream_periodic_timer = None
 
     def print_data_report_on_frame(self):
         if self.current_frame is not None:
@@ -218,6 +219,9 @@ class ObjectTracker:
             # only valid moving objects are added to available_objecs
             valid_moving_objects.append(obj)
 
+        last_frame_moving_objects_cost_matrix = sorted(
+            last_frame_moving_objects_cost_matrix, key=lambda x: min(x)
+        )
         return last_frame_moving_objects_cost_matrix, valid_moving_objects
 
     def update_skipped_frame(
@@ -260,11 +264,12 @@ class ObjectTracker:
             m = re.match(r"([^\.]*)(\..*)", file)
             vfname = m.group(1)
             vfname = m.string[: m.string.rfind(".")]
-            if config.save_periodic_counter:
-                self.object_counter.output_counter_file_name = vfname
-                self.object_counter.export_counter_initialization()
 
             assert os.path.isfile(file), "file {} does not exist".format(file)
+
+        if config.save_periodic_counter:
+            self.object_counter.output_counter_file_name = vfname
+            self.object_counter.export_counter_initialization()
 
         camera = cv2.VideoCapture(file)
 
@@ -294,23 +299,15 @@ class ObjectTracker:
                 outfile, fourcc, fps, (self.video_width, self.video_height)
             )
 
-        if config.save_periodic_counter and self.input_camera_type == "file":
+        if config.save_periodic_counter:
             # Count the number of the frames that should pass in order to compute
             # the time for exporting the counter
             # Since the periodic_counter_time is in minutes we use the following
             # formula to compute the intervals
             # input counter time in minutes * video frame per second * number of
             # seconds in each min
-            self.periodic_counter_interval = int(
-                # config.periodic_counter_time * self.video.fps * 60
-                config.periodic_counter_time
-                * self.stream.fps
-            )
-
-            # For testing purpose we can consider periodic_counter_time as seconds
-            # and use the following formula
-            # self.periodic_counter_interval =
-            #           config.periodic_counter_time * self.video.fps
+            self.periodic_counter_interval = self.stream.periodic_counter_interval
+            self.stream.counter_object = self.object_counter
 
         # if len(self.video.line_of_interest_mask) > 0:
 
@@ -381,9 +378,9 @@ class ObjectTracker:
 
                 self.current_frame_number += 1
 
-                # Check for the need to generate the value of counters periodically
+                # Check for the need to export the values of counters periodically
                 if self.periodic_counter_interval != 0:
-                    if self.current_frame_number % self.periodic_counter_interval == 0:
+                    if self.stream.is_export_time(self.current_frame_number):
                         self.object_counter.export_counter_threading()
 
                 elapsed = self.current_frame_number

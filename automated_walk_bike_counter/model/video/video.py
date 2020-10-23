@@ -9,11 +9,14 @@
 # Mohammad Vahedi
 # Haiyan Wang
 
+import datetime
 from abc import ABC, abstractmethod
 from queue import Queue
 from threading import Thread
 
 import cv2
+
+from ...core.configuration import config
 
 
 class Stream(ABC):
@@ -29,6 +32,8 @@ class Stream(ABC):
         # self.line_of_interest_points = []
         # self.line_of_interest_mask_resized = []
         self.line_of_interest_info = None
+        self.periodic_counter_interval = 0
+        self.counter_object = None
 
     def initialize_camera(self):
         self.camera = cv2.VideoCapture(self.stream_source_path)
@@ -45,12 +50,24 @@ class Stream(ABC):
     def stop(self):
         raise NotImplementedError
 
+    @abstractmethod
+    def is_export_time(self):
+        raise NotImplementedError
+
 
 class VideoFile(Stream):
     def __init__(self, filename):
         super().__init__(filename)
         self.frame_count = int(self.camera.get(cv2.CAP_PROP_FRAME_COUNT))
         self.stopped = False
+        if config.save_periodic_counter:
+            self.periodic_counter_interval = int(
+                config.periodic_counter_time
+                * self.fps
+                * 60
+                # config.periodic_counter_time
+                # * self.fps
+            )
 
     def read(self):
         (grabbed, frame) = self.camera.read()
@@ -70,6 +87,13 @@ class VideoFile(Stream):
         self.camera.release()
         self.initialize_camera()
 
+    def is_export_time(self, frame_number):
+        if self.periodic_counter_interval != 0:
+            if frame_number % self.periodic_counter_interval == 0:
+                return True
+
+        return False
+
 
 class VideoStream(Stream):
     def __init__(self, stream_url):
@@ -77,7 +101,10 @@ class VideoStream(Stream):
         self.frame_count = 1000000
         self.stopped = False
         self.queue = Queue()
+        if config.save_periodic_counter:
+            self.periodic_counter_interval = config.periodic_counter_time * 60
         self.start()
+        self.last_export_date = ""
 
     def start(self):
 
@@ -115,6 +142,20 @@ class VideoStream(Stream):
 
     def stop(self):
         self.stopped = True
+
+    def is_export_time(self, frame_number):
+        if self.last_export_date == "":
+            self.last_export_date = datetime.datetime.now()
+        else:
+            cur_date = datetime.datetime.now()
+
+            time_dif = cur_date - self.last_export_date
+
+            if time_dif.seconds >= self.periodic_counter_interval:
+                self.last_export_date = datetime.datetime.now()
+                return True
+
+        return False
 
 
 class OutputVideo:
